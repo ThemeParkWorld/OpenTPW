@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECSEngine", "..\..\..\sourc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTPW.Files", "OpenTPW.Files\OpenTPW.Files.csproj", "{90D07478-E369-4F36-B220-5D6A59C24BFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTPW.RSSEQ", "OpenTPW.RSSEQ\OpenTPW.RSSEQ.csproj", "{18B8115E-15D3-4309-BE4F-D633E88E1B30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{90D07478-E369-4F36-B220-5D6A59C24BFA}.Release|x64.Build.0 = Release|Any CPU
 		{90D07478-E369-4F36-B220-5D6A59C24BFA}.Release|x86.ActiveCfg = Release|Any CPU
 		{90D07478-E369-4F36-B220-5D6A59C24BFA}.Release|x86.Build.0 = Release|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Debug|x64.Build.0 = Debug|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Debug|x86.Build.0 = Debug|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Release|x64.ActiveCfg = Release|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Release|x64.Build.0 = Release|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Release|x86.ActiveCfg = Release|Any CPU
+		{18B8115E-15D3-4309-BE4F-D633E88E1B30}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

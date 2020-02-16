@@ -10,7 +10,6 @@ namespace OpenTPW.Files.FileFormats
     public class BFMUReader : IAssetReader
     {
         private List<char> _characters = new List<char>();
-
         public List<string> extensions => new List<string>() { ".dat" };
 
         public char GetChar(byte b)

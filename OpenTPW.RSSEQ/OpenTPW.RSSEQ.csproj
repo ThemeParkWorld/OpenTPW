@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{90D07478-E369-4F36-B220-5D6A59C24BFA}</ProjectGuid>
+    <ProjectGuid>{18B8115E-15D3-4309-BE4F-D633E88E1B30}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpenTPW.Files</RootNamespace>
-    <AssemblyName>OpenTPW.Files</AssemblyName>
+    <RootNamespace>OpenTPW.RSSEQ</RootNamespace>
+    <AssemblyName>OpenTPW.RSSEQ</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,15 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenGL.Net">
-      <HintPath>..\..\OpenGL.Net\OpenGL.Net.CoreUI\bin\net461\Release\OpenGL.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net.CoreUI">
-      <HintPath>..\..\OpenGL.Net\OpenGL.Net.CoreUI\bin\net461\Release\OpenGL.Net.CoreUI.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net.Math">
-      <HintPath>..\..\..\..\source\repos\ECSEngine\packages\OpenGL.Net.Math.0.8.4\lib\net461\OpenGL.Net.Math.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,22 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileFormats\BFMUReader.cs" />
-    <Compile Include="FileFormats\BFSTReader.cs" />
-    <Compile Include="FileFormats\BFWDReader.cs" />
-    <Compile Include="FileFormats\ByteExtension.cs" />
-    <Compile Include="FileFormats\IAssetReader.cs" />
-    <Compile Include="FileFormats\MD2Reader.cs" />
-    <Compile Include="FileFormats\SDTReader.cs" />
-    <Compile Include="FileFormats\TGAReader.cs" />
-    <Compile Include="FileFormats\WCTReader.cs" />
+    <Compile Include="ScriptDefs\Events.cs" />
+    <Compile Include="ScriptDefs\Particles.cs" />
+    <Compile Include="ScriptDefs\ScriptDefs.cs" />
+    <Compile Include="VM.cs" />
+    <Compile Include="Instruction.cs" />
+    <Compile Include="Opcode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\ECSEngine\ECSEngine\ECSEngine.csproj">
-      <Project>{7F629AE2-DD5D-4052-AF98-3FD15257C2AE}</Project>
-      <Name>ECSEngine</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

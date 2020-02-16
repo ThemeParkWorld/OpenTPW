@@ -14,7 +14,7 @@ namespace OpenTPW.Files.FileFormats
             // I'm really lazy, and this is really basic.
             // This only supports like, a quarter of the available TGA features,
             // however TPW doesnt't actually use any other features.
-            List<ColorRGB24> colorData = new List<ColorRGB24>();
+            List<ColorRGBA32> colorData = new List<ColorRGBA32>();
             int width, height;
             StreamReader streamReader = new StreamReader(path);
             BinaryReader binaryReader = new BinaryReader(streamReader.BaseStream);
@@ -45,27 +45,27 @@ namespace OpenTPW.Files.FileFormats
                             // ARRRRRGG GGGBBBBB - but its big endian, so in reality its GGGBBBBB ARRRRRGG
                             var byte0 = binaryReader.ReadByte();
                             var byte1 = binaryReader.ReadByte();
-                            colorData.Add(new ColorRGB24(byte0, byte1, 255));
+                            colorData.Add(new ColorRGBA32(byte0, byte1, 255, 255));
                         }
                         break;
                     case 24:
                         {
-                            // 1 byte of each R, G, B.
+                            // 1 byte of each B, G, R (no alpha)
                             var byte0 = binaryReader.ReadByte();
                             var byte1 = binaryReader.ReadByte();
                             var byte2 = binaryReader.ReadByte();
-                            colorData.Add(new ColorRGB24(byte0, byte1, byte2));
+                            colorData.Add(new ColorRGBA32(byte2, byte1, byte0, 255));
                         }
                         break;
                     case 32:
                         {
-                            // 1 byte of each A, R, G, B.
+                            // 1 byte of each B, G, R, A
                             var byte0 = binaryReader.ReadByte();
                             var byte1 = binaryReader.ReadByte();
                             var byte2 = binaryReader.ReadByte();
                             var byte3 = binaryReader.ReadByte();
                             // TODO: handle transparency
-                            colorData.Add(new ColorRGB24(byte3, byte2, byte1));
+                            colorData.Add(new ColorRGBA32(byte3, byte2, byte1, byte0));
                         }
                         break;
                     default:

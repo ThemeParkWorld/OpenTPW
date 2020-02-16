@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+// TODO: clean up, this file is the biggest mess
 namespace OpenTPW.Files.FileFormats
 {
     /*
