@@ -4,6 +4,7 @@
 
 namespace OpenTPW.RSSEQ
 {
+    // From par_lib.h
     enum Particles
     {
         P_EFFECT_NULL = 0,

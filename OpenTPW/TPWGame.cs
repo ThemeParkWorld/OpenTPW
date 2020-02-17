@@ -18,7 +18,7 @@ namespace OpenTPW
             var entities = new List<IEntity>
             {
                 new ImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2(0, 0), new Vector2(1280, 720)),
-                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/features/camera.wad")
+                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/bouncy.wad")
             };
 
             foreach (IEntity entity in entities)

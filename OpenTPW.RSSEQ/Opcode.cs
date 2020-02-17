@@ -86,6 +86,11 @@ namespace OpenTPW.RSSEQ
         REPAIREFFECT = 93,
         SETTIMER = 95,
         GETTIMER = 96,
+        /* SPECULATION */
+        YEAR = 97,
+        MONTH = 98,
+        DAY = 99,
+        /* end speculation */
         HOUR = 100,
         MIN = 101,
         SEC = 102,

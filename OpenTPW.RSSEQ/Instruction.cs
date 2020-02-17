@@ -35,7 +35,7 @@ namespace OpenTPW.RSSEQ
                 if (opcodeName.Length < 8)
                     padding += "\t";
 
-                return $"{(Opcode)opcode} {operandString}";
+                return $"{(Opcode)opcode}{padding}{operandString}";
             }
             else
             {

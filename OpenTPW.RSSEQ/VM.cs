@@ -11,7 +11,7 @@ namespace OpenTPW.RSSEQ
         private int stackSize, limboSize, bounceSize, walkSize, timeSlice;
         private List<int> branches = new List<int>();
         private List<string> strings = new List<string>();
-        private List<string> variables;
+        private List<string> variables = new List<string>();
         private List<Instruction> instructions = new List<Instruction>();
 
         public VM(byte[] rseData)
@@ -73,14 +73,33 @@ namespace OpenTPW.RSSEQ
             // Read string table
             long instructionOffset = binaryReader.BaseStream.Position;
 
-            // FF to string table
+            // Forward to string table
             binaryReader.BaseStream.Seek((expectedInstructions - 1) * 4, SeekOrigin.Current); // -1 offset is due to "NOP" instruction being ignored
+            // First entry will be the strings used within the application
+            int stringEntryLength = binaryReader.ReadInt32();
+            long stringEntryPos = binaryReader.BaseStream.Position;
+            string currentString = "";
+
+            while (binaryReader.BaseStream.Position - stringEntryPos < stringEntryLength)
+            {
+                char currentChar = binaryReader.ReadChar();
+                if (currentChar == '\0')
+                {
+                    strings.Add(currentString);
+                    currentString = "";
+                }
+                else
+                {
+                    currentString += currentChar;
+                }
+            }
+
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
             {
-                // Read string
-                int stringLength = binaryReader.ReadInt32();
-                char[] stringChars = binaryReader.ReadChars(stringLength);
-                strings.Add(new string(stringChars));
+                // Read remaining variables
+                int variableNameLength = binaryReader.ReadInt32();
+                char[] stringChars = binaryReader.ReadChars(variableNameLength);
+                variables.Add(new string(stringChars));
             }
 
             // Go back to instructions
@@ -119,8 +138,8 @@ namespace OpenTPW.RSSEQ
                         break;
                     case 0x40:
                         // Variable
-                        // currentOperands.Add(variables[truncValue]);
-                        currentOperands.Add($"VAR_{truncValue}");
+                        // currentOperands.Add($"VAR_{truncValue}");
+                        currentOperands.Add(variables[truncValue]);
                         break;
                     case 0x00:
                         // Literal
