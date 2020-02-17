@@ -1,5 +1,4 @@
-﻿using ECSEngine;
-using ECSEngine.Components;
+﻿using ECSEngine.Components;
 using ECSEngine.Entities;
 using ECSEngine.MathUtils;
 using ECSEngine.Render;
@@ -27,7 +26,7 @@ namespace OpenTPW.Entities.UI
             material.diffuseTexture = texture;
 
             // Add components
-            AddComponent(new ShaderComponent(new Shader("Content/2D/main.frag", OpenGL.ShaderType.FragmentShader), 
+            AddComponent(new ShaderComponent(new Shader("Content/2D/main.frag", OpenGL.ShaderType.FragmentShader),
                 new Shader("Content/2D/main.vert", OpenGL.ShaderType.VertexShader)));
             AddComponent(new TransformComponent(new Vector3(0, 0, -0.1f), Quaternion.FromEulerAngles(new Vector3(90f, 0, 0)), new Vector3(1, 1, 1)));
             AddComponent(new MaterialComponent(material));

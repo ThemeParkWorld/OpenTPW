@@ -8,7 +8,12 @@ namespace OpenTPW.Components
         private VM vm; // probably shouldn't create a new VM instance for every ride
         public RSSEQComponent(string pathToRSE)
         {
+            vm = new VM(pathToRSE);
+        }
 
+        public RSSEQComponent(byte[] rseData)
+        {
+            vm = new VM(rseData);
         }
     }
 }

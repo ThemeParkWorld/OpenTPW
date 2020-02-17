@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenGL.Net">
@@ -52,7 +54,19 @@
   <ItemGroup>
     <Compile Include="FileFormats\BFMUReader.cs" />
     <Compile Include="FileFormats\BFSTReader.cs" />
-    <Compile Include="FileFormats\BFWDReader.cs" />
+    <Compile Include="FileFormats\BFWD\ArchiveFile.cs" />
+    <Compile Include="FileFormats\BFWD\ArchiveMemoryStream.cs" />
+    <Compile Include="FileFormats\BFWD\BFWDArchive.cs" />
+    <Compile Include="FileFormats\BFWD\Extensions.cs" />
+    <Compile Include="FileFormats\BFWD\FKNLArchive.cs" />
+    <Compile Include="FileFormats\BFWD\IArchive.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\FourByteCommand.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\IRefpackCommand.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\OneByteCommand.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\RefpackUtils.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\StopCommand.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\ThreeByteCommand.cs" />
+    <Compile Include="FileFormats\BFWD\Refpack\TwoByteCommand.cs" />
     <Compile Include="FileFormats\ByteExtension.cs" />
     <Compile Include="FileFormats\IAssetReader.cs" />
     <Compile Include="FileFormats\MD2Reader.cs" />
@@ -67,5 +81,6 @@
       <Name>ECSEngine</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

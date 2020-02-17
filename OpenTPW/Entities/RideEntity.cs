@@ -1,16 +1,21 @@
-﻿using System.IO;
-using ECSEngine.Entities;
+﻿using ECSEngine.Entities;
 using OpenTPW.Components;
+using OpenTPW.Files.BFWD;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace OpenTPW.Entities
 {
     public sealed class RideEntity : Entity<RideEntity>
     {
         private string rideName;
-        public RideEntity(string rideFolderPath)
+        public RideEntity(string rideArchivePath)
         {
-            rideName = Path.GetDirectoryName(rideFolderPath);
-            AddComponent(new RSSEQComponent($"{rideFolderPath}/{rideName}.RSE"));
+            rideName = Path.GetFileNameWithoutExtension(rideArchivePath);
+            var rideArchive = new BFWDArchive(rideArchivePath);
+            var rseFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
+            AddComponent(new RSSEQComponent(rseFile.data));
         }
     }
 }

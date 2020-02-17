@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTPW.Files.BFWD;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,15 +27,15 @@ namespace OpenTPW.Files.FileFormats
             }
             else
             {
-                foreach (BFWDFile bfwdFile in fileMatches)
+                foreach (ArchiveFile archiveFile in fileMatches)
                 {
-                    LoadAsset(bfwdFile);
+                    LoadAsset(archiveFile);
                     break; // Only load 1st file; ignore rest
                 }
             }
         }
 
-        public void LoadAsset(BFWDFile file)
+        public void LoadAsset(ArchiveFile file)
         {
             LoadAsset(file.data);
         }
@@ -89,12 +90,12 @@ namespace OpenTPW.Files.FileFormats
             throw new NotImplementedException();
         }
 
-        public bool ReaderIsCompatible(BFWDFile file)
+        public bool ReaderIsCompatible(ArchiveFile file)
         {
             throw new NotImplementedException();
         }
 
-        public bool ReaderIsCompatible(BFWDFile archive, string file)
+        public bool ReaderIsCompatible(ArchiveFile archive, string file)
         {
             throw new NotImplementedException();
         }
