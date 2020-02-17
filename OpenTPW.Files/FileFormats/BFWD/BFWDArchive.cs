@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace OpenTPW.Files.BFWD
+namespace OpenTPW.Files.FileFormats.BFWD
 {
     /*
      * Special thanks to Fatbag: http://wiki.niotso.org/RefPack, 
@@ -11,8 +11,8 @@ namespace OpenTPW.Files.BFWD
      */
     public class BFWDArchive : IArchive
     {
-        private BFWDMemoryStream _memoryStream;
-        private int _version;
+        private BFWDMemoryStream memoryStream;
+        private int version;
         public byte[] buffer { get; internal set; }
         public List<ArchiveFile> files { get; internal set; }
 
@@ -23,12 +23,12 @@ namespace OpenTPW.Files.BFWD
 
         public void Dispose()
         {
-            _memoryStream.Dispose();
+            memoryStream.Dispose();
         }
 
-        private void _ReadArchive()
+        private void ReadArchive()
         {
-            _memoryStream.Seek(0, SeekOrigin.Begin);
+            memoryStream.Seek(0, SeekOrigin.Begin);
             /* Header:
              * 4 - magic number ('DWFB')
              * 4 - version
@@ -39,17 +39,17 @@ namespace OpenTPW.Files.BFWD
              * 4 - null
              */
 
-            var magicNumber = _memoryStream.ReadString(4);
+            var magicNumber = memoryStream.ReadString(4);
             if (magicNumber != "DWFB")
                 throw new Exception($"Magic number did not match: {magicNumber}");
-            _version = _memoryStream.ReadInt32();
-            _memoryStream.Seek(64, SeekOrigin.Current); // Skip padding
-            var fileCount = _memoryStream.ReadInt32();
+            version = memoryStream.ReadInt32();
+            memoryStream.Seek(64, SeekOrigin.Current); // Skip padding
+            var fileCount = memoryStream.ReadInt32();
 
-            var fileDirectoryOffset = _memoryStream.ReadInt32();
-            var fileDirectoryLength = _memoryStream.ReadInt32();
+            var fileDirectoryOffset = memoryStream.ReadInt32();
+            var fileDirectoryLength = memoryStream.ReadInt32();
 
-            _memoryStream.Seek(4, SeekOrigin.Current); // Skip 'null'
+            memoryStream.Seek(4, SeekOrigin.Current); // Skip 'null'
 
             // Details directory
             // See DWFBFile for more info
@@ -57,31 +57,31 @@ namespace OpenTPW.Files.BFWD
             {
                 GC.Collect();
                 // Save the current position so that we can go back to it later
-                var initialPos = _memoryStream.Position;
+                var initialPos = memoryStream.Position;
 
                 ArchiveFile newFile = new ArchiveFile();
-                _memoryStream.Seek(4, SeekOrigin.Current); // Skip 'null'
-                var filenameOffset = _memoryStream.ReadUInt32();
-                var filenameLength = _memoryStream.ReadUInt32();
-                var dataOffset = _memoryStream.ReadUInt32();
-                var dataLength = _memoryStream.ReadUInt32();
+                memoryStream.Seek(4, SeekOrigin.Current); // Skip 'null'
+                var filenameOffset = memoryStream.ReadUInt32();
+                var filenameLength = memoryStream.ReadUInt32();
+                var dataOffset = memoryStream.ReadUInt32();
+                var dataLength = memoryStream.ReadUInt32();
 
-                newFile.compressed = _memoryStream.ReadUInt32() == 4;
-                newFile.decompressedSize = _memoryStream.ReadUInt32();
+                newFile.compressed = memoryStream.ReadUInt32() == 4;
+                newFile.decompressedSize = memoryStream.ReadUInt32();
 
                 // Set file's name name
-                _memoryStream.Seek(filenameOffset, SeekOrigin.Begin);
-                newFile.name = _memoryStream.ReadString((int)filenameLength);
+                memoryStream.Seek(filenameOffset, SeekOrigin.Begin);
+                newFile.name = memoryStream.ReadString((int)filenameLength);
 
                 // Get file's raw data
-                _memoryStream.Seek(dataOffset, SeekOrigin.Begin);
-                newFile.data = _memoryStream.ReadBytes((int)dataLength);
+                memoryStream.Seek(dataOffset, SeekOrigin.Begin);
+                newFile.data = memoryStream.ReadBytes((int)dataLength);
 
                 newFile.archiveOffset = (int)dataOffset;
                 newFile.parentArchive = this;
 
                 files.Add(newFile);
-                _memoryStream.Seek(initialPos + 40, SeekOrigin.Begin); // Return to initial position, skip to the next file's data
+                memoryStream.Seek(initialPos + 40, SeekOrigin.Begin); // Return to initial position, skip to the next file's data
             }
         }
 
@@ -94,10 +94,10 @@ namespace OpenTPW.Files.BFWD
             tempStreamReader.BaseStream.Read(buffer, 0, fileLength);
             tempStreamReader.Close();
 
-            _memoryStream = new BFWDMemoryStream(buffer);
+            memoryStream = new BFWDMemoryStream(buffer);
             files = new List<ArchiveFile>();
 
-            _ReadArchive();
+            ReadArchive();
         }
     }
 }

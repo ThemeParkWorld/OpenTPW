@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OpenTPW.Files.BFWD.Refpack
+namespace OpenTPW.Files.FileFormats.BFWD.Refpack
 {
     public interface IRefpackCommand
     {

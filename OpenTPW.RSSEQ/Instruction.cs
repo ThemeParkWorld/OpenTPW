@@ -4,10 +4,10 @@ namespace OpenTPW.RSSEQ
 {
     public struct Instruction
     {
-        public readonly int[] operands;
+        public readonly string[] operands;
         public readonly int opcode;
 
-        public Instruction(int opcode, int[] operands)
+        public Instruction(int opcode, string[] operands)
         {
             this.operands = operands;
             this.opcode = opcode;
@@ -35,11 +35,11 @@ namespace OpenTPW.RSSEQ
                 if (opcodeName.Length < 8)
                     padding += "\t";
 
-                return $"{(Opcode)opcode} ({opcode}): {operandString}";
+                return $"{(Opcode)opcode} {operandString}";
             }
             else
             {
-                return $"Unknown - {opcode}: {operandString}";
+                return $"Unknown opcode {opcode}: {operandString}";
             }
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace OpenTPW.Files.BFWD
+namespace OpenTPW.Files.FileFormats.BFWD
 {
     // TODO: This is incredibly incomplete and does not work.
     // Also, is there actually any need for it?

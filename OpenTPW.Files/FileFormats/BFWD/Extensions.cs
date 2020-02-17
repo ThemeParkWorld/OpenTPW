@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenTPW.Files.BFWD
+namespace OpenTPW.Files.FileFormats.BFWD
 {
     public static class ByteExtension
     {

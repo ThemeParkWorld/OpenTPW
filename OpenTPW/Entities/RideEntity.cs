@@ -1,9 +1,9 @@
 ﻿using ECSEngine.Entities;
 using OpenTPW.Components;
-using OpenTPW.Files.BFWD;
 using System;
 using System.IO;
 using System.Linq;
+using OpenTPW.Files.FileFormats.BFWD;
 
 namespace OpenTPW.Entities
 {

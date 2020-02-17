@@ -1,11 +1,11 @@
-﻿using OpenTPW.Files.BFWD.Refpack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using OpenTPW.Files.FileFormats.BFWD.Refpack;
 
-namespace OpenTPW.Files.BFWD
+namespace OpenTPW.Files.FileFormats.BFWD
 {
     public class ArchiveFile
     {

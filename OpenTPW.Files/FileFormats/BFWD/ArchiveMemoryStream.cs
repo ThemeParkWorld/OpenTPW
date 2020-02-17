@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace OpenTPW.Files.BFWD
+namespace OpenTPW.Files.FileFormats.BFWD
 {
     public class BFWDMemoryStream : MemoryStream
     {
