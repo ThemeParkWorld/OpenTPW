@@ -2,6 +2,10 @@
 
 OpenTPW is a re-implementation of [Sim Theme Park / Theme Park World](https://en.wikipedia.org/wiki/Theme_Park_World), requiring an installation the original game and its assets in order to run. OpenTPW aims to re-create the same experience as the original game. While OpenTPW was initially created as it is quite difficult to get Sim Theme Park to run on modern hardware and on a modern operating system, it also aims to somewhat re-introduce the original online aspect of the game - the servers of which have since been shut down.
 
+## File Formats
+
+File format information is available within this repo's [wiki](https://github.com/xezno/OpenTPW/wiki).  Keep in mind that this information is a work-in-progress, and therefore might not be of incredible detail - however, it still aims to be as useful, detailed, and as in-depth as possible when complete.
+
 ## Requirements
 
 ### Running
