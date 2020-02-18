@@ -8,11 +8,13 @@ namespace OpenTPW.RSSEQ
 {
     public class VM
     {
-        private int stackSize, limboSize, bounceSize, walkSize, timeSlice;
+        public int stackSize, limboSize, bounceSize, walkSize, timeSlice;
         private List<int> branches = new List<int>();
         private List<string> strings = new List<string>();
         private List<string> variables = new List<string>();
         private List<Instruction> instructions = new List<Instruction>();
+
+        public string disassembly = "";
 
         public VM(byte[] rseData)
         {
@@ -34,6 +36,8 @@ namespace OpenTPW.RSSEQ
         {
             ReadFileHeader(binaryReader);
             ReadFileBody(binaryReader);
+            WriteDisassembly();
+
             LogDisassembly();
         }
 
@@ -99,7 +103,7 @@ namespace OpenTPW.RSSEQ
                 // Read remaining variables
                 int variableNameLength = binaryReader.ReadInt32();
                 char[] stringChars = binaryReader.ReadChars(variableNameLength);
-                variables.Add(new string(stringChars));
+                variables.Add(new string(stringChars).Replace("\0", ""));
             }
 
             // Go back to instructions
@@ -149,19 +153,23 @@ namespace OpenTPW.RSSEQ
             }
         }
 
-        private void LogDisassembly()
+        private void WriteDisassembly()
         {
             int currentCount = 1;
             for (int i = 0; i < instructions.Count; ++i)
             {
                 if (branches.Contains(currentCount - 1))
                 {
-                    Debug.Log($".branch_{currentCount - 1}");
+                    disassembly += $".branch_{currentCount - 1}\n";
                 }
-                Debug.Log($"\t{instructions[i].ToString()}");
-                Console.ForegroundColor = ConsoleColor.Gray;
+                disassembly += $"\t{instructions[i].ToString()}\n";
                 currentCount += instructions[i].GetCount();
             }
+        }
+
+        private void LogDisassembly()
+        {
+            Debug.Log(disassembly);
         }
     }
 }
