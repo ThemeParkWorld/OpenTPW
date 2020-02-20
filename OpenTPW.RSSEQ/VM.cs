@@ -1,5 +1,4 @@
 ﻿using ECSEngine;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,8 +36,6 @@ namespace OpenTPW.RSSEQ
             ReadFileHeader(binaryReader);
             ReadFileBody(binaryReader);
             WriteDisassembly();
-
-            LogDisassembly();
         }
 
         private void ReadFileHeader(BinaryReader binaryReader)
@@ -165,11 +162,6 @@ namespace OpenTPW.RSSEQ
                 disassembly += $"\t{instructions[i].ToString()}\n";
                 currentCount += instructions[i].GetCount();
             }
-        }
-
-        private void LogDisassembly()
-        {
-            Debug.Log(disassembly);
         }
     }
 }

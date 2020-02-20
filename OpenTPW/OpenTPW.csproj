@@ -122,7 +122,8 @@
   <ItemGroup>
     <Compile Include="Components\RSSEQComponent.cs" />
     <Compile Include="Entities\RideEntity.cs" />
-    <Compile Include="Entities\UI\ImageEntity.cs" />
+    <Compile Include="Entities\UI\BaseImageEntity.cs" />
+    <Compile Include="Entities\UI\TGAImageEntity.cs" />
     <Compile Include="GameSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -157,7 +158,9 @@
       <Name>OpenTPW.RSSEQ</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="Entities\UI\WCTImageEntity.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy $(SolutionDir)Content $(TargetDir)Content /E /H /K /I /Y /s</PreBuildEvent>

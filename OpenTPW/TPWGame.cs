@@ -14,10 +14,12 @@ namespace OpenTPW
 
         protected override void InitScene()
         {
+            // TODO: Set up an archive opening system instead of doing it per-entity
             base.InitScene();
             var entities = new List<IEntity>
             {
-                new ImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2(0, 0), new Vector2(1280, 720)),
+                new WCTImageEntity($"{GameSettings.Default.gameDir}/data/ui.wad", $"tpw_logo.wct", new Vector2(0, 0), new Vector2(1280, 720)),
+                new TGAImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2(0, 0), new Vector2(1280, 720)),
                 new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/bouncy.wad")
             };
 

@@ -2,28 +2,23 @@
 using ECSEngine.Entities;
 using ECSEngine.MathUtils;
 using ECSEngine.Render;
-using OpenTPW.Files.FileFormats;
 
 namespace OpenTPW.Entities.UI
 {
-    public sealed class ImageEntity : Entity<ImageEntity>
+    public class BaseImageEntity : Entity<BaseImageEntity>
     {
-        private Material material;
+        protected Material material;
 
-        private Mesh imageMesh;
-        private Texture2D texture;
+        protected Mesh imageMesh;
+        protected Texture2D texture;
 
-        private Vector2 position;
-        private Vector2 scale;
+        protected Vector2 position;
+        protected Vector2 scale;
 
-        public ImageEntity(string path, Vector2 position, Vector2 scale)
+        public BaseImageEntity(Vector2 position, Vector2 scale)
         {
-            // Load image
-            texture = TGAReader.LoadAsset(path);
-
             // Setup material
             material = new Material("Content/plane.mtl");
-            material.diffuseTexture = texture;
 
             // Add components
             AddComponent(new ShaderComponent(new Shader("Content/2D/main.frag", OpenGL.ShaderType.FragmentShader),

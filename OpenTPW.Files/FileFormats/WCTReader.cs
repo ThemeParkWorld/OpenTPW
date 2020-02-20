@@ -4,8 +4,9 @@ using OpenGL;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
+using Ionic.Zlib;
+using CompressionMode = System.IO.Compression.CompressionMode;
 
 namespace OpenTPW.Files.FileFormats
 {
@@ -24,7 +25,7 @@ namespace OpenTPW.Files.FileFormats
     // world compressed texture
     public static class WCTReader
     {
-        public static Texture2D LoadAsset(string path)
+        private static Texture2D ReadFile(byte[] fileData)
         {
             // WCT File header - little endian
             // Version? (1 byte) - usually 0x12 or 0x13, links with BILZ/ZLIB
@@ -46,8 +47,8 @@ namespace OpenTPW.Files.FileFormats
             // Magic number? (4 bytes) - Always "BILZ" - zlib maybe?
             // 28 more bytes of "???"
             int width, height, file1Len, file2Len;
-            StreamReader streamReader = new StreamReader(path);
-            BinaryReader binaryReader = new BinaryReader(streamReader.BaseStream);
+            using MemoryStream dataMemoryStream = new MemoryStream(fileData);
+            using BinaryReader binaryReader = new BinaryReader(dataMemoryStream);
             int versionMajor = binaryReader.ReadByte();
             int versionMinor = binaryReader.ReadByte();
             int bpp = binaryReader.ReadByte();
@@ -62,137 +63,87 @@ namespace OpenTPW.Files.FileFormats
             binaryReader.BaseStream.Seek(4, SeekOrigin.Current);
 
             bool zlibFile = Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) == "BILZ";
-            List<byte> decompressedData = new List<byte>();
-            List<byte> decompressedDataFile2 = new List<byte>();
+            var decmpMemoryStream = new MemoryStream();
+            var decmpMemoryStreamFile2 = new MemoryStream();
             if (zlibFile)
             {
+                // 4 bytes - decompressed size
+                // 4 bytes - compressed size
+                // rest unknown
+
                 binaryReader.BaseStream.Seek(24, SeekOrigin.Current);
-                // epic zlib time
-                // first byte is CMF - compression method and flags.
-                // if the compression method is 8, then DEFLATE is being used.
-                // if the compression method is 15, then the reserved method is being used.
 
-                // if we're using DEFLATE:
-                //      compression info becomes the base-2 logarithm of the deflate window size minus eight
+                // File 1
+                var cmpMemoryStream = new MemoryStream();
+                cmpMemoryStream.Write(binaryReader.ReadBytes(file1Len - 28), 0, file1Len - 28);
+                cmpMemoryStream.Seek(0, SeekOrigin.Begin);
 
-                byte cmf = binaryReader.ReadByte();
-                int compressionMethod = cmf.GetHighNibble();
-                int compressionInfo = cmf.GetLowNibble();
+                using (ZlibStream decompressionStream = new ZlibStream(cmpMemoryStream, Ionic.Zlib.CompressionMode.Decompress, true))
+                    decompressionStream.CopyTo(decmpMemoryStream);
 
-                int deflateWindowSize = (int)Math.Pow(2, 8 + compressionInfo); // (we reverse the base-2 log - 8)
+                // Dump file 1
+                decmpMemoryStream.Seek(0, SeekOrigin.Begin);
+                if (File.Exists("file1Dump"))
+                    File.Delete("file1Dump");
+                byte[] file1Contents = new byte[decmpMemoryStream.Length];
+                decmpMemoryStream.Read(file1Contents, 0, (int)decmpMemoryStream.Length);
+                using (var fileStream = new FileStream("file1Dump", FileMode.OpenOrCreate))
+                    fileStream.Write(file1Contents, 0, file1Contents.Length);
 
-                // second byte is the flags:
-                // 
+                // Fast-forward to file 2 content
+                binaryReader.BaseStream.Seek(28, SeekOrigin.Current);
 
-                byte flg = binaryReader.ReadByte();
-                int fcheck = flg.GetBitsAsInt(0, 4);
+                // File 2
+                var cmpMemoryStreamFile2 = new MemoryStream();
+                cmpMemoryStreamFile2.Write(binaryReader.ReadBytes(file2Len - 28), 0, file2Len - 28);
+                cmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
 
-                if ((256 * (flg + (cmf << 8))) % 31 != 0) // checksum style thing
-                    throw new Exception("FCHECK was set incorrectly");
+                using (ZlibStream decompressionStream = new ZlibStream(cmpMemoryStreamFile2, Ionic.Zlib.CompressionMode.Decompress, true))
+                    decompressionStream.CopyTo(decmpMemoryStreamFile2);
 
-                bool fdict = flg.GetBit(5);
-                int flevel = flg.GetBitsAsInt(6, 2);
+                // Dump file 2
+                decmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
+                if (File.Exists("file2Dump"))
+                    File.Delete("file2Dump");
+                byte[] file2Contents = new byte[decmpMemoryStreamFile2.Length];
+                decmpMemoryStreamFile2.Read(file2Contents, 0, (int)decmpMemoryStreamFile2.Length);
+                using (var fileStream = new FileStream("file2Dump", FileMode.OpenOrCreate))
+                    fileStream.Write(file2Contents, 0, file2Contents.Length);
 
-                if (fdict)
-                {
-                    byte[] dict = binaryReader.ReadBytes(4);
-                    // adler-32 checksum for this block
-                }
-
-
-                Debug.Log($"zlib compressed file:\n\tCMF: {BitConverter.ToString(new[] { cmf })}\n\tFLG: {BitConverter.ToString(new[] { flg })}\n\tCompression method: {compressionMethod}\n\tDeflate window size: {deflateWindowSize}\n\tHas dictionary? {fdict}\n\tCompression level: {flevel}");
-
-                var memoryStream = new MemoryStream();
-                using (DeflateStream decompressionStream = new DeflateStream(streamReader.BaseStream, CompressionMode.Decompress))
-                {
-                    decompressionStream.CopyTo(memoryStream);
-                }
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                for (int i = 0; i < file1Len; ++i)
-                {
-                    decompressedData.Add((byte)memoryStream.ReadByte());
-                }
-                memoryStream.Close();
-
-                binaryReader.BaseStream.Seek(file1Len + 28, SeekOrigin.Current);
-
-                var memoryStreamFile2 = new MemoryStream();
-                using (DeflateStream decompressionStream = new DeflateStream(streamReader.BaseStream, CompressionMode.Decompress))
-                {
-                    decompressionStream.CopyTo(memoryStreamFile2);
-                }
-                memoryStreamFile2.Seek(0, SeekOrigin.Begin);
-                for (int i = 0; i < file2Len; ++i)
-                {
-                    decompressedDataFile2.Add((byte)memoryStreamFile2.ReadByte());
-                }
-                memoryStreamFile2.Close();
+                cmpMemoryStream.Close();
             }
             else
             {
-                throw new Exception("i dont know how to do this yet :(");
+                throw new Exception("Not yet implemented");
             }
 
-            Debug.Log($"WCT {path} has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decompressedData.Count} (should be ~{(width * height * bpp) / 8})");
+            Debug.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
 
-            if (File.Exists("test.wct.file1"))
-                File.Delete("test.wct.file1");
-            using (FileStream fileStream = new FileStream("test.wct.file1", FileMode.OpenOrCreate))
-            {
-                fileStream.Write(decompressedData.ToArray(), 0, decompressedData.Count);
-                Debug.Log($"Wrote file 1 to test.wct.file1");
-            }
-            if (File.Exists("test.wct.file2"))
-                File.Delete("test.wct.file2");
-            using (FileStream fileStream = new FileStream("test.wct.file2", FileMode.OpenOrCreate))
-            {
-                fileStream.Write(decompressedDataFile2.ToArray(), 0, decompressedDataFile2.Count);
-                Debug.Log($"Wrote file 2 to test.wct.file2");
-            }
-
-            ColorRGB24[] data = new ColorRGB24[width * height * bpp];
+            ColorRGBA32[] data = new ColorRGBA32[width * height * bpp];
 
             for (int i = 0; i < width * height; ++i)
             {
-                data[i] = new ColorRGB24(255, 0, 255);
+                data[i] = new ColorRGBA32(255, 0, 255, 255);
             }
 
+            decmpMemoryStream.Seek(0, SeekOrigin.Begin);
             int dataPos = 0;
             for (int y = height - 1; y >= 0; --y)
             {
                 for (int x = 0; x < width; ++x)
                 {
                     var bytes = new byte[bpp / 8];
-                    for (int i = 0; i < bytes.Length; ++i)
-                    {
-                        // Each byte appears to refer to a color
-                        // In the test file, the palette starts at 0x0100 (8 * 8 * 4)
-                        // So we seek to 0x100 + the byte's value, and then read (bpp / 8) bytes
-                        // in order to get the colour
-
-                        //bytes[i] = decompressedData[(width * height * 4) + decompressedData[x + (y * width)] + i];
-                        try
-                        {
-                            bytes[i] = decompressedData[x + (y * width) + (i * width)];
-                        }
-                        catch
-                        {
-                            bytes[i] = 0xff;
-                        }
-                    }
-
-                    // var bytes = decompressedReader.ReadBytes(bpp / 8);
+                    decmpMemoryStream.Read(bytes, 0, bytes.Length);
                     switch (bpp)
                     {
                         case 32: // R G B A?
                             {
-                                // TODO: Transparency
-                                data[dataPos] = new ColorRGB24(bytes[0], bytes[3], bytes[2]);
+                                data[dataPos] = new ColorRGBA32(bytes[3], bytes[2], bytes[1], bytes[0]);
                             }
                             break;
                         case 24: // R G B? (no alpha)
                             {
-                                data[dataPos] = new ColorRGB24(bytes[2], bytes[1], bytes[0]);
+                                data[dataPos] = new ColorRGBA32(bytes[0], bytes[1], bytes[2]);
                             }
                             break;
                         default:
@@ -201,10 +152,15 @@ namespace OpenTPW.Files.FileFormats
                     dataPos++;
                 }
             }
+            decmpMemoryStream.Close();
 
             binaryReader.Close();
-            streamReader.Close();
             return new Texture2D(data, width, height);
+        }
+
+        public static Texture2D LoadAsset(byte[] data)
+        {
+            return ReadFile(data);
         }
     }
 }

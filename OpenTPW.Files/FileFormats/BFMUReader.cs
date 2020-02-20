@@ -1,9 +1,9 @@
-﻿using System;
+﻿using OpenTPW.Files.FileFormats.BFWD;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using OpenTPW.Files.FileFormats.BFWD;
 
 namespace OpenTPW.Files.FileFormats
 {

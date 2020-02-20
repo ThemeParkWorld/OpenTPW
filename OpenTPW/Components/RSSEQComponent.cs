@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using ECSEngine;
-using ECSEngine.Components;
-using OpenTPW.RSSEQ;
+﻿using ECSEngine.Components;
 using ImGuiNET;
+using OpenTPW.RSSEQ;
+using System;
+using System.Numerics;
 
 namespace OpenTPW.Components
 {
@@ -48,6 +46,7 @@ namespace OpenTPW.Components
                 ImGui.PushItemWidth(-1);
                 ImGui.InputTextMultiline("Disassembly", ref disassembly, UInt32.MaxValue, new Vector2(-1, 250));
                 ImGui.PopItemWidth();
+
                 ImGui.End();
             }
         }

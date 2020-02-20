@@ -1,9 +1,9 @@
-﻿using System;
+﻿using OpenTPW.Files.FileFormats.BFWD.Refpack;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using OpenTPW.Files.FileFormats.BFWD.Refpack;
 
 namespace OpenTPW.Files.FileFormats.BFWD
 {
