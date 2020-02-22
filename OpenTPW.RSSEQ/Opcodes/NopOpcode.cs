@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenTPW.RSSEQ
+namespace OpenTPW.RSSEQ.Opcodes
 {
-    public class Opcode
+    public class NopOpcode : Opcode
     {
-        public Opcode()
-        { }
+        public NopOpcode()
+        {
+
+        }
     }
 }

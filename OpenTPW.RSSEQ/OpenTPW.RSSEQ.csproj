@@ -83,12 +83,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Opcode.cs" />
+    <Compile Include="Opcodes\NopOpcode.cs" />
     <Compile Include="ScriptDefs\Events.cs" />
     <Compile Include="ScriptDefs\Particles.cs" />
     <Compile Include="ScriptDefs\ScriptDefs.cs" />
     <Compile Include="VM.cs" />
     <Compile Include="Instruction.cs" />
-    <Compile Include="Opcode.cs" />
+    <Compile Include="OpcodeID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -100,5 +102,6 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

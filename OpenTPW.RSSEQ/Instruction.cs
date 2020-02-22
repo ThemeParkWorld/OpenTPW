@@ -28,14 +28,14 @@ namespace OpenTPW.RSSEQ
             }
 
             // See if we can get the opcode name from the opcode enum
-            if (Enum.IsDefined(typeof(Opcode), opcode))
+            if (Enum.IsDefined(typeof(OpcodeID), opcode))
             {
                 string padding = "\t";
-                string opcodeName = ((Opcode)opcode).ToString();
+                string opcodeName = ((OpcodeID)opcode).ToString();
                 if (opcodeName.Length < 8)
                     padding += "\t";
 
-                return $"{(Opcode)opcode}{padding}{operandString}";
+                return $"{(OpcodeID)opcode}{padding}{operandString}";
             }
             else
             {

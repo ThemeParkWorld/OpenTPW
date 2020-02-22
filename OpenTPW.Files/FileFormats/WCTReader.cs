@@ -52,7 +52,7 @@ namespace OpenTPW.Files.FileFormats
             int versionMajor = binaryReader.ReadByte();
             int versionMinor = binaryReader.ReadByte();
             int bpp = binaryReader.ReadByte();
-            bpp = 24;
+            bpp = 32;
             int unknown0 = binaryReader.ReadByte();
             width = (binaryReader.ReadInt16());
             height = (binaryReader.ReadInt16());
@@ -93,24 +93,27 @@ namespace OpenTPW.Files.FileFormats
                 // Fast-forward to file 2 content
                 binaryReader.BaseStream.Seek(28, SeekOrigin.Current);
 
-                // File 2
-                var cmpMemoryStreamFile2 = new MemoryStream();
-                cmpMemoryStreamFile2.Write(binaryReader.ReadBytes(file2Len - 28), 0, file2Len - 28);
-                cmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
+                if (file2Len != 0)
+                {
+                    // File 2
+                    var cmpMemoryStreamFile2 = new MemoryStream();
+                    cmpMemoryStreamFile2.Write(binaryReader.ReadBytes(file2Len - 28), 0, file2Len - 28);
+                    cmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
 
-                using (ZlibStream decompressionStream = new ZlibStream(cmpMemoryStreamFile2, Ionic.Zlib.CompressionMode.Decompress, true))
-                    decompressionStream.CopyTo(decmpMemoryStreamFile2);
+                    using (ZlibStream decompressionStream = new ZlibStream(cmpMemoryStreamFile2, Ionic.Zlib.CompressionMode.Decompress, true))
+                        decompressionStream.CopyTo(decmpMemoryStreamFile2);
 
-                // Dump file 2
-                decmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
-                if (File.Exists("file2Dump"))
-                    File.Delete("file2Dump");
-                byte[] file2Contents = new byte[decmpMemoryStreamFile2.Length];
-                decmpMemoryStreamFile2.Read(file2Contents, 0, (int)decmpMemoryStreamFile2.Length);
-                using (var fileStream = new FileStream("file2Dump", FileMode.OpenOrCreate))
-                    fileStream.Write(file2Contents, 0, file2Contents.Length);
+                    // Dump file 2
+                    decmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
+                    if (File.Exists("file2Dump"))
+                        File.Delete("file2Dump");
+                    byte[] file2Contents = new byte[decmpMemoryStreamFile2.Length];
+                    decmpMemoryStreamFile2.Read(file2Contents, 0, (int)decmpMemoryStreamFile2.Length);
+                    using (var fileStream = new FileStream("file2Dump", FileMode.OpenOrCreate))
+                        fileStream.Write(file2Contents, 0, file2Contents.Length);
 
-                cmpMemoryStream.Close();
+                    cmpMemoryStreamFile2.Close();
+                }
             }
             else
             {
@@ -144,6 +147,11 @@ namespace OpenTPW.Files.FileFormats
                         case 24: // R G B? (no alpha)
                             {
                                 data[dataPos] = new ColorRGBA32(bytes[0], bytes[1], bytes[2]);
+                            }
+                            break;
+                        case 8: // monochrome
+                            {
+                                data[dataPos] = new ColorRGBA32(bytes[0], bytes[0], bytes[0]);
                             }
                             break;
                         default:
