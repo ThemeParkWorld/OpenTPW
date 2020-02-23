@@ -1,12 +1,17 @@
 ﻿namespace OpenTPW.RSSEQ.Opcodes
 {
-    public class NameOpcode : Opcode<NameOpcode>
+    public class NameOpcode : OpcodeHandler
     {
-        public new OpcodeID opcodeId => OpcodeID.NAME;
+        public override OpcodeID opcodeId => OpcodeID.NAME;
 
-        public new void Invoke(string[] args)
+        public override int minArgs => 1;
+        public override int maxArgs => 1;
+        public override string description => "Set the script's name.";
+
+        public override void Invoke(Operand[] args)
         {
-            vmInstance.SetRideName(args[0]);
+            // This is the only (known) instruction that actually uses a string
+            vmInstance.scriptName = vmInstance.strings[args[0].value];
         }
     }
 }

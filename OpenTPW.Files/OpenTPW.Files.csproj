@@ -116,6 +116,7 @@
     <Compile Include="FileFormats\SDTReader.cs" />
     <Compile Include="FileFormats\TGAReader.cs" />
     <Compile Include="FileFormats\WCTReader.cs" />
+    <Compile Include="FileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

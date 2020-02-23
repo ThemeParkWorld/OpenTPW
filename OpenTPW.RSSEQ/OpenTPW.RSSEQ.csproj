@@ -83,10 +83,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IOpcode.cs" />
-    <Compile Include="Opcode.cs" />
+    <Compile Include="OpcodeHandler.cs" />
+    <Compile Include="Opcodes\Copy.cs" />
+    <Compile Include="Opcodes\CritLock.cs" />
+    <Compile Include="Opcodes\CritUnlock.cs" />
     <Compile Include="Opcodes\NameOpcode.cs" />
     <Compile Include="Opcodes\NopOpcode.cs" />
+    <Compile Include="Operand.cs" />
     <Compile Include="RSSEQReader.cs" />
     <Compile Include="ScriptDefs\Events.cs" />
     <Compile Include="ScriptDefs\Particles.cs" />

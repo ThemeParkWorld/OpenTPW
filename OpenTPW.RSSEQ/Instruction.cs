@@ -4,19 +4,25 @@ namespace OpenTPW.RSSEQ
 {
     public struct Instruction
     {
-        public readonly string[] operands;
-        public readonly int opcode;
+        public readonly Operand[] operands;
+        public readonly OpcodeID opcode;
 
-        public Instruction(int opcode, string[] operands)
+        private VM vmInstance;
+
+        public Instruction(VM vmInstance, OpcodeID opcode, Operand[] operands)
         {
             this.operands = operands;
             this.opcode = opcode;
+
+            this.vmInstance = vmInstance;
         }
 
         public int GetCount()
         {
             return 1 + operands.Length;
         }
+
+        public void Invoke() => vmInstance.FindOpcodeHandler(opcode).Invoke(operands);
 
         public override string ToString()
         {
@@ -27,20 +33,12 @@ namespace OpenTPW.RSSEQ
                 if (i != operands.Length - 1) operandString += "\t";
             }
 
-            // See if we can get the opcode name from the opcode enum
-            if (Enum.IsDefined(typeof(OpcodeID), opcode))
-            {
-                string padding = "\t";
-                string opcodeName = ((OpcodeID)opcode).ToString();
-                if (opcodeName.Length < 8)
-                    padding += "\t";
+            string padding = "\t";
+            string opcodeName = ((OpcodeID)opcode).ToString();
+            if (opcodeName.Length < 8)
+                padding += "\t";
 
-                return $"{(OpcodeID)opcode}{padding}{operandString}";
-            }
-            else
-            {
-                return $"Unknown opcode {opcode}: {operandString}";
-            }
+            return $"{opcode}{padding}{operandString}";
         }
     }
 }

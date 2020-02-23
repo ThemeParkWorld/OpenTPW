@@ -1,7 +1,12 @@
 ﻿namespace OpenTPW.RSSEQ.Opcodes
 {
-    public class NopOpcode : Opcode<NopOpcode>
+    public class NopOpcode : OpcodeHandler
     {
-        public new OpcodeID opcodeId => OpcodeID.NOP;
+        public override OpcodeID opcodeId => OpcodeID.NOP;
+        public override void Invoke(Operand[] args) { }
+
+        public override int minArgs => 0;
+        public override int maxArgs => 0;
+        public override string description => "No operation.";
     }
 }

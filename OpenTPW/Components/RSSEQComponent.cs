@@ -11,6 +11,7 @@ namespace OpenTPW.Components
         private VM vm; // probably shouldn't create a new VM instance for every ride
         private bool showImGUIWindow;
         private string disassembly;
+        private string log;
 
         public RSSEQComponent(string pathToRSE)
         {
@@ -35,6 +36,11 @@ namespace OpenTPW.Components
             {
                 ImGui.Begin("RSSEQ VM");
 
+                if (ImGui.Button("Step thru"))
+                {
+                    vm.Step();
+                }
+
                 ImGui.LabelText("", "Config");
                 // TODO: condense these into a list somehow
                 ImGui.InputInt("Stack Size", ref vm.config.stackSize);
@@ -42,6 +48,7 @@ namespace OpenTPW.Components
                 ImGui.InputInt("Bounce Size", ref vm.config.bounceSize);
                 ImGui.InputInt("Walk Size", ref vm.config.walkSize);
                 ImGui.InputInt("Time Slice", ref vm.config.timeSlice);
+                ImGui.LabelText("Script name", vm.scriptName);
 
                 ImGui.LabelText("", "Variables");
 
