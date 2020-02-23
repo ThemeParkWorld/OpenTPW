@@ -2,10 +2,11 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
 
-namespace OpenTPW.RSSEQ
+namespace OpenTPW.RSSEQ.ScriptDefs
 {
     enum ScriptDefs
     {
+        // Animations
         ANIM_Create = 0,
         ANIM_Idle = 2,
         ANIM_Load = 3,
@@ -17,6 +18,7 @@ namespace OpenTPW.RSSEQ
         ANIM_Repair = 10,
         ANIM_Other = 11,
 
+        // Particle / sound effects
         OBJ_PTCL = 1,
         OBJ_SOUND_LOC_AMB = 1,
         OBJ_PTCL_D = 2,
@@ -28,6 +30,7 @@ namespace OpenTPW.RSSEQ
         OBJ_SOUND_GLO_UI = 9,
         OBJ_SOUND_GLO_BMP = 11,
 
+        // Rollercoaster specific
         COAST_ADDPEEP = 1,
         COAST_GETQUEUE = 2,
         COAST_GETPEEP = 3,
@@ -40,12 +43,14 @@ namespace OpenTPW.RSSEQ
         SPACE_ENGINE_REVS = 16,
         BUS_CTRL = 20,
 
+        // WALKON actions
         WALK_ACTION_VANISH = 1,
         WALK_ACTION_BEAM = 2,
         WALK_ACTION_HEAD = 4,
         WALK_ACTION_THROW = 5,
         WALK_ACTION_CHEER = 6,
 
+        // Bumper (DinoKart) specific
         BUMP_LAUNCHCAR = -1,
         BUMP_HALTRIDE = 0,
         BUMP_PEEPOFF = 7,

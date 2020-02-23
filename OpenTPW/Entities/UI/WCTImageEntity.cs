@@ -1,9 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using ECSEngine.MathUtils;
+﻿using ECSEngine.MathUtils;
 using OpenTPW.Files.FileFormats;
 using OpenTPW.Files.FileFormats.BFWD;
+using System;
+using System.Linq;
 
 namespace OpenTPW.Entities.UI
 {

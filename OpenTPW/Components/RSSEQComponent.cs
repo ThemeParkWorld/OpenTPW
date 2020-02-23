@@ -33,15 +33,25 @@ namespace OpenTPW.Components
 
             if (showImGUIWindow)
             {
-                ImGui.Begin("Test");
-                // TODO: condense these into a list somehow
-                ImGui.InputInt("Stack Size", ref vm.stackSize);
-                ImGui.InputInt("Limbo Size", ref vm.limboSize);
-                ImGui.InputInt("Bounce Size", ref vm.bounceSize);
-                ImGui.InputInt("Walk Size", ref vm.walkSize);
-                ImGui.InputInt("Time Slice", ref vm.timeSlice);
+                ImGui.Begin("RSSEQ VM");
 
-                ImGui.LabelText("", "RSSEQ Disassembly");
+                ImGui.LabelText("", "Config");
+                // TODO: condense these into a list somehow
+                ImGui.InputInt("Stack Size", ref vm.config.stackSize);
+                ImGui.InputInt("Limbo Size", ref vm.config.limboSize);
+                ImGui.InputInt("Bounce Size", ref vm.config.bounceSize);
+                ImGui.InputInt("Walk Size", ref vm.config.walkSize);
+                ImGui.InputInt("Time Slice", ref vm.config.timeSlice);
+
+                ImGui.LabelText("", "Variables");
+
+                // pipe all variables thru to imgui
+                for (int i = 0; i < vm.variables.Count; i++)
+                {
+                    ImGui.LabelText(vm.variables[i].ToString(), i.ToString());
+                }
+
+                ImGui.LabelText("", "Disassembly");
 
                 ImGui.PushItemWidth(-1);
                 ImGui.InputTextMultiline("Disassembly", ref disassembly, UInt32.MaxValue, new Vector2(-1, 250));

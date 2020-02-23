@@ -2,35 +2,35 @@
 {
     public static class ByteExtension
     {
-        private static int _GetNibble(this byte byte_, bool high)
+        private static int GetNibble(this byte @byte, bool high)
         {
-            return (byte_ >> (high ? 0 : 4) & 0x0F);
+            return (@byte >> (high ? 0 : 4) & 0x0F);
         }
 
-        public static int GetHighNibble(this byte byte_)
+        public static int GetHighNibble(this byte @byte)
         {
-            return byte_._GetNibble(true);
+            return @byte.GetNibble(true);
         }
 
-        public static int GetLowNibble(this byte byte_)
+        public static int GetLowNibble(this byte @byte)
         {
-            return byte_._GetNibble(false);
+            return @byte.GetNibble(false);
         }
-        public static int GetBitsAsInt(this byte byte_, int pos, int length)
+        public static int GetBitsAsInt(this byte @byte, int pos, int length)
         {
-            return ((byte_ >> (pos)) & (length));
+            return ((@byte >> (pos)) & (length));
         }
-        public static bool GetBit(this byte byte_, int index)
+        public static bool GetBit(this byte @byte, int index)
         {
-            var value = ((byte_ >> (index)) & 1) != 0;
+            var value = ((@byte >> (index)) & 1) != 0;
             return value;
         }
-        public static bool[] GetBits(this byte byte_, params int[] indices)
+        public static bool[] GetBits(this byte @byte, params int[] indices)
         {
             bool[] bits = new bool[indices.Length];
             for (int i = 0; i < indices.Length; ++i)
             {
-                bits[i] = byte_.GetBit(indices[i]);
+                bits[i] = @byte.GetBit(indices[i]);
             }
             return bits;
         }

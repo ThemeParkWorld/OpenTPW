@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OpenTPW.RSSEQ.Opcodes
+﻿namespace OpenTPW.RSSEQ.Opcodes
 {
-    public class NopOpcode : Opcode
+    public class NopOpcode : Opcode<NopOpcode>
     {
-        public NopOpcode()
-        {
-
-        }
+        public new OpcodeID opcodeId => OpcodeID.NOP;
     }
 }

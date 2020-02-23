@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OpenTPW.RSSEQ
+﻿namespace OpenTPW.RSSEQ
 {
-    public class Opcode
+    public class Opcode<T> : IOpcode
     {
-        public Opcode()
-        { }
+        public virtual OpcodeID opcodeId { get; }
+
+        public virtual void Invoke(string[] args) { }
+
+        protected VM vmInstance;
     }
 }

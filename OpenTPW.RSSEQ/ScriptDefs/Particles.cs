@@ -2,7 +2,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
 
-namespace OpenTPW.RSSEQ
+namespace OpenTPW.RSSEQ.ScriptDefs
 {
     // From par_lib.h
     enum Particles

@@ -1,12 +1,10 @@
 ﻿using ECSEngine;
 using ECSEngine.Render;
+using Ionic.Zlib;
 using OpenGL;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Ionic.Zlib;
-using CompressionMode = System.IO.Compression.CompressionMode;
 
 namespace OpenTPW.Files.FileFormats
 {

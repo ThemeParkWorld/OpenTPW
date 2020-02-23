@@ -15,7 +15,7 @@ namespace OpenTPW.Entities
             rideName = Path.GetFileNameWithoutExtension(rideArchivePath);
             var rideArchive = new BFWDArchive(rideArchivePath);
             var rseFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
-            AddComponent(new RSSEQComponent(rseFile.data)); 
+            AddComponent(new RSSEQComponent(rseFile.data));
         }
     }
 }

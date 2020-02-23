@@ -70,10 +70,10 @@ namespace OpenTPW.RSSEQ
         GETVARINPARENT = 69,// Get a parent script's variable: SETVARINCHILD <dest> <variable ID>
         BOUNCESETNODE = 70, // Unknown - set bouncing node?
         BOUNCESETBASE = 71, // Unknown - set bouncing base?
-        BOUNCE = 72,        // Unknown
-        UNBOUNCE = 73,      // Unknown
-        FORCEUNBOUNCE = 74, // Unknown
-        BOUNCING = 75,      // Unknown
+        BOUNCE = 72,        // Make a visitor bounce on a ride: BOUNCE <visitor ID> <duration>
+        UNBOUNCE = 73,      // Stop a visitor bouncing on a ride: UNBOUNCE <visitor ID>
+        FORCEUNBOUNCE = 74, // Stop a visitor bouncing on a ride (ignore bounce duration): FORCEUNBOUNCE <visitor ID>
+        BOUNCING = 75,      // Check whether a visitor is bouncing on the ride: BOUNCING <visitor ID>
         WALKON = 76,        // Unknown
         WALKOFF = 77,       // Unknown
         WALKGET = 78,       // Unknown

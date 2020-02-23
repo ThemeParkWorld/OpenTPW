@@ -2,7 +2,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
 
-namespace OpenTPW.RSSEQ
+namespace OpenTPW.RSSEQ.ScriptDefs
 {
     // duplicates here are because this file is essentially a
     // merged version of all of the event defs for each theme
