@@ -27,7 +27,7 @@ namespace OpenTPW.Files.FileFormats
             }
             else
             {
-                foreach (ArchiveFile archiveFile in fileMatches)
+                foreach (var archiveFile in fileMatches)
                 {
                     LoadAsset(archiveFile);
                     break; // Only load 1st file; ignore rest
@@ -42,8 +42,8 @@ namespace OpenTPW.Files.FileFormats
 
         public void LoadAsset(byte[] data)
         {
-            MemoryStream memoryStream = new MemoryStream(data);
-            BinaryReader binaryReader = new BinaryReader(memoryStream);
+            var memoryStream = new MemoryStream(data);
+            var binaryReader = new BinaryReader(memoryStream);
 
             if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFMU") throw new Exception("This isn't a BFMU file!");
 
@@ -63,10 +63,10 @@ namespace OpenTPW.Files.FileFormats
             binaryReader.ReadInt16();
             var characterCount = binaryReader.ReadInt16();
 
-            for (int i = 0; i < characterCount; ++i)
+            for (var i = 0; i < characterCount; ++i)
             {
-                byte[] bytes = binaryReader.ReadBytes(2);
-                foreach (char c in Encoding.Unicode.GetChars(bytes))
+                var bytes = binaryReader.ReadBytes(2);
+                foreach (var c in Encoding.Unicode.GetChars(bytes))
                 {
                     _characters.Add(c);
                 }
@@ -78,8 +78,8 @@ namespace OpenTPW.Files.FileFormats
 
         public void LoadAsset(string file)
         {
-            StreamReader streamReader = new StreamReader(file);
-            byte[] buffer = new byte[streamReader.BaseStream.Length];
+            var streamReader = new StreamReader(file);
+            var buffer = new byte[streamReader.BaseStream.Length];
             streamReader.BaseStream.Read(buffer, 0, buffer.Length);
             LoadAsset(buffer);
             streamReader.Close();

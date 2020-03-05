@@ -53,13 +53,13 @@ namespace OpenTPW.Files.FileFormats.BFWD
 
             // Details directory
             // See DWFBFile for more info
-            for (int i = 0; i < fileCount; ++i)
+            for (var i = 0; i < fileCount; ++i)
             {
                 GC.Collect();
                 // Save the current position so that we can go back to it later
                 var initialPos = memoryStream.Position;
 
-                ArchiveFile newFile = new ArchiveFile();
+                var newFile = new ArchiveFile();
                 memoryStream.Seek(4, SeekOrigin.Current); // Skip 'null'
                 var filenameOffset = memoryStream.ReadUInt32();
                 var filenameLength = memoryStream.ReadUInt32();

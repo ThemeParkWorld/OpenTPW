@@ -14,10 +14,11 @@ namespace OpenTPW.Files.FileFormats
             // I'm really lazy, and this is really basic.
             // This only supports like, a quarter of the available TGA features,
             // however TPW doesnt't actually use any other features.
-            List<ColorRGBA32> colorData = new List<ColorRGBA32>();
+            var colorData = new List<ColorRGBA32>();
+            var streamReader = new StreamReader(path);
+            var binaryReader = new BinaryReader(streamReader.BaseStream);
+
             int width, height;
-            StreamReader streamReader = new StreamReader(path);
-            BinaryReader binaryReader = new BinaryReader(streamReader.BaseStream);
             int idLength = binaryReader.ReadByte();
             int colorMapType = binaryReader.ReadByte();
             int dataTypeCode = binaryReader.ReadByte();

@@ -2,11 +2,11 @@
 {
     public class NopOpcode : OpcodeHandler
     {
-        public override OpcodeID opcodeId => OpcodeID.NOP;
+        public override OpcodeID OpcodeId => OpcodeID.NOP;
         public override void Invoke(Operand[] args) { }
 
-        public override int minArgs => 0;
-        public override int maxArgs => 0;
-        public override string description => "No operation.";
+        public override int MinArgs => 0;
+        public override int MaxArgs => 0;
+        public override string Description => "No operation.";
     }
 }

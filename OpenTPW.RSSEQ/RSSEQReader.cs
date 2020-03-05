@@ -13,8 +13,8 @@ namespace OpenTPW.RSSEQ
         private int expectedInstructions;
         private long instructionOffset;
         
-        public string disassembly { get; private set; } = "";
-        public int variableCount => variables.Count;
+        public string Disassembly { get; private set; } = "";
+        public int VariableCount => variables.Count;
 
         public RSSEQReader(VM vmInstance)
         {
@@ -61,22 +61,22 @@ namespace OpenTPW.RSSEQ
 
         private void ReadFileHeader(BinaryReader binaryReader)
         {
-            char[] magicNumber = binaryReader.ReadChars(8);
+            var magicNumber = binaryReader.ReadChars(8);
             if (!Enumerable.SequenceEqual(magicNumber, new[] { 'R', 'S', 'S', 'E', 'Q', (char)0x0F, (char)0x01, (char)0x00 }))
                 Debug.Log("Magic number was not 'RSSEQ'", Debug.DebugSeverity.High);
 
             // Variable count
             var variableCount = binaryReader.ReadInt32();
 
-            vmInstance.config.stackSize = binaryReader.ReadInt32();
-            vmInstance.config.timeSlice = binaryReader.ReadInt32();
-            vmInstance.config.limboSize = binaryReader.ReadInt32();
-            vmInstance.config.bounceSize = binaryReader.ReadInt32();
-            vmInstance.config.walkSize = binaryReader.ReadInt32();
+            vmInstance.StackSize = binaryReader.ReadInt32();
+            vmInstance.TimeSlice = binaryReader.ReadInt32();
+            vmInstance.LimboSize = binaryReader.ReadInt32();
+            vmInstance.BounceSize = binaryReader.ReadInt32();
+            vmInstance.WalkSize = binaryReader.ReadInt32();
 
-            for (int i = 0; i < 4; ++i)
+            for (var i = 0; i < 4; ++i)
             {
-                char[] paddingChars = binaryReader.ReadChars(4);
+                var paddingChars = binaryReader.ReadChars(4);
                 if (!Enumerable.SequenceEqual(paddingChars, new[] { 'P', 'a', 'd', ' ' }))
                     Debug.Log("Invalid padding!", Debug.DebugSeverity.High);
             }
@@ -84,20 +84,20 @@ namespace OpenTPW.RSSEQ
 
         private void ReadFileBody(BinaryReader binaryReader)
         {
-            List<Operand> currentOperands = new List<Operand>();
+            var currentOperands = new List<Operand>();
 
-            int currentOpcode = 0;
+            var currentOpcode = 0;
 
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length - 1)
             {
-                int currentValue = binaryReader.ReadInt32();
-                int flag = (currentValue >> 24 & 0xFF);
+                var currentValue = binaryReader.ReadInt32();
+                var flag = (currentValue >> 24 & 0xFF);
                 int truncValue = (short)currentValue;
 
                 if ((binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions)
                 {
                     Debug.Log($"Hit max count ({(binaryReader.BaseStream.Position - instructionOffset) / 4} of {expectedInstructions})");
-                    vmInstance.instructions.Add(new Instruction(vmInstance, (OpcodeID)currentOpcode, currentOperands.ToArray()));
+                    vmInstance.Instructions.Add(new Instruction(vmInstance, (OpcodeID)currentOpcode, currentOperands.ToArray()));
                     break;
                 }
 
@@ -105,30 +105,30 @@ namespace OpenTPW.RSSEQ
                 {
                     case 0x80:
                         // Opcode
-                        vmInstance.instructions.Add(new Instruction(vmInstance, (OpcodeID)currentOpcode, currentOperands.ToArray()));
+                        vmInstance.Instructions.Add(new Instruction(vmInstance, (OpcodeID)currentOpcode, currentOperands.ToArray()));
                         currentOpcode = (short)currentValue;
                         currentOperands = new List<Operand>();
                         break;
                     case 0x10:
                         // String
                         // currentOperands.Add($"\"{vmInstance.strings[truncValue].Replace("\0", "")}\"");
-                        currentOperands.Add(new Operand(Operand.Type.String, truncValue));
+                        currentOperands.Add(new Operand(vmInstance, Operand.Type.String, truncValue));
                         break;
                     case 0x20:
                         // Branch
                         // currentOperands.Add($"branch_{truncValue}");
-                        currentOperands.Add(new Operand(Operand.Type.Location, truncValue));
+                        currentOperands.Add(new Operand(vmInstance, Operand.Type.Location, truncValue));
                         branches.Add(truncValue);
                         break;
                     case 0x40:
                         // Variable
                         // currentOperands.Add(variables[truncValue]);
-                        currentOperands.Add(new Operand(Operand.Type.Variable, truncValue));
+                        currentOperands.Add(new Operand(vmInstance, Operand.Type.Variable, truncValue));
                         break;
                     case 0x00:
                         // Literal
                         // currentOperands.Add(truncValue.ToString());
-                        currentOperands.Add(new Operand(Operand.Type.Literal, truncValue));
+                        currentOperands.Add(new Operand(vmInstance, Operand.Type.Literal, truncValue));
                         break;
                 }
             }
@@ -137,16 +137,16 @@ namespace OpenTPW.RSSEQ
         private void ReadStringTable(BinaryReader binaryReader)
         {
             // First entry will be the strings used within the application
-            int stringEntryLength = binaryReader.ReadInt32();
-            long stringEntryPos = binaryReader.BaseStream.Position;
-            string currentString = "";
+            var stringEntryLength = binaryReader.ReadInt32();
+            var stringEntryPos = binaryReader.BaseStream.Position;
+            var currentString = "";
 
             while (binaryReader.BaseStream.Position - stringEntryPos < stringEntryLength)
             {
-                char currentChar = binaryReader.ReadChar();
+                var currentChar = binaryReader.ReadChar();
                 if (currentChar == '\0')
                 {
-                    vmInstance.strings.Add(currentString);
+                    vmInstance.Strings.Add(currentString);
                     currentString = "";
                 }
                 else
@@ -158,24 +158,24 @@ namespace OpenTPW.RSSEQ
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
             {
                 // Read remaining variables
-                int variableNameLength = binaryReader.ReadInt32();
-                char[] stringChars = binaryReader.ReadChars(variableNameLength);
+                var variableNameLength = binaryReader.ReadInt32();
+                var stringChars = binaryReader.ReadChars(variableNameLength);
                 variables.Add(new string(stringChars).Replace("\0", ""));
             }
         }
 
         private void WriteDisassembly()
         {
-            int currentCount = 1;
+            var currentCount = 1;
 
-            for (int i = 0; i < vmInstance.instructions.Count; ++i)
+            for (var i = 0; i < vmInstance.Instructions.Count; ++i)
             {
                 if (branches.Contains(currentCount - 1))
                 {
-                    disassembly += $".branch_{currentCount - 1}\n";
+                    Disassembly += $".branch_{currentCount - 1}\n";
                 }
-                disassembly += $"\t{vmInstance.instructions[i].ToString()}\n";
-                currentCount += vmInstance.instructions[i].GetCount();
+                Disassembly += $"\t{vmInstance.Instructions[i].ToString()}\n";
+                currentCount += vmInstance.Instructions[i].GetCount();
             }
         }
     }

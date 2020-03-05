@@ -2,8 +2,6 @@
 {
     public class Operand
     {
-        private VM vmInstance;
-
         public enum Type
         {
             Variable,
@@ -12,25 +10,27 @@
             Location
         }
 
-        private int value_;
-        private Type type;
+        private VM vmInstance;
+        private int value;
+        private readonly Type type;
 
-        public Operand(Type type, int value_)
+        public Operand(VM vmInstance, Type type, int value)
         {
+            this.vmInstance = vmInstance;
             this.type = type;
-            this.value_ = value_;
+            this.value = value;
         }
 
-        public int value
+        public int Value
         {
             get
             {
                 switch (type)
                 {
                     case Type.Variable:
-                        return vmInstance.variables[value_];
+                        return vmInstance.Variables[value];
                     default:
-                        return value_;
+                        return value;
                 }
             }
             set
@@ -38,10 +38,10 @@
                 switch (type)
                 {
                     case Type.Variable:
-                        vmInstance.variables[value_] = value;
+                        vmInstance.Variables[this.value] = value;
                         break;
                     default:
-                        value_ = value;
+                        this.value = value;
                         break;
                 }
             }

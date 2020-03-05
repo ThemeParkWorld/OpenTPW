@@ -30,8 +30,8 @@
 
         public static bool[] GetBits(this byte @byte, params int[] indices)
         {
-            bool[] bits = new bool[indices.Length];
-            for (int i = 0; i < indices.Length; ++i)
+            var bits = new bool[indices.Length];
+            for (var i = 0; i < indices.Length; ++i)
             {
                 bits[i] = @byte.GetBit(indices[i]);
             }

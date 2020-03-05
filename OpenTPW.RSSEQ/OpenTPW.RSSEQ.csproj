@@ -84,11 +84,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpcodeHandler.cs" />
-    <Compile Include="Opcodes\Copy.cs" />
-    <Compile Include="Opcodes\CritLock.cs" />
-    <Compile Include="Opcodes\CritUnlock.cs" />
+    <Compile Include="Opcodes\AddObjOpcode.cs" />
+    <Compile Include="Opcodes\CopyOpcode.cs" />
+    <Compile Include="Opcodes\CritLockOpcode.cs" />
+    <Compile Include="Opcodes\CritUnlockOpcode.cs" />
+    <Compile Include="Opcodes\EndSliceOpcode.cs" />
+    <Compile Include="Opcodes\EventOpcode.cs" />
+    <Compile Include="Opcodes\FadeObjOpcode.cs" />
+    <Compile Include="Opcodes\FlushAnimOpcode.cs" />
+    <Compile Include="Opcodes\GetTimeOpcode.cs" />
+    <Compile Include="Opcodes\KillObjOpcode.cs" />
     <Compile Include="Opcodes\NameOpcode.cs" />
     <Compile Include="Opcodes\NopOpcode.cs" />
+    <Compile Include="Opcodes\SetLVOpcode.cs" />
+    <Compile Include="Opcodes\SetObjParamOpcode.cs" />
+    <Compile Include="Opcodes\SubOpcode.cs" />
     <Compile Include="Operand.cs" />
     <Compile Include="RSSEQReader.cs" />
     <Compile Include="ScriptDefs\Events.cs" />
@@ -98,6 +108,8 @@
     <Compile Include="Instruction.cs" />
     <Compile Include="OpcodeID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VMConfig.cs" />
+    <Compile Include="VMObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\source\repos\ECSEngine\ECSEngine\ECSEngine.csproj">
@@ -107,7 +119,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Opcodes\PROGRESS.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="VMFlags.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

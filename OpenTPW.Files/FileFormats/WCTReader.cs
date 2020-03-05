@@ -45,8 +45,8 @@ namespace OpenTPW.Files.FileFormats
             // Magic number? (4 bytes) - Always "BILZ" - zlib maybe?
             // 28 more bytes of "???"
             int width, height, file1Len, file2Len;
-            using MemoryStream dataMemoryStream = new MemoryStream(fileData);
-            using BinaryReader binaryReader = new BinaryReader(dataMemoryStream);
+            using var dataMemoryStream = new MemoryStream(fileData);
+            using var binaryReader = new BinaryReader(dataMemoryStream);
             int versionMajor = binaryReader.ReadByte();
             int versionMinor = binaryReader.ReadByte();
             int bpp = binaryReader.ReadByte();
@@ -60,7 +60,7 @@ namespace OpenTPW.Files.FileFormats
             file2Len = binaryReader.ReadInt32();
             binaryReader.BaseStream.Seek(4, SeekOrigin.Current);
 
-            bool zlibFile = Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) == "BILZ";
+            var zlibFile = Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) == "BILZ";
             var decmpMemoryStream = new MemoryStream();
             var decmpMemoryStreamFile2 = new MemoryStream();
             if (zlibFile)
@@ -76,14 +76,14 @@ namespace OpenTPW.Files.FileFormats
                 cmpMemoryStream.Write(binaryReader.ReadBytes(file1Len - 28), 0, file1Len - 28);
                 cmpMemoryStream.Seek(0, SeekOrigin.Begin);
 
-                using (ZlibStream decompressionStream = new ZlibStream(cmpMemoryStream, Ionic.Zlib.CompressionMode.Decompress, true))
+                using (var decompressionStream = new ZlibStream(cmpMemoryStream, Ionic.Zlib.CompressionMode.Decompress, true))
                     decompressionStream.CopyTo(decmpMemoryStream);
 
                 // Dump file 1
                 decmpMemoryStream.Seek(0, SeekOrigin.Begin);
                 if (File.Exists("file1Dump"))
                     File.Delete("file1Dump");
-                byte[] file1Contents = new byte[decmpMemoryStream.Length];
+                var file1Contents = new byte[decmpMemoryStream.Length];
                 decmpMemoryStream.Read(file1Contents, 0, (int)decmpMemoryStream.Length);
                 using (var fileStream = new FileStream("file1Dump", FileMode.OpenOrCreate))
                     fileStream.Write(file1Contents, 0, file1Contents.Length);
@@ -98,14 +98,14 @@ namespace OpenTPW.Files.FileFormats
                     cmpMemoryStreamFile2.Write(binaryReader.ReadBytes(file2Len - 28), 0, file2Len - 28);
                     cmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
 
-                    using (ZlibStream decompressionStream = new ZlibStream(cmpMemoryStreamFile2, Ionic.Zlib.CompressionMode.Decompress, true))
+                    using (var decompressionStream = new ZlibStream(cmpMemoryStreamFile2, Ionic.Zlib.CompressionMode.Decompress, true))
                         decompressionStream.CopyTo(decmpMemoryStreamFile2);
 
                     // Dump file 2
                     decmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
                     if (File.Exists("file2Dump"))
                         File.Delete("file2Dump");
-                    byte[] file2Contents = new byte[decmpMemoryStreamFile2.Length];
+                    var file2Contents = new byte[decmpMemoryStreamFile2.Length];
                     decmpMemoryStreamFile2.Read(file2Contents, 0, (int)decmpMemoryStreamFile2.Length);
                     using (var fileStream = new FileStream("file2Dump", FileMode.OpenOrCreate))
                         fileStream.Write(file2Contents, 0, file2Contents.Length);
@@ -120,18 +120,18 @@ namespace OpenTPW.Files.FileFormats
 
             Debug.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
 
-            ColorRGBA32[] data = new ColorRGBA32[width * height * bpp];
+            var data = new ColorRGBA32[width * height * bpp];
 
-            for (int i = 0; i < width * height; ++i)
+            for (var i = 0; i < width * height; ++i)
             {
                 data[i] = new ColorRGBA32(255, 0, 255, 255);
             }
 
             decmpMemoryStream.Seek(0, SeekOrigin.Begin);
-            int dataPos = 0;
-            for (int y = height - 1; y >= 0; --y)
+            var dataPos = 0;
+            for (var y = height - 1; y >= 0; --y)
             {
-                for (int x = 0; x < width; ++x)
+                for (var x = 0; x < width; ++x)
                 {
                     var bytes = new byte[bpp / 8];
                     decmpMemoryStream.Read(bytes, 0, bytes.Length);

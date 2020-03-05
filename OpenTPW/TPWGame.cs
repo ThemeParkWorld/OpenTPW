@@ -23,7 +23,7 @@ namespace OpenTPW
                 new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/bouncy.wad")
             };
 
-            foreach (IEntity entity in entities)
+            foreach (var entity in entities)
                 SceneManager.instance.AddEntity(entity);
         }
     }

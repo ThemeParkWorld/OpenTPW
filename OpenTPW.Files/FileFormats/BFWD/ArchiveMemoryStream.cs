@@ -10,7 +10,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
 
         public byte[] ReadBytes(int length, bool bigEndian = false)
         {
-            byte[] bytes = new byte[length];
+            var bytes = new byte[length];
             Read(bytes, 0, length);
 
             if (bigEndian) Array.Reverse(bytes);

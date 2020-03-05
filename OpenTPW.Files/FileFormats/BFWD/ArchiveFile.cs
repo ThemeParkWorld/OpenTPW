@@ -35,7 +35,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
                 // Therefore all memorystream operations have bigEndian set to true
                 if (compressed && !_hasBeenDecompressed)
                 {
-                    List<byte> decompressedData = new List<byte>();
+                    var decompressedData = new List<byte>();
                     using (var memoryStream = new BFWDMemoryStream(_data))
                     {
                         var refpackHeader = memoryStream.ReadBytes(2, bigEndian: true);
@@ -46,7 +46,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
 
                         memoryStream.Seek(3, SeekOrigin.Current); // Skip decompressed size
 
-                        byte[] currentByte = memoryStream.ReadBytes(1, bigEndian: true);
+                        var currentByte = memoryStream.ReadBytes(1, bigEndian: true);
 
                         var commands = new List<IRefpackCommand>();
                         var commandCount = new Dictionary<Type, int>();
@@ -72,7 +72,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
                                         commandCount.Add(commandType, 1);
                                     try
                                     {
-                                        command.Decompress(_data, ref decompressedData, (int)memoryStream.Position - 1, out uint skipAhead);
+                                        command.Decompress(_data, ref decompressedData, (int)memoryStream.Position - 1, out var skipAhead);
                                         memoryStream.Seek(command.length + skipAhead - 1, SeekOrigin.Current);
                                     }
                                     catch (Exception ex)

@@ -12,11 +12,11 @@ namespace OpenTPW.Files.FileFormats
         public List<string> strings = new List<string>();
         public BFSTReader(string path)
         {
-            BFMUReader characters = new BFMUReader();
+            var characters = new BFMUReader();
             characters.LoadAsset(@"C:\Program Files (x86)\Bullfrog\Theme Park World\data\Language\English\MBToUni.dat");
 
-            StreamReader streamReader = new StreamReader(path);
-            BinaryReader binaryReader = new BinaryReader(streamReader.BaseStream);
+            var streamReader = new StreamReader(path);
+            var binaryReader = new BinaryReader(streamReader.BaseStream);
             if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFST") throw new Exception("not bfst");
 
             /* 
@@ -30,8 +30,8 @@ namespace OpenTPW.Files.FileFormats
             binaryReader.ReadUInt32();
             var stringCount = binaryReader.ReadUInt32();
 
-            List<uint> offsets = new List<uint>();
-            for (int i = 0; i < stringCount; ++i)
+            var offsets = new List<uint>();
+            for (var i = 0; i < stringCount; ++i)
                 offsets.Add(binaryReader.ReadUInt32());
 
             /* 
@@ -55,9 +55,9 @@ namespace OpenTPW.Files.FileFormats
                 var byte3 = binaryReader.ReadByte();
                 var stringLength = ((uint)byte3 << 16 | (uint)byte2 << 8 | (uint)byte1);
                 var str = "";
-                for (int i = 0; i < stringLength; ++i)
+                for (var i = 0; i < stringLength; ++i)
                 {
-                    byte b = binaryReader.ReadByte();
+                    var b = binaryReader.ReadByte();
 
                     str += characters.GetChar(b);
                 }
@@ -71,7 +71,7 @@ namespace OpenTPW.Files.FileFormats
 
         public void WriteAllStrings()
         {
-            for (int i = 0; i < strings.Count; ++i)
+            for (var i = 0; i < strings.Count; ++i)
             {
                 Debug.Log($"{strings[i]}");
             }

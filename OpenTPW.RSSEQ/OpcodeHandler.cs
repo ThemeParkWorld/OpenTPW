@@ -2,13 +2,13 @@
 {
     public abstract class OpcodeHandler
     {
-        public abstract OpcodeID opcodeId { get; }
+        public abstract OpcodeID OpcodeId { get; }
 
-        public abstract int minArgs { get; }
+        public abstract int MinArgs { get; }
 
-        public abstract int maxArgs { get; }
+        public abstract int MaxArgs { get; }
 
-        public abstract string description { get; }
+        public abstract string Description { get; }
 
         public abstract void Invoke(Operand[] args);
 

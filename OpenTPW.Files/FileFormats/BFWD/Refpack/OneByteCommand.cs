@@ -10,7 +10,7 @@ namespace OpenTPW.Files.FileFormats.BFWD.Refpack
         public void Decompress(byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead)
         {
             var dataAtOffset = data[offset];
-            uint proceedingDataLength = (uint)(((dataAtOffset & 0x1F) + 1) << 2);
+            var proceedingDataLength = (uint)(((dataAtOffset & 0x1F) + 1) << 2);
 
             skipAhead = proceedingDataLength;
             RefpackUtils.DecompressData(data, ref decompressedData, offset, length, proceedingDataLength, 0, 0);

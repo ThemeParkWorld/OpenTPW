@@ -26,15 +26,15 @@ namespace OpenTPW.RSSEQ
 
         public override string ToString()
         {
-            string operandString = "";
-            for (int i = 0; i < operands.Length; ++i)
+            var operandString = "";
+            for (var i = 0; i < operands.Length; ++i)
             {
                 operandString += operands[i];
                 if (i != operands.Length - 1) operandString += "\t";
             }
 
-            string padding = "\t";
-            string opcodeName = ((OpcodeID)opcode).ToString();
+            var padding = "\t";
+            var opcodeName = ((OpcodeID)opcode).ToString();
             if (opcodeName.Length < 8)
                 padding += "\t";
 
