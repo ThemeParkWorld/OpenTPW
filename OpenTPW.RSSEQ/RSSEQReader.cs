@@ -1,4 +1,5 @@
-﻿using ECSEngine;
+﻿using System;
+using ECSEngine;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -68,6 +69,7 @@ namespace OpenTPW.RSSEQ
             // Variable count
             var variableCount = binaryReader.ReadInt32();
 
+            vmInstance.Variables = new List<int>(variableCount);
             vmInstance.StackSize = binaryReader.ReadInt32();
             vmInstance.TimeSlice = binaryReader.ReadInt32();
             vmInstance.LimboSize = binaryReader.ReadInt32();
@@ -111,23 +113,19 @@ namespace OpenTPW.RSSEQ
                         break;
                     case 0x10:
                         // String
-                        // currentOperands.Add($"\"{vmInstance.strings[truncValue].Replace("\0", "")}\"");
                         currentOperands.Add(new Operand(vmInstance, Operand.Type.String, truncValue));
                         break;
                     case 0x20:
                         // Branch
-                        // currentOperands.Add($"branch_{truncValue}");
                         currentOperands.Add(new Operand(vmInstance, Operand.Type.Location, truncValue));
                         branches.Add(truncValue);
                         break;
                     case 0x40:
                         // Variable
-                        // currentOperands.Add(variables[truncValue]);
                         currentOperands.Add(new Operand(vmInstance, Operand.Type.Variable, truncValue));
                         break;
                     case 0x00:
                         // Literal
-                        // currentOperands.Add(truncValue.ToString());
                         currentOperands.Add(new Operand(vmInstance, Operand.Type.Literal, truncValue));
                         break;
                 }
@@ -160,7 +158,8 @@ namespace OpenTPW.RSSEQ
                 // Read remaining variables
                 var variableNameLength = binaryReader.ReadInt32();
                 var stringChars = binaryReader.ReadChars(variableNameLength);
-                variables.Add(new string(stringChars).Replace("\0", ""));
+                vmInstance.Variables.Add(0);
+                //vmInstance.Variables.Add(new string(stringChars).Replace("\0", ""));
             }
         }
 

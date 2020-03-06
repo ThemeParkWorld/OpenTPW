@@ -10,8 +10,8 @@
             Location
         }
 
-        private VM vmInstance;
         private int value;
+        private readonly VM vmInstance;
         private readonly Type type;
 
         public Operand(VM vmInstance, Type type, int value)

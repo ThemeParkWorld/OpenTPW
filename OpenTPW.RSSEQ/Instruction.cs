@@ -22,7 +22,7 @@ namespace OpenTPW.RSSEQ
             return 1 + operands.Length;
         }
 
-        public void Invoke() => vmInstance.FindOpcodeHandler(opcode).Invoke(operands);
+        public void Invoke() => vmInstance.FindOpcodeHandler(opcode)?.Invoke(operands);
 
         public override string ToString()
         {

@@ -2,7 +2,7 @@
 {
     public class GetTimeOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.GETTIME;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.GETTIME };
 
         public override void Invoke(Operand[] args)
         {

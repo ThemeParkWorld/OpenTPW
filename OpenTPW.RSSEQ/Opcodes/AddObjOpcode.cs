@@ -4,7 +4,7 @@ namespace OpenTPW.RSSEQ.Opcodes
 {
     public class AddObjOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.ADDOBJ | OpcodeID.ADDOBJ_EXT;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.ADDOBJ, OpcodeID.ADDOBJ_EXT };
 
         public override void Invoke(Operand[] args)
         {

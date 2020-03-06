@@ -3,6 +3,7 @@ using ImGuiNET;
 using OpenTPW.RSSEQ;
 using System;
 using System.Numerics;
+using OpenGL;
 
 namespace OpenTPW.Components
 {
@@ -45,7 +46,10 @@ namespace OpenTPW.Components
                 // TODO: condense these into a list somehow
                 foreach (var property in typeof(VM).GetProperties())
                 {
-                    ImGui.LabelText(property.Name, property.GetValue(vmInstance).ToString());
+                    var propName = property.Name;
+                    var propValue = property.GetValue(vmInstance);
+                    if (propValue != null)
+                        ImGui.LabelText(propName, propValue.ToString());
                 }
 
                 ImGui.LabelText("", "Variables");

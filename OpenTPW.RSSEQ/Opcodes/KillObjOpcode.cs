@@ -2,7 +2,7 @@
 {
     public class KillObjOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.KILLOBJ;
+        public override OpcodeID[] OpcodeIds => new [] { OpcodeID.KILLOBJ };
 
         public override void Invoke(Operand[] args)
         {

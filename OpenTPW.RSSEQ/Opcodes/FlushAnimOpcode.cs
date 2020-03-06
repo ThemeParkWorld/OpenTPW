@@ -2,7 +2,7 @@
 {
     public class FlushAnimOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.FLUSHANIM;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.FLUSHANIM };
 
         public override void Invoke(Operand[] args)
         {

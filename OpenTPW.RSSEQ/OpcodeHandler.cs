@@ -2,7 +2,7 @@
 {
     public abstract class OpcodeHandler
     {
-        public abstract OpcodeID OpcodeId { get; }
+        public abstract OpcodeID[] OpcodeIds { get; }
 
         public abstract int MinArgs { get; }
 

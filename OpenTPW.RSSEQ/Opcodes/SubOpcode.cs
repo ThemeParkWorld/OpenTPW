@@ -2,7 +2,7 @@
 {
     public class SubOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.SUB;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.SUB };
 
         public override void Invoke(Operand[] args)
         {

@@ -2,7 +2,7 @@
 {
     public class FadeObjOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.FADEOBJ;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.FADEOBJ };
 
         public override void Invoke(Operand[] args)
         {

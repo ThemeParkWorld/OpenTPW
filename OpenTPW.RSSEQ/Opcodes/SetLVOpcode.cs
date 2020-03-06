@@ -2,7 +2,7 @@
 {
     public class SetLVOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.SETLV;
+        public override OpcodeID[] OpcodeIds => new [] { OpcodeID.SETLV };
 
         public override void Invoke(Operand[] args)
         {

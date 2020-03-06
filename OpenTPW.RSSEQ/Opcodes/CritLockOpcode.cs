@@ -2,7 +2,7 @@
 {
     class CritLockOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.CRIT_LOCK;
+        public override OpcodeID[] OpcodeIds => new [] { OpcodeID.CRIT_LOCK };
 
         public override void Invoke(Operand[] args)
         {

@@ -2,7 +2,7 @@
 {
     public class EndSliceOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.ENDSLICE;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.ENDSLICE };
 
         public override void Invoke(Operand[] args)
         {

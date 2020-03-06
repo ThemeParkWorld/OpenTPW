@@ -11,7 +11,7 @@ namespace OpenTPW.RSSEQ
         private readonly RSSEQReader rsseqReader;
         private int currentPos;
 
-        private readonly Dictionary<OpcodeID, OpcodeHandler> opcodeHandlers = new Dictionary<OpcodeID, OpcodeHandler>();
+        private readonly Dictionary<OpcodeID[], OpcodeHandler> opcodeHandlers = new Dictionary<OpcodeID[], OpcodeHandler>();
 
         private VMConfig config = new VMConfig();
 
@@ -62,7 +62,7 @@ namespace OpenTPW.RSSEQ
         public string ScriptName { get; set; } = "Unnamed";
         public List<Instruction> Instructions { get; } = new List<Instruction>();
         public List<string> Strings { get; } = new List<string>();
-        public List<int> Variables { get; private set; }
+        public List<int> Variables { get; set; }
         public string Disassembly => rsseqReader.Disassembly;
         public Dictionary<int, VMObject> Objects { get; set; }
 
@@ -70,7 +70,6 @@ namespace OpenTPW.RSSEQ
         {
             rsseqReader = new RSSEQReader(this);
             rsseqReader.ReadFile(rseData);
-            Variables = new List<int>(rsseqReader.VariableCount);
             RegisterOpcodeHandlers(); 
         }
 
@@ -78,7 +77,6 @@ namespace OpenTPW.RSSEQ
         {
             rsseqReader = new RSSEQReader(this);
             rsseqReader.ReadFile(rsePath);
-            Variables = new List<int>(rsseqReader.VariableCount);
             RegisterOpcodeHandlers();
         }
 
@@ -89,7 +87,7 @@ namespace OpenTPW.RSSEQ
             {
                 var handler = (OpcodeHandler) Activator.CreateInstance(type);
                 handler.vmInstance = this;
-                opcodeHandlers.Add(handler.OpcodeId, handler);
+                opcodeHandlers.Add(handler.OpcodeIds, handler);
             }
         }
 
@@ -100,9 +98,13 @@ namespace OpenTPW.RSSEQ
             Instructions[currentPos++].Invoke();
         }
 
-        public OpcodeHandler FindOpcodeHandler(OpcodeID opcode)
+        public OpcodeHandler FindOpcodeHandler(OpcodeID opcodeId)
         {
-            return opcodeHandlers[opcode];
+            // TODO: Optimize
+            var handler = (opcodeHandlers.FirstOrDefault(opcodeHandler => opcodeHandler.Key.Contains(opcodeId))).Value;
+            if (handler == null)
+                Debug.Log($"Opcode ID {opcodeId} has no appropriate handler");
+            return handler;
         }
     }
 }

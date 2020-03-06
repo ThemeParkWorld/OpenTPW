@@ -4,7 +4,7 @@ namespace OpenTPW.RSSEQ.Opcodes
 {
     public class EventOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.EVENT | OpcodeID.EVENT_EXT;
+        public override OpcodeID[] OpcodeIds => new[] {OpcodeID.EVENT, OpcodeID.EVENT_EXT };
 
         public override void Invoke(Operand[] args)
         {

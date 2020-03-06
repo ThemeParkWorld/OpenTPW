@@ -2,7 +2,7 @@
 {
     public class SetObjParamOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.SETOBJPARAM;
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.SETOBJPARAM };
 
         public override void Invoke(Operand[] args)
         {

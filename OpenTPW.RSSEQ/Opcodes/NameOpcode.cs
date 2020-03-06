@@ -2,7 +2,7 @@
 {
     public class NameOpcode : OpcodeHandler
     {
-        public override OpcodeID OpcodeId => OpcodeID.NAME;
+        public override OpcodeID[] OpcodeIds => new [] { OpcodeID.NAME };
 
         public override int MinArgs => 1;
         public override int MaxArgs => 1;

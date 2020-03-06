@@ -10,7 +10,6 @@ namespace OpenTPW.RSSEQ
     // ADDOBJ_3 isn't correct.
     // TODO: investigate further
 
-    [Flags]
     public enum OpcodeID
     {
         NOP = 0,
