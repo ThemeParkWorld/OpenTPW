@@ -1,5 +1,5 @@
-﻿using System;
-using ECSEngine;
+﻿using ECSEngine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -70,7 +70,7 @@ namespace OpenTPW.RSSEQ
         {
             rsseqReader = new RSSEQReader(this);
             rsseqReader.ReadFile(rseData);
-            RegisterOpcodeHandlers(); 
+            RegisterOpcodeHandlers();
         }
 
         public VM(string rsePath)
@@ -85,7 +85,7 @@ namespace OpenTPW.RSSEQ
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.BaseType == typeof(OpcodeHandler) && t != typeof(OpcodeHandler)))
             {
-                var handler = (OpcodeHandler) Activator.CreateInstance(type);
+                var handler = (OpcodeHandler)Activator.CreateInstance(type);
                 handler.vmInstance = this;
                 opcodeHandlers.Add(handler.OpcodeIds, handler);
             }

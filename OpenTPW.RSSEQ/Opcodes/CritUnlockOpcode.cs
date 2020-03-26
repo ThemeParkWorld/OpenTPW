@@ -2,7 +2,7 @@
 {
     public class CritUnlockOpcode : OpcodeHandler
     {
-        public override OpcodeID[] OpcodeIds => new [] { OpcodeID.CRIT_UNLOCK };
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.CRIT_UNLOCK };
 
         public override void Invoke(Operand[] args)
         {

@@ -1,5 +1,4 @@
-﻿using System;
-using ECSEngine;
+﻿using ECSEngine;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace OpenTPW.RSSEQ
         private List<string> variables = new List<string>();
         private int expectedInstructions;
         private long instructionOffset;
-        
+
         public string Disassembly { get; private set; } = "";
         public int VariableCount => variables.Count;
 

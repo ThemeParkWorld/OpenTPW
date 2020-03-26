@@ -1,10 +1,8 @@
-﻿using System.Reflection.Emit;
-
-namespace OpenTPW.RSSEQ.Opcodes
+﻿namespace OpenTPW.RSSEQ.Opcodes
 {
     public class EventOpcode : OpcodeHandler
     {
-        public override OpcodeID[] OpcodeIds => new[] {OpcodeID.EVENT, OpcodeID.EVENT_EXT };
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.EVENT, OpcodeID.EVENT_EXT };
 
         public override void Invoke(Operand[] args)
         {

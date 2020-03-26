@@ -2,8 +2,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable IdentifierTypo
 
-using System;
-
 namespace OpenTPW.RSSEQ
 {
     // Some opcodes are missing entirely, and I'm pretty sure

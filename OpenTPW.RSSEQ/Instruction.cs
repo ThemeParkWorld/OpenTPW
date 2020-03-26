@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OpenTPW.RSSEQ
+﻿namespace OpenTPW.RSSEQ
 {
     public struct Instruction
     {

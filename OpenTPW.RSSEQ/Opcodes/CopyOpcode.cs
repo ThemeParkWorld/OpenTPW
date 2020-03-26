@@ -2,7 +2,7 @@
 {
     public class CopyOpcode : OpcodeHandler
     {
-        public override OpcodeID[] OpcodeIds => new [] { OpcodeID.COPY };
+        public override OpcodeID[] OpcodeIds => new[] { OpcodeID.COPY };
 
         public override void Invoke(Operand[] args)
         {

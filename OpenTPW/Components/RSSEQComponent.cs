@@ -1,9 +1,6 @@
 ﻿using ECSEngine.Components;
 using ImGuiNET;
 using OpenTPW.RSSEQ;
-using System;
-using System.Numerics;
-using OpenGL;
 
 namespace OpenTPW.Components
 {
