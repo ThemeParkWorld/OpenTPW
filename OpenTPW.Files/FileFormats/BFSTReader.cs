@@ -1,4 +1,5 @@
 ﻿using ECSEngine;
+using ECSEngine.DebugUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -73,7 +74,7 @@ namespace OpenTPW.Files.FileFormats
         {
             for (var i = 0; i < strings.Count; ++i)
             {
-                Debug.Log($"{strings[i]}");
+                Logging.Log($"{strings[i]}");
             }
         }
     }

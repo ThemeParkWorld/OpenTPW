@@ -23,7 +23,7 @@ namespace OpenTPW.Components
             disassembly = vmInstance.Disassembly;
         }
 
-        public override void RenderImGUI()
+        public void RenderImGUI()
         {
             if (ImGui.Button("Toggle window"))
             {

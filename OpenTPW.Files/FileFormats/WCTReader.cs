@@ -1,4 +1,5 @@
 ﻿using ECSEngine;
+using ECSEngine.DebugUtils;
 using ECSEngine.Render;
 using Ionic.Zlib;
 using OpenGL;
@@ -118,7 +119,7 @@ namespace OpenTPW.Files.FileFormats
                 throw new Exception("Not yet implemented");
             }
 
-            Debug.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
+            Logging.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
 
             var data = new ColorRGBA32[width * height * bpp];
 

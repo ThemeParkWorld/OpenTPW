@@ -1,4 +1,5 @@
 ﻿using ECSEngine;
+using ECSEngine.DebugUtils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -63,7 +64,7 @@ namespace OpenTPW.RSSEQ
         {
             var magicNumber = binaryReader.ReadChars(8);
             if (!Enumerable.SequenceEqual(magicNumber, new[] { 'R', 'S', 'S', 'E', 'Q', (char)0x0F, (char)0x01, (char)0x00 }))
-                Debug.Log("Magic number was not 'RSSEQ'", Debug.DebugSeverity.High);
+                Logging.Log("Magic number was not 'RSSEQ'", Logging.Severity.High);
 
             // Variable count
             var variableCount = binaryReader.ReadInt32();
@@ -79,7 +80,7 @@ namespace OpenTPW.RSSEQ
             {
                 var paddingChars = binaryReader.ReadChars(4);
                 if (!Enumerable.SequenceEqual(paddingChars, new[] { 'P', 'a', 'd', ' ' }))
-                    Debug.Log("Invalid padding!", Debug.DebugSeverity.High);
+                    Logging.Log("Invalid padding!", Logging.Severity.High);
             }
         }
 
@@ -97,7 +98,7 @@ namespace OpenTPW.RSSEQ
 
                 if ((binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions)
                 {
-                    Debug.Log($"Hit max count ({(binaryReader.BaseStream.Position - instructionOffset) / 4} of {expectedInstructions})");
+                    Logging.Log($"Hit max count ({(binaryReader.BaseStream.Position - instructionOffset) / 4} of {expectedInstructions})");
                     vmInstance.Instructions.Add(new Instruction(vmInstance, (OpcodeID)currentOpcode, currentOperands.ToArray()));
                     break;
                 }

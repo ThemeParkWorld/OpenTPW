@@ -1,4 +1,5 @@
 ﻿using ECSEngine;
+using ECSEngine.DebugUtils;
 using ECSEngine.Render;
 using OpenGL;
 using System;
@@ -33,7 +34,7 @@ namespace OpenTPW.Files.FileFormats
             int bpp = binaryReader.ReadByte();
             int descriptor = binaryReader.ReadByte();
 
-            Debug.Log($"Image {path} has a width of {width} and a height of {height}, and uses {dataTypeCode} data type code.  Image uses {bpp} bits per pixel");
+            Logging.Log($"Image {path} has a width of {width} and a height of {height}, and uses {dataTypeCode} data type code.  Image uses {bpp} bits per pixel");
 
             if (dataTypeCode != 2 || colorMapType != 0) throw new Exception("uhh");
 

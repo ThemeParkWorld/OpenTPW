@@ -120,14 +120,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\ECSEngine\ECSEngine\ECSEngine.csproj">
-      <Project>{7F629AE2-DD5D-4052-AF98-3FD15257C2AE}</Project>
-      <Name>ECSEngine</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\source\repos\Ulaid\ECSEngine\ECSEngine.csproj">
+      <Project>{7f629ae2-dd5d-4052-af98-3fd15257c2ae}</Project>
+      <Name>ECSEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

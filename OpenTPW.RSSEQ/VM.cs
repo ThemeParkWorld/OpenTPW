@@ -1,4 +1,5 @@
 ﻿using ECSEngine;
+using ECSEngine.DebugUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,7 +94,7 @@ namespace OpenTPW.RSSEQ
 
         public void Step()
         {
-            Debug.Log($"Current pos: {currentPos}");
+            Logging.Log($"Current pos: {currentPos}");
 
             Instructions[currentPos++].Invoke();
         }
@@ -103,7 +104,7 @@ namespace OpenTPW.RSSEQ
             // TODO: Optimize
             var handler = (opcodeHandlers.FirstOrDefault(opcodeHandler => opcodeHandler.Key.Contains(opcodeId))).Value;
             if (handler == null)
-                Debug.Log($"Opcode ID {opcodeId} has no appropriate handler");
+                Logging.Log($"Opcode ID {opcodeId} has no appropriate handler");
             return handler;
         }
     }

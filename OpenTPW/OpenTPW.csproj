@@ -145,8 +145,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\ECSEngine\ECSEngine\ECSEngine.csproj">
-      <Project>{7F629AE2-DD5D-4052-AF98-3FD15257C2AE}</Project>
+    <ProjectReference Include="..\..\..\..\source\repos\Ulaid\ECSEngine\ECSEngine.csproj">
+      <Project>{7f629ae2-dd5d-4052-af98-3fd15257c2ae}</Project>
       <Name>ECSEngine</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj">
@@ -163,7 +163,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy $(SolutionDir)Content $(TargetDir)Content /E /H /K /I /Y /s</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ImGui.NET.1.75.0\build\net40\ImGui.NET.targets" Condition="Exists('..\packages\ImGui.NET.1.75.0\build\net40\ImGui.NET.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

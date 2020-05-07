@@ -24,7 +24,7 @@ namespace OpenTPW
             };
 
             foreach (var entity in entities)
-                SceneManager.instance.AddEntity(entity);
+                SceneManager.Instance.AddEntity(entity);
         }
     }
 }

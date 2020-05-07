@@ -2,6 +2,7 @@
 using ECSEngine.Entities;
 using ECSEngine.MathUtils;
 using ECSEngine.Render;
+using ECSEngine.Render.Mesh;
 
 namespace OpenTPW.Entities.UI
 {
@@ -9,7 +10,7 @@ namespace OpenTPW.Entities.UI
     {
         protected Material material;
 
-        protected Mesh imageMesh;
+        protected MeshAsset imageMesh;
         protected Texture2D texture;
 
         protected Vector2 position;
@@ -21,11 +22,11 @@ namespace OpenTPW.Entities.UI
             material = new Material("Content/plane.mtl");
 
             // Add components
-            AddComponent(new ShaderComponent(new Shader("Content/2D/main.frag", OpenGL.ShaderType.FragmentShader),
-                new Shader("Content/2D/main.vert", OpenGL.ShaderType.VertexShader)));
+            AddComponent(new ShaderComponent(new Shader("Content/Shaders/2D/main.frag", OpenGL.ShaderType.FragmentShader),
+                new Shader("Content/Shaders/2D/main.vert", OpenGL.ShaderType.VertexShader)));
             AddComponent(new TransformComponent(new Vector3(0, 0, -0.1f), Quaternion.FromEulerAngles(new Vector3(90f, 0, 0)), new Vector3(1, 1, 1)));
             AddComponent(new MaterialComponent(material));
-            AddComponent(new MeshComponent("Content/plane.obj"));
+            // AddComponent(new MeshComponent("Content/plane.obj"));
         }
     }
 }
