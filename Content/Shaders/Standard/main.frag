@@ -55,6 +55,7 @@ in vec3 outVertexPos;
 in vec2 outUvCoord;
 in vec3 outNormal;
 in vec3 outFragPos;
+in vec4 outFragPosLightSpace;
 
 uniform Material material;
 uniform Light light;
@@ -68,48 +69,56 @@ uniform vec3 cameraPos;
 uniform vec3 skyColor;
 uniform float fogNear;
 
+uniform sampler2D shadowMap;
+
 out vec4 fragColor;
 
 vec3 modelPos;
-vec3 normal;
-vec3 lightDirection;
 vec3 cameraDirection;
+vec3 lightDirection;
+vec3 normalizedNormal;
 
 vec3 CalcAmbience()
 {
-    return material.ambientColor.xyz * 0.3;
+    return material.ambientColor.xyz * 0.05;
 }
 
 vec3 CalcDiffuse()
 {
-    float diff = max(dot(normal, lightDirection), 0.0);
-
-    return diff * material.diffuseColor.xyz;
+    float diffuseStrength = max(dot(normalizedNormal, lightDirection), 0.0);
+    return vec3(diffuseStrength);
 }
 
 vec3 CalcSpecular()
 {
-    vec3 reflectionDirection = reflect(-lightDirection, normal);
-    float spec = pow(max(dot(cameraDirection, reflectionDirection), 0.0), 32);
-    return spec * material.specularColor.xyz * 16;
+    float specularStrength = 0.5;
+    float specularPower = 16;
+    vec3 viewDirection = normalize(cameraPos - outFragPos);
+    vec3 halfwayDirection = normalize(lightDirection + cameraDirection);
+    float specularDirection = pow(max(dot(normalizedNormal, halfwayDirection), 0.0), specularPower);
+    return specularStrength * specularDirection * vec3(1.0);
+}
+
+float CalcShadow()
+{
+    vec3 projCoords = outFragPosLightSpace.xyz / outFragPosLightSpace.w;
+    projCoords = (projCoords * 0.5) + 0.5;
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+    return (currentDepth > closestDepth) ? 1.0 : 0.0;
 }
 
 vec3 CalcFullMix()
 {
-    // return texture(material.diffuseTexture, outUvCoord).xyz;
-    return (CalcAmbience() + CalcDiffuse() + CalcSpecular()) * texture(material.diffuseTexture, outUvCoord).xyz;
+    float shadow = CalcShadow();
+    vec3 fullMix = (CalcAmbience() + (1.0 - shadow) * (CalcSpecular() + CalcDiffuse())) * texture(material.diffuseTexture, outUvCoord).xyz;
+    return fullMix;
 }
 
-void main() 
+void main()
 {
-    modelPos = vec3(modelMatrix * vec4(outFragPos, 1.0));
-    lightDirection = normalize(light.pos - modelPos);
+    normalizedNormal = normalize(outNormal);
+    lightDirection = normalize(light.pos - outFragPos);
 
-    lightDirection = normalize(modelPos - light.pos);
-    cameraDirection = normalize(cameraPos - modelPos);
-    normal = normalize(outNormal);
-
-    fragColor = vec4(outUvCoord, 1.0, 1.0);
-
-    fragColor = vec4(mix(skyColor, CalcFullMix(), clamp(1.0 - (fogNear * outFragPos.z), 0.0, 1.0)), 1.0 - material.transparency);
+    fragColor = vec4(CalcFullMix(), 1.0 - material.transparency);
 }

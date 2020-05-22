@@ -1,84 +1,30 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C3549307-580E-44B1-838A-A56C4B51E6F2}</ProjectGuid>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RootNamespace>OpenTPW</RootNamespace>
-    <AssemblyName>OpenTPW</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Engine">
@@ -99,9 +45,6 @@
     <Reference Include="Engine.Utils">
       <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="ImGui.NET, Version=1.75.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImGui.NET.1.75.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
-    </Reference>
     <Reference Include="OpenGL.Net, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\OpenGL.Net.dll</HintPath>
@@ -114,84 +57,48 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ECSEngine\Other\OpenGL.Net\OpenGL.Net\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.Math.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.4.1.0\lib\net462\System.Runtime.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.4.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.InteropServices, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.4.1.0\lib\net462\System.Runtime.InteropServices.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\RSSEQComponent.cs" />
-    <Compile Include="Entities\RideEntity.cs" />
-    <Compile Include="Entities\UI\BaseImageEntity.cs" />
-    <Compile Include="Entities\UI\TGAImageEntity.cs" />
-    <Compile Include="GameSettings.Designer.cs">
+    <Compile Update="GameSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>GameSettings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TPWGame.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="GameProperties.json">
+    <None Update="GameProperties.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="GameSettings.settings">
+    <None Update="GameSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GameSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>GameSettings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj">
-      <Project>{90D07478-E369-4F36-B220-5D6A59C24BFA}</Project>
-      <Name>OpenTPW.Files</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenTPW.RSSEQ\OpenTPW.RSSEQ.csproj">
-      <Project>{18B8115E-15D3-4309-BE4F-D633E88E1B30}</Project>
-      <Name>OpenTPW.RSSEQ</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj" />
+    <ProjectReference Include="..\OpenTPW.RSSEQ\OpenTPW.RSSEQ.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\UI\WCTImageEntity.cs" />
+    <PackageReference Include="BepuPhysics" Version="2.2.0" />
+    <PackageReference Include="cef.redist.x64" Version="79.1.36" />
+    <PackageReference Include="cef.redist.x86" Version="79.1.36" />
+    <PackageReference Include="CefSharp.Common" Version="79.1.360" />
+    <PackageReference Include="CefSharp.OffScreen" Version="79.1.360" />
+    <PackageReference Include="Fleck" Version="1.1.0" />
+    <PackageReference Include="ImGui.NET" Version="1.75.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Buffers" Version="4.4.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0-preview.4.20251.6" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.1.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <Import Project="..\packages\ImGui.NET.1.75.0\build\net40\ImGui.NET.targets" Condition="Exists('..\packages\ImGui.NET.1.75.0\build\net40\ImGui.NET.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\ImGui.NET.1.75.0\build\net40\ImGui.NET.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ImGui.NET.1.75.0\build\net40\ImGui.NET.targets'))" />
-  </Target>
+  <PropertyGroup />
 </Project>

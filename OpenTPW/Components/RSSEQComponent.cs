@@ -6,6 +6,7 @@ namespace OpenTPW.Components
 {
     public class RSSEQComponent : Component<RSSEQComponent>
     {
+
         private VM vmInstance; // probably shouldn't create a new VM instance for every ride
         private bool showImGUIWindow;
         private string disassembly;
@@ -32,38 +33,43 @@ namespace OpenTPW.Components
 
             if (showImGUIWindow)
             {
-                ImGui.Begin("RSSEQ VM");
-
-                if (ImGui.Button("Step thru"))
-                {
-                    vmInstance.Step();
-                }
-
-                ImGui.LabelText("", "Config");
-                // TODO: condense these into a list somehow
-                foreach (var property in typeof(VM).GetProperties())
-                {
-                    var propName = property.Name;
-                    var propValue = property.GetValue(vmInstance);
-                    if (propValue != null)
-                        ImGui.LabelText(propName, propValue.ToString());
-                }
-
-                ImGui.LabelText("", "Variables");
-                // pipe all variables thru to imgui
-                for (var i = 0; i < vmInstance.Variables.Count; i++)
-                {
-                    ImGui.LabelText(vmInstance.Variables[i].ToString(), i.ToString());
-                }
-
-                //ImGui.LabelText("", "Disassembly");
-
-                //ImGui.PushItemWidth(-1);
-                //ImGui.InputTextMultiline("Disassembly", ref disassembly, UInt32.MaxValue, new Vector2(-1, 250));
-                //ImGui.PopItemWidth();
-
-                ImGui.End();
+                DrawImGuiWindow();
             }
+        }
+
+        private void DrawImGuiWindow()
+        {
+            ImGui.Begin("RSSEQ VM");
+
+            if (ImGui.Button("Step thru"))
+            {
+                vmInstance.Step();
+            }
+
+            ImGui.LabelText("", "Config");
+            // TODO: condense these into a list somehow
+            foreach (var property in typeof(VM).GetProperties())
+            {
+                var propName = property.Name;
+                var propValue = property.GetValue(vmInstance);
+                if (propValue != null)
+                    ImGui.LabelText(propName, propValue.ToString());
+            }
+
+            ImGui.LabelText("", "Variables");
+            // pipe all variables thru to imgui
+            for (var i = 0; i < vmInstance.Variables.Count; i++)
+            {
+                ImGui.LabelText(vmInstance.Variables[i].ToString(), i.ToString());
+            }
+
+            //ImGui.LabelText("", "Disassembly");
+
+            //ImGui.PushItemWidth(-1);
+            //ImGui.InputTextMultiline("Disassembly", ref disassembly, UInt32.MaxValue, new Vector2(-1, 250));
+            //ImGui.PopItemWidth();
+
+            ImGui.End();
         }
     }
 }

@@ -20,10 +20,10 @@ namespace OpenTPW
                 // new WCTImageEntity($"{GameSettings.Default.gameDir}/data/ui.wad", $"hilight.wct", new Vector2(0, 0), new Vector2(1280, 720)),
                 // new TGAImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2(0, 0), new Vector2(1280, 720)),
                 new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/bouncy.wad"),
-                new CefEntity()
-                {
-                    Name = "CEF HUD Entity"
-                }
+                //new CefEntity()
+                //{
+                //    Name = "CEF HUD Entity"
+                //}
             };
 
             foreach (var entity in entities)
