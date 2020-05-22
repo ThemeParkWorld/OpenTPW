@@ -1,0 +1,14 @@
+{
+  "scriptList": [
+    {
+      "path": "HUDWindow.cs",
+      "entryPoint": "Run" 
+    }
+  ],
+    "name":"TestScript",
+    "license":"MPL-2.0",
+    "author":"xezno",
+    "description":"Test Script for Ulaid",
+    "keywords":"ulaid,test,script",
+    "version":"0.1.0"
+}

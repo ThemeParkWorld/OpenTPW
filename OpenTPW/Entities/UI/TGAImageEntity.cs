@@ -1,4 +1,4 @@
-﻿using ECSEngine.MathUtils;
+﻿using Engine.Utils.MathUtils;
 using OpenTPW.Files.FileFormats;
 
 namespace OpenTPW.Entities.UI

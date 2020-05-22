@@ -1,6 +1,5 @@
-﻿using ECSEngine;
-using ECSEngine.DebugUtils;
-using ECSEngine.Render;
+﻿using Engine.Renderer.GL.Render;
+using Engine.Utils.DebugUtils;
 using Ionic.Zlib;
 using OpenGL;
 using System;

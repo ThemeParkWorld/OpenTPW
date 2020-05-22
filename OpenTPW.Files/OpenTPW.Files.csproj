@@ -76,14 +76,23 @@
     <Reference Include="DotNetZip, Version=1.13.5.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.13.5\lib\net40\DotNetZip.dll</HintPath>
     </Reference>
-    <Reference Include="OpenGL.Net">
-      <HintPath>..\..\OpenGL.Net\OpenGL.Net.CoreUI\bin\net461\Release\OpenGL.Net.dll</HintPath>
+    <Reference Include="Engine.Renderer.GL">
+      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Renderer.GL.dll</HintPath>
     </Reference>
-    <Reference Include="OpenGL.Net.CoreUI">
-      <HintPath>..\..\OpenGL.Net\OpenGL.Net.CoreUI\bin\net461\Release\OpenGL.Net.CoreUI.dll</HintPath>
+    <Reference Include="Engine.Utils">
+      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="OpenGL.Net.Math">
-      <HintPath>..\..\..\..\source\repos\ECSEngine\packages\OpenGL.Net.Math.0.8.4\lib\net461\OpenGL.Net.Math.dll</HintPath>
+    <Reference Include="OpenGL.Net, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\OpenGL.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenGL.Net.CoreUI, Version=0.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\OpenGL.Net.CoreUI\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.CoreUI.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenGL.Net.Math, Version=0.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\OpenGL.Net\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.Math.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -122,12 +131,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\Ulaid\ECSEngine\ECSEngine.csproj">
-      <Project>{7f629ae2-dd5d-4052-af98-3fd15257c2ae}</Project>
-      <Name>ECSEngine</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

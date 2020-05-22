@@ -1,4 +1,4 @@
-﻿using ECSEngine.Components;
+﻿using Engine.ECS.Components;
 using ImGuiNET;
 using OpenTPW.RSSEQ;
 
@@ -23,7 +23,7 @@ namespace OpenTPW.Components
             disassembly = vmInstance.Disassembly;
         }
 
-        public void RenderImGUI()
+        public override void RenderImGui()
         {
             if (ImGui.Button("Toggle window"))
             {

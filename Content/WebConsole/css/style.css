@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+:root {
+    --low:          #a2e19544;
+    --medium:       #fce38a44;
+    --high:         #f3818144;
+    --fatal:        #fa465944;
+    --input:        #43ff5344;
+
+    --low-text:     #43ff53;
+    --medium-text:  #ffc800;
+    --high-text:    #ff5e5e;
+    --fatal-text:   #ff0000;
+    --input-text:   #43ff53;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    font-family: "Roboto", sans-serif;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    color: white;
+    background: #333;
+}
+
+main {
+    margin: auto;
+    width: 95vw;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+header {
+    padding: 0 20px;
+    border-bottom: 1px solid #ffffff22;
+    margin-bottom: 10px;
+}
+
+.console-input { 
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ffffff22;
+    background: inherit;
+    color: inherit;
+    width: 100%;
+}
+
+.console-timestamp { 
+    padding: 2px 6px;
+    background: #00000022;
+    border-radius: 5px;
+}
+
+.console {
+    font-family: monospace;
+}
+
+.console-wrapper {
+    width: 100%;
+    height: calc(100vh - 150px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.console-message, .console-input-message {
+    width: 100%;
+    padding: 4px;
+    padding-left: 16px;
+    position: relative;
+    cursor: pointer;
+
+    transition: 150ms all ease-in-out;
+}
+
+.console-input-message {
+    padding: 8px 4px;
+    padding-left: 16px;
+    background: var(--input);
+    color: var(--input-text);
+}
+
+.console-message::before, .console-input-message::before {
+    content: ' ';
+    display: inline-block;
+    width: 4px;
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top: 1px;
+    bottom: 1px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00000000;
+
+    transition: 150ms all ease-in-out;
+}
+
+.console-message:hover::before, .console-input-message:hover::before {
+    width: 42px;
+    padding: 8px;
+    color: black;
+}
+
+.console-message:hover, .console-input-message:hover {
+    padding-left: 66px;
+}
+
+.console-input-message::before {
+    background: var(--input);
+    color: var(--input);
+}
+
+.console-message.low {
+    background: var(--low);
+    color: var(--low-text);
+}
+
+.console-message.low .console-timestamp {
+    background: var(--low-text);
+    color: black;
+}
+
+.console-message.low::before {
+    background: var(--low-text);
+}
+
+.console-message.medium {
+    background: var(--medium);
+    color: var(--medium-text);
+}
+
+.console-message.medium .console-timestamp {
+    background: var(--medium-text);
+    color: black;
+}
+
+.console-message.medium::before {
+    background: var(--medium-text);
+}
+
+.console-message.high {
+    background: var(--high);
+    color: var(--high-text);
+}
+
+.console-message.high .console-timestamp {
+    background: var(--high-text);
+    color: black;
+}
+
+.console-message.high::before {
+    background: var(--high-text);
+}
+
+.console-message.fatal {
+    background: var(--fatal);
+    color: var(--fatal-text);
+}
+
+.console-message.fatal .console-timestamp {
+    background: var(--fatal-text);
+    color: white;
+}
+
+.console-message.fatal::before {
+    background: var(--fatal-text);
+}
+
+.console-message.low::before {
+    content: 'LOW';
+}
+
+.console-message.medium::before {
+    content: 'MEDIUM';
+}
+
+.console-message.fatal::before {
+    CONTENT: 'FATAL';
+}
+
+.console-message.high::before {
+    content: 'HIGH';
+}
+
+.console-input-message::before {
+    content: 'INPUT';
+}
+
+.console-suggestions {
+    position: absolute;
+    height: fit-content;
+    bottom: 27px;
+    background: #111;
+    padding: 12px;
+
+    list-style: none;
+    visibility: hidden;
+}
+
+.console-suggestions li {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.console-suggestions li > * { 
+    width: 100%;
+}
+
+.console-suggestions li:not(:last-child) {
+    border-bottom: 1px solid #ffffff22;
+}
+
+.console-suggestion-description {
+    font-size: 0.8em;
+    color: #aaa;
+}
+
+.console-suggestion-error {
+    color: #ff5e5e;
+}
+
+.console-suggestion-value {
+    color: #ffc800;
+}
+
+.console-suggestion-value:not(:empty)::before, .console-suggestion-value:not(:empty)::after {
+    content: "\"";
+}
+
+.message {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: #111;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 250px;
+    height: 100px;
+    margin-left: -125px;
+    margin-top: -50px;
+
+    z-index: 1000;
+}
+
+.message > * {
+    width: 100%;
+}
+
+.message-title {
+    font-size: 1.2em;
+}

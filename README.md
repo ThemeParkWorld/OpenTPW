@@ -16,7 +16,6 @@ File format information is available within this repo's [wiki](https://github.co
 - .NET Framework 4.8
 - Visual Studio 2019
 - Windows
-- [ECSEngine](https://github.com/xezno/ECSEngine)
 
 ## License
 

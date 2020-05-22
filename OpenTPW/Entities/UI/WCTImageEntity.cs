@@ -1,4 +1,4 @@
-﻿using ECSEngine.MathUtils;
+﻿using Engine.Utils.MathUtils;
 using OpenTPW.Files.FileFormats;
 using OpenTPW.Files.FileFormats.BFWD;
 using System;

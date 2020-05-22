@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <title>Web Console</title>
+    </head>
+    <body>
+        <header>
+            <h1>Web Console</h1>
+        </header>
+
+        <div class="message" id="message">
+            <span class="message-title">No connection</span>
+            <span class="message-description">Try launching the game if you haven't already.</span>
+        </div>
+
+        <main>
+            <div class="console-wrapper" id="console-wrapper">
+                <div class="console" id="console">
+                </div>
+            </div>
+            <ul class="console-suggestions" id="console-suggestions">
+            </ul>
+            <input id="console-input" class="console-input" placeholder="Input..." onkeyup="inputKeyDown(event)" />
+        </main>
+
+        <script src="script/frontend.js"></script> 
+        <script src="script/socket.js"></script> 
+    </body>
+</html>
