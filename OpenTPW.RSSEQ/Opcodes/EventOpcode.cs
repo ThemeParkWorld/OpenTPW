@@ -16,8 +16,10 @@
             }
         }
 
-        public override int MinArgs => 0;
-        public override int MaxArgs => 0;
+        public override int MinArgs => 3;
+        public override int MaxArgs => 4;
         public override string Description => "Trigger an in-game event.";
+
+        public override string[] Args => new[] { "type", "unknown", "event" };
     }
 }

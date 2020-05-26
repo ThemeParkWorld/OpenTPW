@@ -13,12 +13,14 @@
         private int value;
         private readonly VM vmInstance;
         private readonly Type type;
+        private readonly int nameIndex;
 
-        public Operand(VM vmInstance, Type type, int value)
+        public Operand(VM vmInstance, Type type, int value, int nameIndex = -1)
         {
             this.vmInstance = vmInstance;
             this.type = type;
             this.value = value;
+            this.nameIndex = nameIndex;
         }
 
         public int Value
@@ -44,6 +46,19 @@
                         this.value = value;
                         break;
                 }
+            }
+        }
+
+        public override string ToString()
+        {
+            switch (type)
+            {
+                case Type.Variable:
+                    return vmInstance.VariableNames[nameIndex];
+                case Type.Location:
+                    return $"jump_{Value}";
+                default:
+                    return Value.ToString();
             }
         }
     }

@@ -27,12 +27,12 @@
             var operandString = "";
             for (var i = 0; i < operands.Length; ++i)
             {
-                operandString += operands[i];
+                operandString += operands[i].Value;
                 if (i != operands.Length - 1) operandString += "\t";
             }
 
             var padding = "\t";
-            var opcodeName = ((OpcodeID)opcode).ToString();
+            var opcodeName = opcode.ToString();
             if (opcodeName.Length < 8)
                 padding += "\t";
 

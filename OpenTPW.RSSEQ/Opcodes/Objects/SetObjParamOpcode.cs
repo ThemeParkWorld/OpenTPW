@@ -19,5 +19,7 @@
         public override int MinArgs => 3;
         public override int MaxArgs => 3;
         public override string Description => "Set a sub-object's parameters";
+
+        public override string[] Args => new[] { "slot", "parameter", "value" };
     }
 }

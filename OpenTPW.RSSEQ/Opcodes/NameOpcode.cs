@@ -3,10 +3,10 @@
     public class NameOpcode : OpcodeHandler
     {
         public override OpcodeID[] OpcodeIds => new[] { OpcodeID.NAME };
-
         public override int MinArgs => 1;
         public override int MaxArgs => 1;
         public override string Description => "Set the script's name.";
+        public override string[] Args => new[] { "value" };
 
         public override void Invoke(Operand[] args)
         {

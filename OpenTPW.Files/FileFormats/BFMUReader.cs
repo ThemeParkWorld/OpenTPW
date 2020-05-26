@@ -7,45 +7,28 @@ using System.Text;
 
 namespace OpenTPW.Files.FileFormats
 {
-    // bullfrog multibyte <-> unicode?
     public class BFMUReader : IAssetReader
     {
-        private List<char> _characters = new List<char>();
-        public List<string> extensions => new List<string>() { ".dat" };
+        private List<char> characters = new List<char>();
+        public string[] Extensions => new[] { ".dat" };
 
         public char GetChar(byte b)
         {
-            return _characters[(int)b - 0x01]; // BFMU characters are offset by 0x01
+            return characters[(int)b - 0x01]; // BFMU characters are offset by 0x01
         }
 
-        public void LoadAsset(BFWDArchive archive, string file)
+        public AbstractAsset LoadAsset(ArchiveFile file)
         {
-            var fileMatches = archive.files.Where((bfwdFile) => bfwdFile.name == file);
-            if (fileMatches.Count() < 1)
-            {
-                throw new Exception($"File {file} does not exist in archive.");
-            }
-            else
-            {
-                foreach (var archiveFile in fileMatches)
-                {
-                    LoadAsset(archiveFile);
-                    break; // Only load 1st file; ignore rest
-                }
-            }
+            return LoadAsset(file.data);
         }
 
-        public void LoadAsset(ArchiveFile file)
-        {
-            LoadAsset(file.data);
-        }
-
-        public void LoadAsset(byte[] data)
+        public AbstractAsset LoadAsset(byte[] data)
         {
             var memoryStream = new MemoryStream(data);
             var binaryReader = new BinaryReader(memoryStream);
 
-            if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFMU") throw new Exception("This isn't a BFMU file!");
+            if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFMU") 
+                throw new Exception("This isn't a BFMU file!");
 
             /* 
              * BFMU (bullfrog multibyte <-> unicode) is like, the simplest format of all time
@@ -68,12 +51,18 @@ namespace OpenTPW.Files.FileFormats
                 var bytes = binaryReader.ReadBytes(2);
                 foreach (var c in Encoding.Unicode.GetChars(bytes))
                 {
-                    _characters.Add(c);
+                    characters.Add(c);
                 }
             }
 
             binaryReader.Close();
             memoryStream.Close();
+
+            return new AbstractAsset()
+            {
+                DataType = typeof(char),
+                Data = characters.Cast<object>().ToList()
+            };
         }
 
         public void LoadAsset(string file)

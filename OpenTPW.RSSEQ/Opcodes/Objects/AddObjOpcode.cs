@@ -11,8 +11,8 @@ namespace OpenTPW.RSSEQ.Opcodes
             if (args.Length == 4)
             {
                 // non-EXT
-                // <type> <slot> <id> <quantity>
-                vmInstance.Objects.Add(args[1].Value, new VMObject(args[0].Value, args[2].Value));
+                // <type> <parameter> <slot> <id>
+                vmInstance.Objects.Add(args[2].Value, new VMObject(args[0].Value, args[3].Value));
             }
             else
             {
@@ -24,5 +24,7 @@ namespace OpenTPW.RSSEQ.Opcodes
         public override int MinArgs => 4;
         public override int MaxArgs => 5;
         public override string Description => "Add an object of a specific type to the ride.";
+
+        public override string[] Args => new[] { "type", "parameter", "id", "slot" };
     }
 }

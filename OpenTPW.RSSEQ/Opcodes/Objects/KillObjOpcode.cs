@@ -13,5 +13,7 @@
         public override int MinArgs => 1;
         public override int MaxArgs => 1;
         public override string Description => "Remove an object of a specific slot type.";
+
+        public override string[] Args => new[] { "slot" };
     }
 }

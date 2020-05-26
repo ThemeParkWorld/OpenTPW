@@ -27,6 +27,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Engine.ECS">
+      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.ECS.dll</HintPath>
+    </Reference>
     <Reference Include="Engine.Renderer.GL">
       <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Renderer.GL.dll</HintPath>
     </Reference>

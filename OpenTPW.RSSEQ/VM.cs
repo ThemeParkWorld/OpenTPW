@@ -1,4 +1,5 @@
-﻿using Engine.Utils.DebugUtils;
+﻿using Engine.Gui.Attributes;
+using Engine.Utils.DebugUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,62 +10,21 @@ namespace OpenTPW.RSSEQ
     public class VM
     {
         private readonly RSSEQReader rsseqReader;
-        private int currentPos;
-
         private readonly Dictionary<OpcodeID[], OpcodeHandler> opcodeHandlers = new Dictionary<OpcodeID[], OpcodeHandler>();
 
-        private VMConfig config = new VMConfig();
-
-        private VMFlags flags = new VMFlags();
-
-        public bool Crit
-        {
-            get => flags.crit;
-            set => flags.crit = value;
-        }
-        public bool Sign
-        {
-            get => flags.sign;
-            set => flags.sign = value;
-        }
-        public bool Zero
-        {
-            get => flags.zero;
-            set => flags.zero = value;
-        }
-
-        public int StackSize
-        {
-            get => config.stackSize;
-            set => config.stackSize = value;
-        }
-        public int LimboSize
-        {
-            get => config.limboSize;
-            set => config.limboSize = value;
-        }
-        public int TimeSlice
-        {
-            get => config.timeSlice;
-            set => config.timeSlice = value;
-        }
-        public int BounceSize
-        {
-            get => config.bounceSize;
-            set => config.bounceSize = value;
-        }
-        public int WalkSize
-        {
-            get => config.walkSize;
-            set => config.walkSize = value;
-        }
-
         public string ScriptName { get; set; } = "Unnamed";
-        public List<Instruction> Instructions { get; } = new List<Instruction>();
-        public List<string> Strings { get; } = new List<string>();
-        public List<int> Variables { get; set; }
-        public string Disassembly => rsseqReader.Disassembly;
-        public Dictionary<int, VMObject> Objects { get; set; }
+
+        [HideInImGui] public int CurrentPos { get; set; }
+        [HideInImGui] public List<Instruction> Instructions { get; } = new List<Instruction>();
+        [HideInImGui] public List<string> Strings { get; } = new List<string>();
+        [HideInImGui] public List<int> Variables { get; set; } = new List<int>();
+        [HideInImGui] public string Disassembly => rsseqReader.Disassembly;
+        [HideInImGui] public List<string> VariableNames { get; set; } = new List<string>();
+        [HideInImGui] public Dictionary<int, VMObject> Objects { get; set; } = new Dictionary<int, VMObject>();
+        [HideInImGui] public VMFlags Flags { get; private set; } = new VMFlags();
+        [HideInImGui] public VMConfig Config { get; private set; } = new VMConfig();
+
+        [HideInImGui] public List<VMBranch> Branches { get; set; } = new List<VMBranch>();
 
         public VM(byte[] rseData)
         {
@@ -93,9 +53,10 @@ namespace OpenTPW.RSSEQ
 
         public void Step()
         {
-            Logging.Log($"Current pos: {currentPos}");
+            var instruction = Instructions[CurrentPos++];
+            Logging.Log($"Invoking {instruction.opcode} at position {CurrentPos}");
 
-            Instructions[currentPos++].Invoke();
+            instruction.Invoke();
         }
 
         public OpcodeHandler FindOpcodeHandler(OpcodeID opcodeId)
@@ -105,6 +66,13 @@ namespace OpenTPW.RSSEQ
             if (handler == null)
                 Logging.Log($"Opcode ID {opcodeId} has no appropriate handler");
             return handler;
+        }
+
+        public void BranchTo(int value)
+        {
+            var destBranch = Branches.First(b => b.compiledOffset == value);
+            Logging.Log($"Branching to pos {destBranch.compiledOffset} ({destBranch.instructionOffset})");
+            CurrentPos = destBranch.instructionOffset;
         }
     }
 }

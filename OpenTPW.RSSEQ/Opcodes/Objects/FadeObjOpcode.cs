@@ -9,8 +9,10 @@
             // Fade object in args[0]
         }
 
-        public override int MinArgs => 0;
-        public override int MaxArgs => 0;
-        public override string Description => "Unknown";
+        public override int MinArgs => 1;
+        public override int MaxArgs => 1;
+        public override string Description => "Fade out an object, and then remove it.";
+
+        public override string[] Args => new[] { "slot" };
     }
 }

@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace OpenTPW.RSSEQ
 {
+    // TODO: Move to OpenTPW.FileFormats
     public class RSSEQReader
     {
         private VM vmInstance;
-        private List<int> branches = new List<int>();
         private List<string> variables = new List<string>();
         private int expectedInstructions;
         private long instructionOffset;
@@ -57,6 +57,8 @@ namespace OpenTPW.RSSEQ
 
             ReadFileBody(binaryReader);
             WriteDisassembly();
+
+            Logging.Log(Disassembly);
         }
 
         private void ReadFileHeader(BinaryReader binaryReader)
@@ -69,11 +71,11 @@ namespace OpenTPW.RSSEQ
             var variableCount = binaryReader.ReadInt32();
 
             vmInstance.Variables = new List<int>(variableCount);
-            vmInstance.StackSize = binaryReader.ReadInt32();
-            vmInstance.TimeSlice = binaryReader.ReadInt32();
-            vmInstance.LimboSize = binaryReader.ReadInt32();
-            vmInstance.BounceSize = binaryReader.ReadInt32();
-            vmInstance.WalkSize = binaryReader.ReadInt32();
+            vmInstance.Config.StackSize = binaryReader.ReadInt32();
+            vmInstance.Config.TimeSlice = binaryReader.ReadInt32();
+            vmInstance.Config.LimboSize = binaryReader.ReadInt32();
+            vmInstance.Config.BounceSize = binaryReader.ReadInt32();
+            vmInstance.Config.WalkSize = binaryReader.ReadInt32();
 
             for (var i = 0; i < 4; ++i)
             {
@@ -86,7 +88,6 @@ namespace OpenTPW.RSSEQ
         private void ReadFileBody(BinaryReader binaryReader)
         {
             var currentOperands = new List<Operand>();
-
             var currentOpcode = 0;
 
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length - 1)
@@ -112,16 +113,16 @@ namespace OpenTPW.RSSEQ
                         break;
                     case 0x10:
                         // String
-                        currentOperands.Add(new Operand(vmInstance, Operand.Type.String, truncValue));
+                        currentOperands.Add(new Operand(vmInstance, Operand.Type.String, truncValue, truncValue));
                         break;
                     case 0x20:
                         // Branch
                         currentOperands.Add(new Operand(vmInstance, Operand.Type.Location, truncValue));
-                        branches.Add(truncValue);
+                        vmInstance.Branches.Add(new VMBranch(vmInstance.Instructions.Count - 2 /* ignore NOP and array starts at 0 */, truncValue));
                         break;
                     case 0x40:
                         // Variable
-                        currentOperands.Add(new Operand(vmInstance, Operand.Type.Variable, truncValue));
+                        currentOperands.Add(new Operand(vmInstance, Operand.Type.Variable, truncValue, truncValue));
                         break;
                     case 0x00:
                         // Literal
@@ -157,6 +158,7 @@ namespace OpenTPW.RSSEQ
                 // Read remaining variables
                 var variableNameLength = binaryReader.ReadInt32();
                 var stringChars = binaryReader.ReadChars(variableNameLength);
+                vmInstance.VariableNames.Add(new string(stringChars));
                 vmInstance.Variables.Add(0);
                 //vmInstance.Variables.Add(new string(stringChars).Replace("\0", ""));
             }
@@ -168,11 +170,11 @@ namespace OpenTPW.RSSEQ
 
             for (var i = 0; i < vmInstance.Instructions.Count; ++i)
             {
-                if (branches.Contains(currentCount - 1))
+                if (vmInstance.Branches.Any(b => b.compiledOffset == currentCount - 1))
                 {
                     Disassembly += $".branch_{currentCount - 1}\n";
                 }
-                Disassembly += $"\t{vmInstance.Instructions[i].ToString()}\n";
+                Disassembly += $"\t{vmInstance.Instructions[i]}\n";
                 currentCount += vmInstance.Instructions[i].GetCount();
             }
         }

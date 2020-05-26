@@ -1,7 +1,11 @@
 ﻿namespace OpenTPW.RSSEQ
 {
-    public struct VMConfig
+    public class VMConfig
     {
-        public int stackSize, limboSize, bounceSize, walkSize, timeSlice;
+        public int StackSize { get; set; }
+        public int LimboSize { get; set; }
+        public int BounceSize { get; set; }
+        public int WalkSize { get; set; }
+        public int TimeSlice { get; set; }
     }
 }

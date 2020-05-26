@@ -1,9 +1,9 @@
 ﻿namespace OpenTPW.RSSEQ
 {
-    struct VMFlags
+    public class VMFlags
     {
-        public bool sign;
-        public bool zero;
-        public bool crit;
+        public bool Sign { get; set; }
+        public bool Zero { get; set; }
+        public bool Crit { get; set; }
     }
 }

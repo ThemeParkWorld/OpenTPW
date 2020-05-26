@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace OpenTPW.Files.FileFormats
+﻿namespace OpenTPW.Files.FileFormats
 {
-    public interface IAssetReader
+    internal interface IAssetReader
     {
-        List<string> extensions { get; }
-        void LoadAsset(byte[] data);
+        string[] Extensions { get; }
+        AbstractAsset LoadAsset(byte[] data);
     }
 }

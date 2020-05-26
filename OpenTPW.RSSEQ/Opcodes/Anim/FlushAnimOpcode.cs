@@ -12,5 +12,7 @@
         public override int MinArgs => 0;
         public override int MaxArgs => 0;
         public override string Description => "Stop all active animations";
+
+        public override string[] Args => new string[0];
     }
 }
