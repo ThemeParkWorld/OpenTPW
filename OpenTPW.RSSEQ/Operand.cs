@@ -57,6 +57,8 @@
                     return vmInstance.VariableNames[nameIndex];
                 case Type.Location:
                     return $"jump_{Value}";
+                case Type.String:
+                    return $"\"{vmInstance.Strings[value]}\"";
                 default:
                     return Value.ToString();
             }

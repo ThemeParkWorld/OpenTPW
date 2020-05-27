@@ -28,13 +28,13 @@
             for (var i = 0; i < operands.Length; ++i)
             {
                 operandString += operands[i].Value;
-                if (i != operands.Length - 1) operandString += "\t";
+                if (i != operands.Length - 1) operandString += " ";
             }
 
-            var padding = "\t";
+            var padding = " ";
             var opcodeName = opcode.ToString();
             if (opcodeName.Length < 8)
-                padding += "\t";
+                padding += " ";
 
             return $"{opcode}{padding}{operandString}";
         }

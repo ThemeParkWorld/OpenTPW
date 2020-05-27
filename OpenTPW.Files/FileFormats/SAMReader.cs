@@ -1,5 +1,4 @@
-﻿using Engine.Utils.DebugUtils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -11,6 +10,7 @@ namespace OpenTPW.Files.FileFormats
         public string Value { get; set; }
     }
 
+    // TODO: Read hoarding & shape data
     public class SAMReader : IAssetReader
     {
         public string[] Extensions => new[] { ".sam" };
@@ -101,21 +101,11 @@ namespace OpenTPW.Files.FileFormats
                 wordBuffer += character;
             }
 
-            ListAll(fileBuffer);
-
             return new AbstractAsset()
             {
                 DataType = typeof(SAMPair),
                 Data = fileBuffer.Cast<object>().ToList()
             };
-        }
-
-        void ListAll(List<SAMPair> fileBuffer)
-        {
-            foreach (var pair in fileBuffer)
-            {
-                Logging.Log($"{pair.Key}: {pair.Value}");
-            }
         }
     }
 }

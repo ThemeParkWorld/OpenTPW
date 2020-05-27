@@ -57,8 +57,6 @@ namespace OpenTPW.RSSEQ
 
             ReadFileBody(binaryReader);
             WriteDisassembly();
-
-            Logging.Log(Disassembly);
         }
 
         private void ReadFileHeader(BinaryReader binaryReader)
@@ -138,14 +136,16 @@ namespace OpenTPW.RSSEQ
             var stringEntryLength = binaryReader.ReadInt32();
             var stringEntryPos = binaryReader.BaseStream.Position;
             var currentString = "";
+            var stringOffsetPos = 0L;
 
             while (binaryReader.BaseStream.Position - stringEntryPos < stringEntryLength)
             {
                 var currentChar = binaryReader.ReadChar();
                 if (currentChar == '\0')
                 {
-                    vmInstance.Strings.Add(currentString);
+                    vmInstance.Strings.Add(stringOffsetPos, currentString);
                     currentString = "";
+                    stringOffsetPos = binaryReader.BaseStream.Position - stringEntryPos;
                 }
                 else
                 {

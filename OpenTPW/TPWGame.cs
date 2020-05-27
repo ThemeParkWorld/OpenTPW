@@ -1,5 +1,7 @@
 ﻿using Engine;
 using Engine.ECS.Entities;
+using Engine.Gui.Managers;
+using Engine.Gui.Managers.ImGuiWindows.Theming;
 using Engine.Renderer.GL.Managers;
 using OpenTPW.Entities;
 using OpenTPW.Files;
@@ -29,6 +31,7 @@ namespace OpenTPW
             foreach (var entity in entities)
                 SceneManager.Instance.AddEntity(entity);
 
+            ImGuiManager.Instance.Theme = ImGuiTheme.LoadFromFile("Content/Themes/light.json");
             FileManager.CreateInstance();
         }
     }

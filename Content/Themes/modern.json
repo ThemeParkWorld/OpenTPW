@@ -5,11 +5,11 @@
     },
     "Style": {
         "WindowPadding": "<16, 16>",
-        "WindowRounding": 5.0,
         "FramePadding": "<6, 6>",
-        "FrameRounding": 4.0,
         "ItemSpacing": "<12, 8>",
         "ItemInnerSpacing": "<8, 6>",
+        "WindowRounding": 5.0,
+        "FrameRounding": 4.0,
         "IdentSpacing": 25.0,
         "ScrollbarRounding": 9.0,
         "GrabMinSize": 5.0,

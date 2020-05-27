@@ -18,6 +18,9 @@ namespace OpenTPW.Components
         private List<SAMPair> samContents;
         private VM vmInstance;
         private bool showImGUIWindow;
+        private float totalTime, lastUpdate;
+        private byte[] data;
+        private float columnWidth = 400f;
 
         public RideComponent(string rideArchivePath)
         {
@@ -27,8 +30,22 @@ namespace OpenTPW.Components
             var rseFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
             var samFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.SAM\0", StringComparison.OrdinalIgnoreCase));
 
-            vmInstance = new VM(rseFile.data);
+            data = rseFile.data;
+            vmInstance = new VM(data);
             samContents = new SAMReader().LoadAsset(samFile.data).Data.Cast<SAMPair>().ToList();
+        }
+
+        public override void Update(float deltaTime)
+        {
+            if (vmInstance.Run)
+            {
+                totalTime += deltaTime;
+                if (totalTime - lastUpdate > 1.0f / vmInstance.Config.TimeSlice)
+                {
+                    vmInstance.Step();                    
+                    lastUpdate = totalTime;
+                }
+            }
         }
 
         public override void RenderImGui()
@@ -96,11 +113,15 @@ namespace OpenTPW.Components
 
         private void DrawDisassembly()
         {
-            if (ImGui.Button(FontAwesome5.Play))
-            { }
+            if (ImGui.Button(vmInstance.Run ? FontAwesome5.Pause : FontAwesome5.Play))
+            { 
+                vmInstance.Run = !vmInstance.Run;
+            }
             ImGui.SameLine();
             if (ImGui.Button(FontAwesome5.Redo))
-            { }
+            { 
+                vmInstance = new VM(data);
+            }
             ImGui.SameLine();
             if (ImGui.Button(FontAwesome5.StepForward))
             {
@@ -111,6 +132,7 @@ namespace OpenTPW.Components
 
             ImGui.Separator();
 
+            ImGui.BeginChild("disassemblyChild");
             ImGui.Columns(8, null, false);
             int instructionIndex = 0;
             int jumpOffset = 0;
@@ -174,7 +196,25 @@ namespace OpenTPW.Components
                 for (int i = 0; i < 6; ++i)
                 {
                     if (i <= instruction.operands.Length - 1 && instruction.operands.Length > 0)
+                    {
                         ImGui.Text(instruction.operands[i].ToString());
+                        
+                        if (ImGui.IsItemHovered())
+                        {
+                            ImGui.BeginTooltip();
+                            var instructionHandler = vmInstance.FindOpcodeHandler(instruction.opcode);
+                            ImGui.Text(instruction.opcode.ToString());
+                            if (instructionHandler == null)
+                            {
+                                ImGui.Text("No handler found.");
+                            }
+                            else
+                            {
+                                ImGui.Text(instructionHandler.Args[i]);
+                            }
+                            ImGui.EndTooltip();
+                        }
+                    }
                     ImGui.NextColumn();
                 }
 
@@ -182,6 +222,7 @@ namespace OpenTPW.Components
                 jumpOffset += instruction.GetCount();
             }
             ImGui.Columns(1);
+            ImGui.EndChild();
         }
 
         private void DrawImGuiWindow()
@@ -192,34 +233,43 @@ namespace OpenTPW.Components
 
             ImGui.BeginChild("column1");
 
-            if (ImGui.TreeNode("Properties (SAM)"))
+            ImGui.BeginTabBar("mainTabs");
+
+            if (ImGui.BeginTabItem("Properties"))
             {
                 ImGui.BeginChild("properties");
                 DrawProperties();
                 ImGui.EndChild();
-                ImGui.TreePop();
+                ImGui.EndTabItem();
             }
 
-            if (ImGui.TreeNode("Config"))
+            if (ImGui.BeginTabItem("VM Config"))
             {
                 ImGui.BeginChild("config");
                 DrawConfig();
                 ImGui.EndChild();
-                ImGui.TreePop();
+                ImGui.EndTabItem();
             }
 
-            if (ImGui.TreeNode("Variables"))
+            if (ImGui.BeginTabItem("Variables"))
             {
                 ImGui.BeginChild("variables");
                 DrawVariables();
                 ImGui.EndChild();
-                ImGui.TreePop();
+                ImGui.EndTabItem();
             }
+
+            ImGui.EndTabBar();
 
             ImGui.EndChild();
 
+            //ImGui.NextColumn();
+            //// Splitter (draggable)
+            //ImGui.SetColumnWidth(0, 5f);
+            //ImGui.Button("Fuck you", new System.Numerics.Vector2(0, 0));
+
             ImGui.NextColumn();
-            ImGui.SetColumnWidth(0, 400);
+            ImGui.SetColumnWidth(0, columnWidth);
 
             //if (ImGui.TreeNode("Disassembly"))
             //{
