@@ -1,9 +1,6 @@
 ﻿using Engine.ECS.Entities;
 using OpenTPW.Components;
-using OpenTPW.Files.FileFormats.BFWD;
-using System;
 using System.IO;
-using System.Linq;
 
 namespace OpenTPW.Entities
 {
@@ -13,13 +10,7 @@ namespace OpenTPW.Entities
         public RideEntity(string rideArchivePath)
         {
             rideName = Path.GetFileNameWithoutExtension(rideArchivePath);
-            var rideArchive = new BFWDArchive(rideArchivePath);
-            
-            var rseFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
-            AddComponent(new RSSEQComponent(rseFile.data));
-            
-            var samFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.SAM\0", StringComparison.OrdinalIgnoreCase));
-            AddComponent(new SAMComponent(samFile.data));
+            AddComponent(new RideComponent(rideArchivePath));
         }
     }
 }

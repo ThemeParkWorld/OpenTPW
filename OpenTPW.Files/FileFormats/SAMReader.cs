@@ -1,5 +1,4 @@
 ﻿using Engine.Utils.DebugUtils;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,7 +31,7 @@ namespace OpenTPW.Files.FileFormats
             using var binaryReader = new BinaryReader(memoryStream);
 
             bool inComment = false, inString = false;
-            
+
             string wordBuffer = "";
             bool isKey = true;
             SAMPair lineBuffer = new SAMPair();
@@ -89,7 +88,7 @@ namespace OpenTPW.Files.FileFormats
                     }
 
                     if (IsNewLine(character))
-                    {                     
+                    {
                         if (lineBuffer.Key != null && lineBuffer.Value != null)
                             fileBuffer.Add(lineBuffer);
                         lineBuffer = new SAMPair();

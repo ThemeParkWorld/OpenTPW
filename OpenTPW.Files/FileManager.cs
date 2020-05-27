@@ -14,7 +14,7 @@ namespace OpenTPW.Files
         private Dictionary<string[], IAssetReader> assetReaders = new Dictionary<string[], IAssetReader>();
 
         public FileManager()
-        { 
+        {
             RegisterAssetReaders();
         }
 

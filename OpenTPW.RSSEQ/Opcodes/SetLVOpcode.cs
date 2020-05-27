@@ -11,6 +11,6 @@
         public override int MaxArgs => 1;
         public override string Description => "Unknown";
 
-        public override string[] Args => new[] { "unknown "};
+        public override string[] Args => new[] { "unknown " };
     }
 }

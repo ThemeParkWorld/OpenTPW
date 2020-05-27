@@ -27,7 +27,7 @@ namespace OpenTPW.Files.FileFormats
             var memoryStream = new MemoryStream(data);
             var binaryReader = new BinaryReader(memoryStream);
 
-            if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFMU") 
+            if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFMU")
                 throw new Exception("This isn't a BFMU file!");
 
             /* 
