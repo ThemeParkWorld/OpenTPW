@@ -3,6 +3,7 @@ using Engine.ECS.Entities;
 using Engine.Gui.Managers;
 using Engine.Gui.Managers.ImGuiWindows.Theming;
 using Engine.Renderer.GL.Managers;
+using ImGuiNET;
 using OpenTPW.Entities;
 using OpenTPW.Files;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace OpenTPW
                 SceneManager.Instance.AddEntity(entity);
 
             ImGuiManager.Instance.Theme = ImGuiTheme.LoadFromFile("Content/Themes/light.json");
+            ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
             FileManager.CreateInstance();
         }
     }

@@ -69,20 +69,27 @@ namespace OpenTPW.Components
             foreach (var kvp in samContents)
             {
                 ImGui.Text(kvp.Key);
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip(kvp.Key);
+
                 ImGui.NextColumn();
+
                 ImGui.Text(kvp.Value);
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip(kvp.Value);
+
                 ImGui.NextColumn();
             }
             ImGui.Columns(1);
         }
 
-        private void DrawConfig()
+        private void DrawObjectProperties(object obj)
         {
             ImGui.Columns(2, null, false);
-            foreach (var property in typeof(VM).GetProperties())
+            foreach (var property in obj.GetType().GetProperties())
             {
                 var propName = property.Name;
-                var propValue = property.GetValue(vmInstance);
+                var propValue = property.GetValue(obj);
 
                 if (propValue == null || propName == null || property.GetCustomAttribute(typeof(HideInImGui)) != null)
                     continue;
@@ -92,6 +99,34 @@ namespace OpenTPW.Components
                 ImGui.Text(propValue.ToString());
                 ImGui.NextColumn();
             }
+            ImGui.Columns(1);
+        }
+
+        private void DrawConfig()
+        {
+            if (ImGui.TreeNode("Runtime"))
+            {
+                DrawObjectProperties(vmInstance);
+                ImGui.TreePop();
+            }
+            if (ImGui.TreeNode("Config"))
+            {
+                DrawObjectProperties(vmInstance.Config);
+                ImGui.TreePop();
+            }
+            if (ImGui.TreeNode("Flags"))
+            {
+                DrawObjectProperties(vmInstance.Flags);
+                ImGui.TreePop();
+            }
+        }
+
+        private void DrawObjects()
+        {
+            ImGui.Columns(2, null, false);
+            ImGui.Text("Todo");
+            ImGui.NextColumn();
+            ImGui.Text("Todo");
             ImGui.Columns(1);
         }
 
@@ -255,6 +290,14 @@ namespace OpenTPW.Components
             {
                 ImGui.BeginChild("variables");
                 DrawVariables();
+                ImGui.EndChild();
+                ImGui.EndTabItem();
+            }
+
+            if (ImGui.BeginTabItem("Objects"))
+            {
+                ImGui.BeginChild("objects");
+                DrawObjects();
                 ImGui.EndChild();
                 ImGui.EndTabItem();
             }

@@ -15,15 +15,9 @@ namespace OpenTPW.Files.FileFormats
     {
         public string[] Extensions => new[] { ".sam" };
 
-        private bool IsWhiteSpace(char character)
-        {
-            return character == ' ' || character == '\t';
-        }
+        private bool IsWhiteSpace(char character) => character == ' ' || character == '\t';
 
-        private bool IsNewLine(char character)
-        {
-            return character == '\n' || character == '\r';
-        }
+        private bool IsNewLine(char character) => character == '\n' || character == '\r';
 
         public AbstractAsset LoadAsset(byte[] data)
         {

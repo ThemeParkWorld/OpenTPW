@@ -36,17 +36,14 @@
     <Reference Include="Engine.Utils">
       <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="OpenGL.Net, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\OpenGL.Net.dll</HintPath>
+    <Reference Include="OpenGL.Net">
+      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.dll</HintPath>
     </Reference>
-    <Reference Include="OpenGL.Net.CoreUI, Version=0.5.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\OpenGL.Net.CoreUI\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.CoreUI.dll</HintPath>
+    <Reference Include="OpenGL.Net.CoreUI">
+      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.CoreUI.dll</HintPath>
     </Reference>
-    <Reference Include="OpenGL.Net.Math, Version=0.8.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\OpenGL.Net\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.Math.dll</HintPath>
+    <Reference Include="OpenGL.Net.Math">
+      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.Math.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
