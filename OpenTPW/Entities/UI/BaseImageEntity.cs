@@ -12,10 +12,10 @@ namespace OpenTPW.Entities.UI
         protected Mesh imageMesh;
         protected Texture2D texture;
 
-        protected Vector2 position;
-        protected Vector2 scale;
+        protected Vector2d position;
+        protected Vector2d scale;
 
-        public BaseImageEntity(Vector2 position, Vector2 scale)
+        public BaseImageEntity(Vector2d position, Vector2d scale)
         {
             // Setup material
             material = new Material("Content/plane.mtl");
@@ -23,7 +23,7 @@ namespace OpenTPW.Entities.UI
             // Add components
             AddComponent(new ShaderComponent(new Shader("Content/Shaders/2D/main.frag", Shader.Type.FragmentShader),
                 new Shader("Content/Shaders/2D/main.vert", Shader.Type.VertexShader)));
-            AddComponent(new TransformComponent(new Vector3(0, 0, -0.1f), Quaternion.FromEulerAngles(new Vector3(90f, 0, 0)), new Vector3(1, 1, 1)));
+            AddComponent(new TransformComponent(new Vector3d(0, 0, -0.1f), Quaternion.FromEulerAngles(new Vector3f(90f, 0, 0)), new Vector3d(1, 1, 1)));
             AddComponent(new MaterialComponent(material));
             AddComponent(new MeshComponent("Content/plane.obj"));
         }

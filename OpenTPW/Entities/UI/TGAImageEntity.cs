@@ -5,7 +5,7 @@ namespace OpenTPW.Entities.UI
 {
     public sealed class TGAImageEntity : BaseImageEntity
     {
-        public TGAImageEntity(string path, Vector2 position, Vector2 scale) : base(position, scale)
+        public TGAImageEntity(string path, Vector2d position, Vector2d scale) : base(position, scale)
         {
             // Load image
             texture = TGAReader.LoadAsset(path);

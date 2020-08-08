@@ -91,7 +91,7 @@ namespace OpenTPW.Components
                 var propName = property.Name;
                 var propValue = property.GetValue(obj);
 
-                if (propValue == null || propName == null || property.GetCustomAttribute(typeof(HideInImGui)) != null)
+                if (propValue == null || propName == null || property.GetCustomAttribute(typeof(HideInImGuiAttribute)) != null)
                     continue;
 
                 ImGui.Text(propName);

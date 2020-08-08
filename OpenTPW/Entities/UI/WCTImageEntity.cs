@@ -8,7 +8,7 @@ namespace OpenTPW.Entities.UI
 {
     public sealed class WCTImageEntity : BaseImageEntity
     {
-        public WCTImageEntity(string archivePath, string filePath, Vector2 position, Vector2 scale) : base(position, scale)
+        public WCTImageEntity(string archivePath, string filePath, Vector2d position, Vector2d scale) : base(position, scale)
         {
             var rideArchive = new BFWDArchive(archivePath);
             var rseFile = rideArchive.files.Last(file => file.name.Equals($"{filePath}\0", StringComparison.OrdinalIgnoreCase));
