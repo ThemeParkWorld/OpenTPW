@@ -3,6 +3,6 @@
     internal interface IAssetReader
     {
         string[] Extensions { get; }
-        AbstractAsset LoadAsset(byte[] data);
+        IAssetContainer LoadAsset(byte[] data);
     }
 }

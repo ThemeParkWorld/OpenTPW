@@ -9,7 +9,7 @@ namespace OpenTPW.Files.FileFormats
     // bullfrog string
     public class BFSTReader
     {
-        public List<string> strings = new List<string>();
+        public List<string> Strings { get; private set; } = new List<string>();
         public BFSTReader(string path)
         {
             var characters = new BFMUReader();
@@ -62,7 +62,7 @@ namespace OpenTPW.Files.FileFormats
                     str += characters.GetChar(b);
                 }
                 binaryReader.ReadInt32();
-                strings.Add(str);
+                Strings.Add(str);
             }
 
             binaryReader.Close();
@@ -71,9 +71,9 @@ namespace OpenTPW.Files.FileFormats
 
         public void WriteAllStrings()
         {
-            for (var i = 0; i < strings.Count; ++i)
+            for (var i = 0; i < Strings.Count; ++i)
             {
-                Logging.Log($"{strings[i]}");
+                Logging.Log($"{Strings[i]}");
             }
         }
     }

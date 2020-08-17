@@ -19,7 +19,7 @@ namespace OpenTPW.Files.FileFormats
 
         private bool IsNewLine(char character) => character == '\n' || character == '\r';
 
-        public AbstractAsset LoadAsset(byte[] data)
+        public IAssetContainer LoadAsset(byte[] data)
         {
             using var memoryStream = new MemoryStream(data);
             using var binaryReader = new BinaryReader(memoryStream);
@@ -95,7 +95,7 @@ namespace OpenTPW.Files.FileFormats
                 wordBuffer += character;
             }
 
-            return new AbstractAsset()
+            return new IAssetContainer()
             {
                 DataType = typeof(SAMPair),
                 Data = fileBuffer.Cast<object>().ToList()

@@ -6,6 +6,8 @@ using System;
 using System.IO;
 using System.Text;
 
+// TODO: Re-write this
+
 namespace OpenTPW.Files.FileFormats
 {
     /*

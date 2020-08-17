@@ -28,15 +28,29 @@ namespace OpenTPW.Files
             }
         }
 
-        public void ReadFile(string assetArchivePath, string assetName)
+        private IAssetReader GetAssetReader(string assetName)
+        {
+            var assetExtension = Path.GetExtension(assetName);
+
+            return assetReaders.First(r => r.Key.Contains(assetExtension)).Value;
+        }
+
+        public IAssetContainer ReadFile(string assetArchivePath, string assetName)
         {
             var fileArchive = new BFWDArchive(assetArchivePath);
-
             var assetFile = fileArchive.files.First(file => file.name.Equals($"{assetName}\0", StringComparison.OrdinalIgnoreCase));
-            var assetExtension = Path.GetExtension(assetName);
-            var assetReader = assetReaders.First(r => r.Key.Contains(assetExtension));
 
-            assetReader.Value.LoadAsset(assetFile.data);
+            var assetReader = GetAssetReader(assetFile.name);
+
+            return assetReader.LoadAsset(assetFile.data);
+        }
+
+        public IAssetContainer ReadFile(string assetFilePath)
+        {
+            var data = File.ReadAllBytes(assetFilePath);
+            var assetReader = GetAssetReader(assetFilePath);
+
+            return assetReader.LoadAsset(data);
         }
     }
 }

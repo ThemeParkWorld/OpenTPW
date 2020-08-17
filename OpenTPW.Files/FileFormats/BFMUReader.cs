@@ -17,12 +17,12 @@ namespace OpenTPW.Files.FileFormats
             return characters[(int)b - 0x01]; // BFMU characters are offset by 0x01
         }
 
-        public AbstractAsset LoadAsset(ArchiveFile file)
+        public IAssetContainer LoadAsset(ArchiveFile file)
         {
             return LoadAsset(file.data);
         }
 
-        public AbstractAsset LoadAsset(byte[] data)
+        public IAssetContainer LoadAsset(byte[] data)
         {
             var memoryStream = new MemoryStream(data);
             var binaryReader = new BinaryReader(memoryStream);
@@ -58,11 +58,7 @@ namespace OpenTPW.Files.FileFormats
             binaryReader.Close();
             memoryStream.Close();
 
-            return new AbstractAsset()
-            {
-                DataType = typeof(char),
-                Data = characters.Cast<object>().ToList()
-            };
+            return new AssetContainer<List<char>>(characters.ToList());
         }
 
         public void LoadAsset(string file)
