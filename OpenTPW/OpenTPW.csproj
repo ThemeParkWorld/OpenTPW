@@ -85,7 +85,7 @@
     <PackageReference Include="BepuPhysics" Version="2.2.0" />
     <PackageReference Include="cef.redist.x64" Version="79.1.36" />
     <PackageReference Include="cef.redist.x86" Version="79.1.36" />
-    <PackageReference Include="CefSharp.Common" Version="79.1.360" />
+    <PackageReference Include="CefSharp.Common" Version="85.3.130" />
     <PackageReference Include="CefSharp.OffScreen" Version="79.1.360" />
     <PackageReference Include="Fleck" Version="1.1.0" />
     <PackageReference Include="ImGui.NET" Version="1.75.0" />
