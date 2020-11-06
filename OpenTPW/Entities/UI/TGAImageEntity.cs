@@ -1,4 +1,6 @@
-﻿using Engine.Utils.MathUtils;
+﻿using Engine.Renderer.GL.Render;
+using Engine.Utils.MathUtils;
+using OpenTPW.Files;
 using OpenTPW.Files.FileFormats;
 
 namespace OpenTPW.Entities.UI
@@ -7,8 +9,10 @@ namespace OpenTPW.Entities.UI
     {
         public TGAImageEntity(string path, Vector2d position, Vector2d scale) : base(position, scale)
         {
+            SetupMaterial();
+
             // Load image
-            texture = TGAReader.LoadAsset(path);
+            texture = FileManager.Instance.ReadFile(path).Data as Texture2D;
             material.diffuseTexture = texture;
         }
     }

@@ -17,15 +17,18 @@ namespace OpenTPW.Entities.UI
 
         public BaseImageEntity(Vector2d position, Vector2d scale)
         {
-            // Setup material
-            material = new Material("Content/plane.mtl");
-
             // Add components
-            AddComponent(new ShaderComponent(new Shader("Content/Shaders/2D/main.frag", Shader.Type.FragmentShader),
-                new Shader("Content/Shaders/2D/main.vert", Shader.Type.VertexShader)));
-            AddComponent(new TransformComponent(new Vector3d(0, 0, -0.1f), Quaternion.FromEulerAngles(new Vector3f(90f, 0, 0)), new Vector3d(1, 1, 1)));
+            AddComponent(new ShaderComponent(new Shader("Content/Shaders/2D/2D.frag", Shader.Type.FragmentShader),
+                new Shader("Content/Shaders/2D/2D.vert", Shader.Type.VertexShader)));
+            AddComponent(new TransformComponent(new Vector3d(0, 0, 0.1f), Quaternion.FromEulerAngles(new Vector3f(90f, 0, 0)), new Vector3d(1, 1, 1)));
             AddComponent(new MaterialComponent(material));
             AddComponent(new MeshComponent("Content/plane.obj"));
+        }
+
+        protected void SetupMaterial()
+        {
+            // Setup material
+            material = new Material("Content/plane.mtl");
         }
     }
 }

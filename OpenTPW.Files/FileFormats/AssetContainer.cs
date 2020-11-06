@@ -3,11 +3,14 @@ using System.Collections.Generic;
 
 namespace OpenTPW.Files.FileFormats
 {
-    public class IAssetContainer { }
+    public class IAssetContainer 
+    { 
+        public object Data { get; set; }
+    }
 
     public class AssetContainer<T> : IAssetContainer
     {
-        public T Data { get; set; }
+        public new T Data { get; set; }
         public AssetContainer(T data)
         {
             Data = data;

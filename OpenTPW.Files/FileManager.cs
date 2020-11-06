@@ -32,7 +32,7 @@ namespace OpenTPW.Files
         {
             var assetExtension = Path.GetExtension(assetName);
 
-            return assetReaders.First(r => r.Key.Contains(assetExtension)).Value;
+            return assetReaders.First(r => r.Key.Contains(assetExtension.Replace("\0", ""))).Value;
         }
 
         public IAssetContainer ReadFile(string assetArchivePath, string assetName)

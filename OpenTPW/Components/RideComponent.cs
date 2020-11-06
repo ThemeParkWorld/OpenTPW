@@ -2,6 +2,7 @@
 using Engine.ECS.Components;
 using Engine.Gui.Attributes;
 using ImGuiNET;
+using OpenTPW.Files;
 using OpenTPW.Files.FileFormats;
 using OpenTPW.Files.FileFormats.BFWD;
 using OpenTPW.RSSEQ;
@@ -28,11 +29,10 @@ namespace OpenTPW.Components
             var rideArchive = new BFWDArchive(rideArchivePath);
 
             var rseFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
-            var samFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.SAM\0", StringComparison.OrdinalIgnoreCase));
 
             data = rseFile.data;
             vmInstance = new VM(data);
-            samContents = new SAMReader().LoadAsset(samFile.data).Data.Cast<SAMPair>().ToList();
+            samContents = FileManager.Instance.ReadFile(rideArchivePath, $"{rideName}.SAM").Data as List<SAMPair>;
         }
 
         public override void Update(float deltaTime)

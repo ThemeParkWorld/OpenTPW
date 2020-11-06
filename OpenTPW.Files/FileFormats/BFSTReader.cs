@@ -1,5 +1,4 @@
-﻿using Engine.Utils.DebugUtils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -7,17 +6,20 @@ using System.Text;
 namespace OpenTPW.Files.FileFormats
 {
     // bullfrog string
-    public class BFSTReader
+    public class BFSTReader : IAssetReader
     {
-        public List<string> Strings { get; private set; } = new List<string>();
-        public BFSTReader(string path)
+        public string[] Extensions => new[] { ".str" };
+
+        public IAssetContainer LoadAsset(byte[] data)
         {
+            var strings = new List<string>();
             var characters = new BFMUReader();
             characters.LoadAsset(@"C:\Program Files (x86)\Bullfrog\Theme Park World\data\Language\English\MBToUni.dat");
 
-            var streamReader = new StreamReader(path);
-            var binaryReader = new BinaryReader(streamReader.BaseStream);
-            if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFST") throw new Exception("not bfst");
+            using var memoryStream = new MemoryStream(data);
+            using var binaryReader = new BinaryReader(memoryStream);
+            if (Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) != "BFST") 
+                throw new Exception("Not a valid BFST file!");
 
             /* 
              * 4 bytes - magic number - BFST 
@@ -62,19 +64,10 @@ namespace OpenTPW.Files.FileFormats
                     str += characters.GetChar(b);
                 }
                 binaryReader.ReadInt32();
-                Strings.Add(str);
+                strings.Add(str);
             }
 
-            binaryReader.Close();
-            streamReader.Close();
-        }
-
-        public void WriteAllStrings()
-        {
-            for (var i = 0; i < Strings.Count; ++i)
-            {
-                Logging.Log($"{Strings[i]}");
-            }
+            return new AssetContainer<List<string>>(strings);
         }
     }
 }

@@ -24,12 +24,13 @@ namespace OpenTPW.Files.FileFormats
             using var memoryStream = new MemoryStream(data);
             using var binaryReader = new BinaryReader(memoryStream);
 
-            bool inComment = false, inString = false;
+            var inComment = false;
+            var inString = false;
+            var isKey = true;
 
-            string wordBuffer = "";
-            bool isKey = true;
-            SAMPair lineBuffer = new SAMPair();
-            List<SAMPair> fileBuffer = new List<SAMPair>();
+            var wordBuffer = "";
+            var lineBuffer = new SAMPair();
+            var samPairs = new List<SAMPair>();
 
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length - 1)
             {
@@ -84,7 +85,7 @@ namespace OpenTPW.Files.FileFormats
                     if (IsNewLine(character))
                     {
                         if (lineBuffer.Key != null && lineBuffer.Value != null)
-                            fileBuffer.Add(lineBuffer);
+                            samPairs.Add(lineBuffer);
                         lineBuffer = new SAMPair();
                     }
 
@@ -95,11 +96,7 @@ namespace OpenTPW.Files.FileFormats
                 wordBuffer += character;
             }
 
-            return new IAssetContainer()
-            {
-                DataType = typeof(SAMPair),
-                Data = fileBuffer.Cast<object>().ToList()
-            };
+            return new AssetContainer<List<SAMPair>>(samPairs.ToList());
         }
     }
 }

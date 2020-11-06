@@ -23,9 +23,11 @@ namespace OpenTPW.Files.FileFormats
      */
 
     // world compressed texture
-    public static class WCTReader
+    public class WCTReader : IAssetReader
     {
-        private static Texture2D ReadFile(byte[] fileData)
+        public string[] Extensions => new[] { ".wct" };
+
+        public IAssetContainer LoadAsset(byte[] data)
         {
             // WCT File header - little endian
             // Version? (1 byte) - usually 0x12 or 0x13, links with BILZ/ZLIB
@@ -47,8 +49,8 @@ namespace OpenTPW.Files.FileFormats
             // Magic number? (4 bytes) - Always "BILZ" - zlib maybe?
             // 28 more bytes of "???"
             int width, height, file1Len, file2Len;
-            using var dataMemoryStream = new MemoryStream(fileData);
-            using var binaryReader = new BinaryReader(dataMemoryStream);
+            using var memoryStream = new MemoryStream(data);
+            using var binaryReader = new BinaryReader(memoryStream);
             int versionMajor = binaryReader.ReadByte();
             int versionMinor = binaryReader.ReadByte();
             int bpp = binaryReader.ReadByte();
@@ -122,11 +124,11 @@ namespace OpenTPW.Files.FileFormats
 
             Logging.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
 
-            var data = new ColorRGBA32[width * height * bpp];
+            var imageData = new ColorRGB24[width * height];
 
             for (var i = 0; i < width * height; ++i)
             {
-                data[i] = new ColorRGBA32(255, 0, 255, 255);
+                imageData[i] = new ColorRGB24(255, 0, 255);
             }
 
             decmpMemoryStream.Seek(0, SeekOrigin.Begin);
@@ -135,40 +137,14 @@ namespace OpenTPW.Files.FileFormats
             {
                 for (var x = 0; x < width; ++x)
                 {
-                    var bytes = new byte[bpp / 8];
+                    var bytes = new byte[1];
                     decmpMemoryStream.Read(bytes, 0, bytes.Length);
-                    switch (bpp)
-                    {
-                        case 32: // R G B A?
-                            {
-                                data[dataPos] = new ColorRGBA32(bytes[3], bytes[2], bytes[1], bytes[0]);
-                            }
-                            break;
-                        case 24: // R G B? (no alpha)
-                            {
-                                data[dataPos] = new ColorRGBA32(bytes[0], bytes[1], bytes[2]);
-                            }
-                            break;
-                        case 8: // monochrome
-                            {
-                                data[dataPos] = new ColorRGBA32(bytes[0], bytes[0], bytes[0]);
-                            }
-                            break;
-                        default:
-                            throw new Exception($"wtf is {bpp} bits per pixel????");
-                    }
+                    imageData[dataPos] = new ColorRGB24(bytes[0], bytes[0], bytes[0]);
                     dataPos++;
                 }
             }
-            decmpMemoryStream.Close();
 
-            binaryReader.Close();
-            return new Texture2D(data, width, height);
-        }
-
-        public static Texture2D LoadAsset(byte[] data)
-        {
-            return ReadFile(data);
+            return new AssetContainer<Texture2D>(new Texture2D(imageData, width, height));
         }
     }
 }

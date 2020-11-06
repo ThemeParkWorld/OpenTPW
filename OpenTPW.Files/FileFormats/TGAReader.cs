@@ -7,16 +7,17 @@ using System.IO;
 
 namespace OpenTPW.Files.FileFormats
 {
-    public static class TGAReader
+    public class TGAReader : IAssetReader
     {
-        public static Texture2D LoadAsset(string path)
+        public string[] Extensions => new[] { ".tga" };
+
+        public IAssetContainer LoadAsset(byte[] data)
         {
             // I'm really lazy, and this is really basic.
             // This only supports like, a quarter of the available TGA features,
-            // however TPW doesnt't actually use any other features.
-            var colorData = new List<ColorRGBA32>();
-            var streamReader = new StreamReader(path);
-            var binaryReader = new BinaryReader(streamReader.BaseStream);
+            // however TPW doesn't actually use any other features.
+            using var memoryReader = new MemoryStream(data);
+            using var binaryReader = new BinaryReader(memoryReader);
 
             int width, height;
             int idLength = binaryReader.ReadByte();
@@ -29,33 +30,33 @@ namespace OpenTPW.Files.FileFormats
             int xOrigin = binaryReader.ReadInt16();
             int yOrigin = binaryReader.ReadInt16();
             width = binaryReader.ReadInt16();
-            height = binaryReader.ReadInt16();
+            height = binaryReader.ReadInt16() + 1;
             int bpp = binaryReader.ReadByte();
             int descriptor = binaryReader.ReadByte();
+            
+            var colorData = new ColorRGBA32[width * height];
 
-            Logging.Log($"Image {path} has a width of {width} and a height of {height}, and uses {dataTypeCode} data type code.  Image uses {bpp} bits per pixel");
+            Logging.Log($"Image has a width of {width} and a height of {height}, and uses {dataTypeCode} data type code. Image uses {bpp} bits per pixel");
 
-            if (dataTypeCode != 2 || colorMapType != 0) throw new Exception("uhh");
+            if (dataTypeCode != 2 || colorMapType != 0)
+                throw new Exception("uhh");
+
+            int i = 0;
 
             while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length - (bpp / 8))
             {
                 switch (bpp)
                 {
                     case 16:
-                        {
-                            // ARRRRRGG GGGBBBBB - but its big endian, so in reality its GGGBBBBB ARRRRRGG
-                            var byte0 = binaryReader.ReadByte();
-                            var byte1 = binaryReader.ReadByte();
-                            colorData.Add(new ColorRGBA32(byte0, byte1, 255, 255));
-                        }
-                        break;
+                        // ARRRRRGG GGGBBBBB - but its big endian, so in reality its GGGBBBBB ARRRRRGG
+                        throw new NotImplementedException();
                     case 24:
                         {
                             // 1 byte of each B, G, R (no alpha)
                             var byte0 = binaryReader.ReadByte();
                             var byte1 = binaryReader.ReadByte();
                             var byte2 = binaryReader.ReadByte();
-                            colorData.Add(new ColorRGBA32(byte2, byte1, byte0, 255));
+                            colorData[i] = new ColorRGBA32(byte2, byte1, byte0, 255);
                         }
                         break;
                     case 32:
@@ -66,17 +67,16 @@ namespace OpenTPW.Files.FileFormats
                             var byte2 = binaryReader.ReadByte();
                             var byte3 = binaryReader.ReadByte();
                             // TODO: handle transparency
-                            colorData.Add(new ColorRGBA32(byte3, byte2, byte1, byte0));
+                            colorData[i] = new ColorRGBA32(byte3, byte2, byte1, byte0);
                         }
                         break;
                     default:
-                        throw new Exception($"{bpp} bits per pixel????");
+                        throw new Exception($"{bpp} is an invalid number of bits per pixel.");
                 }
+                i++;
             }
-            binaryReader.Close();
-            streamReader.Close();
 
-            return new Texture2D(colorData.ToArray(), width, height);
+            return new AssetContainer<Texture2D>(new Texture2D(colorData, width, height));
         }
     }
 }

@@ -3,6 +3,7 @@ using Engine.ECS.Entities;
 using Engine.Gui.Managers;
 using Engine.Gui.Managers.ImGuiWindows.Theming;
 using Engine.Renderer.GL.Managers;
+using Engine.Utils.DebugUtils;
 using Engine.Utils.MathUtils;
 using ImGuiNET;
 using OpenTPW.Entities;
@@ -18,23 +19,25 @@ namespace OpenTPW
 
         protected override void InitScene()
         {
-            // TODO: Set up an archive opening system instead of doing it per-entity
+            // FileManager.Instance.ReadFile($"{GameSettings.Default.gameDir}/data/generic/dynamic/textures/red.wct");
+
             base.InitScene();
             var entities = new List<IEntity>
             {
-                // new WCTImageEntity($"{GameSettings.Default.gameDir}/data/ui.wad", $"hilight.wct", new Vector2(0, 0), new Vector2(1280, 720)),
+                // new WCTImageEntity($"{GameSettings.Default.gameDir}/data/ui.wad", $"b_upgrade.wct", new Vector2d(0, 0), new Vector2d(1280, 720)),
                 new TGAImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2d(0, 0), new Vector2d(1280, 720)),
-                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/Bouncy.wad"),
-                //new CefEntity()
-                //{
-                //    Name = "CEF HUD Entity"
-                //}
+                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/Bouncy.wad")
             };
+
+            var uiText = FileManager.Instance.ReadFile($"{GameSettings.Default.gameDir}/data/Language/English/UITEXT.str");
+            foreach (var textElement in uiText.Data as List<string>)
+            {
+                Logging.Log(textElement);
+            }
 
             foreach (var entity in entities)
                 SceneManager.Instance.AddEntity(entity);
 
-            ImGuiManager.Instance.Theme = ImGuiTheme.LoadFromFile("Content/Themes/light.json");
             ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
             FileManager.CreateInstance();
         }
