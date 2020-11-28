@@ -27,28 +27,20 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Engine.ECS">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.ECS.dll</HintPath>
-    </Reference>
-    <Reference Include="Engine.Renderer.GL">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Renderer.GL.dll</HintPath>
-    </Reference>
-    <Reference Include="Engine.Utils">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net">
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net.CoreUI">
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.CoreUI.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net.Math">
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net\bin\netcore\Debug\netcoreapp3.1\OpenGL.Net.Math.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="DotNetZip" Version="1.13.5" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Other\Engine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\OpenGL.Net.CoreUI.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Other\OpenGL.Net\Source\OpenGL.Net\OpenGL.Net.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Other\OpenGL.Net\Source\OpenGL.Net\OpenGL.Net.Math.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Other\stbi-sharp\stbi-sharp.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.AssetCompiler\Engine.AssetCompiler.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.ECS\Engine.ECS.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.ImGui\Engine.Gui.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.Utils\Engine.Utils.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine\Engine.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Quincy\Quincy.csproj" />
   </ItemGroup>
 </Project>

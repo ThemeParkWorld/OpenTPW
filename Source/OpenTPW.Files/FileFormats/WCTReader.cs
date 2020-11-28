@@ -1,7 +1,7 @@
-﻿using Engine.Renderer.GL.Render;
-using Engine.Utils.DebugUtils;
+﻿using Engine.Utils.DebugUtils;
 using Ionic.Zlib;
 using OpenGL;
+using Quincy;
 using System;
 using System.IO;
 using System.Text;
@@ -144,7 +144,10 @@ namespace OpenTPW.Files.FileFormats
                 }
             }
 
-            return new AssetContainer<Texture2D>(new Texture2D(imageData, width, height));
+            throw new NotImplementedException();
+
+            // TODO: Load from color array
+            // return new AssetContainer<Texture>(Texture.LoadFromData(imageData, width, height));
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using Engine;
 using Engine.ECS.Entities;
-using Engine.Gui.Managers;
-using Engine.Gui.Managers.ImGuiWindows.Theming;
-using Engine.Renderer.GL.Managers;
 using Engine.Utils.DebugUtils;
 using Engine.Utils.MathUtils;
 using ImGuiNET;

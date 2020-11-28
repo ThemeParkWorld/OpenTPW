@@ -27,32 +27,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Engine">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="Engine.ECS">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.ECS.dll</HintPath>
-    </Reference>
-    <Reference Include="Engine.Gui">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Gui.dll</HintPath>
-    </Reference>
-    <Reference Include="Engine.Renderer.GL">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Renderer.GL.dll</HintPath>
-    </Reference>
-    <Reference Include="Engine.Utils">
-      <HintPath>..\..\ECSEngine\Source\Engine\bin\x86\Debug\netcoreapp3.1\Engine.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net">
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net\bin\netcore\x86\Debug\netcoreapp3.1\OpenGL.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net.CoreUI">
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\bin\netcore\x86\Debug\netcoreapp3.1\OpenGL.Net.CoreUI.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenGL.Net.Math">
-      <HintPath>..\..\ECSEngine\Other\OpenGL.Net\Source\OpenGL.Net\bin\netcore\x86\Debug\netcoreapp3.1\OpenGL.Net.Math.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="GameSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -72,6 +46,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Other\Engine\Other\OpenGL.Net\Source\OpenGL.Net.CoreUI\OpenGL.Net.CoreUI.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Other\OpenGL.Net\Source\OpenGL.Net\OpenGL.Net.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Other\OpenGL.Net\Source\OpenGL.Net\OpenGL.Net.Math.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Other\stbi-sharp\stbi-sharp.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.AssetCompiler\Engine.AssetCompiler.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.ECS\Engine.ECS.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.ImGui\Engine.Gui.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine.Utils\Engine.Utils.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Engine\Engine.csproj" />
+    <ProjectReference Include="..\..\Other\Engine\Source\Quincy\Quincy.csproj" />
     <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj" />
     <ProjectReference Include="..\OpenTPW.RSSEQ\OpenTPW.RSSEQ.csproj" />
   </ItemGroup>
@@ -82,11 +66,11 @@
     <PackageReference Include="CefSharp.Common" Version="79.1.360" />
     <PackageReference Include="CefSharp.OffScreen" Version="79.1.360" />
     <PackageReference Include="Fleck" Version="1.1.0" />
-    <PackageReference Include="ImGui.NET" Version="1.75.0" />
+    <PackageReference Include="ImGui.NET" Version="1.78.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="NetCoreEx.Geometry" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="System.Buffers" Version="4.4.0" />
+    <PackageReference Include="System.Buffers" Version="4.5.0" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />

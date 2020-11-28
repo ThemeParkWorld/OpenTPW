@@ -1,6 +1,6 @@
-﻿using Engine.Renderer.GL.Render;
-using Engine.Utils.DebugUtils;
+﻿using Engine.Utils.DebugUtils;
 using OpenGL;
+using Quincy;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -76,7 +76,10 @@ namespace OpenTPW.Files.FileFormats
                 i++;
             }
 
-            return new AssetContainer<Texture2D>(new Texture2D(colorData, width, height));
+            throw new NotImplementedException();
+
+            // TODO: Load from color array
+            // return new AssetContainer<Texture>(new Texture(colorData, width, height));
         }
     }
 }
