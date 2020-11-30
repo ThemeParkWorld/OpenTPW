@@ -1,0 +1,4 @@
+{
+    "fragment": "Unlit/unlit.frag",
+    "vertex": "Unlit/unlit.vert"
+}

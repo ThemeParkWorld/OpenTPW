@@ -1,91 +1,50 @@
 #version 450
+const float PI = 3.14159265359;
 
-#define PI 3.14159265359
+in VS_OUT {
+    vec2 texCoords;
+    vec3 normal;
+    vec4 fragPosLightSpace;
 
-struct Material {
-    vec4 ambientColor;
-    sampler2D ambientTexture;
+    vec3 lightPos;
+    vec3 camPos;
+    vec3 worldPos;
 
-    vec4 diffuseColor;
-    sampler2D diffuseTexture;
-
-    vec4 specularColor;
-    sampler2D specularTexture;
-
-    float specularExponentColor;
-    sampler2D specularExponentTexture;
-
-    float transparency;
-    sampler2D transparencyTexture;
-
-    int illuminationModel;
-
-    sampler2D bumpTexture;
-    sampler2D displacementTexture;
-    sampler2D stencilTexture;
-
-    float roughness;
-    sampler2D roughnessTexture;
-
-    float metallic;
-    sampler2D metallicTexture;
-
-    float sheen;
-    sampler2D sheenTexture;
-
-    float clearcoatThickness;
-    float clearcoatRoughness;
-    
-    vec4 emissiveColor;
-    sampler2D emissiveTexture;
-
-    float anisotropy;
-    float anisotropyRot;
-};
-
-struct Light {
-    vec3 pos;
-    float range;
-    float constant;
-    float linear;
-    float quadratic;
-};
-
-in vec3 outVertexPos;
-in vec2 outUvCoord;
-in vec3 outNormal;
-in vec3 outFragPos;
-
-uniform Material material;
-uniform Light light;
-
-uniform mat4 projMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 modelMatrix;
-
-uniform vec3 cameraPos;
-
-uniform vec3 skyColor;
-uniform float fogNear;
+    vec3 tangentLightPos;
+    vec3 tangentCamPos;
+    vec3 tangentWorldPos;
+} vs_out;
 
 out vec4 fragColor;
 
-vec3 modelPos;
-vec3 cameraDirection;
+struct Texture {
+    bool exists;
+    sampler2D texture;
+};
 
-vec3 CalcAmbience()
-{
-    return material.ambientColor.xyz;
-}
+struct Material {
+    Texture texture_diffuse1;
+    Texture texture_diffuse2;
 
-vec3 CalcFullMix()
-{
-    return CalcAmbience() * texture(material.diffuseTexture, outUvCoord).xyz;
-}
+    Texture texture_emissive1;
 
-void main()
-{
-    cameraDirection = normalize(cameraPos - modelPos);
+    Texture texture_unknown1;
 
-    fragColor = vec4(CalcFullMix(), 1.0 - material.transparency);
+    Texture texture_normal1;
+
+    Texture texture_specular1;
+};
+
+uniform Material material;
+uniform sampler2D shadowMap;
+uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLut;
+uniform sampler2D holoMap;
+
+void main() {
+    vec4 albedoSrc = texture(material.texture_diffuse1.texture, vs_out.texCoords);
+    vec3 albedo = albedoSrc.xyz;
+    
+    fragColor = vec4(albedo, albedoSrc.w);
 }

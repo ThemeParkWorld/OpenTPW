@@ -1,0 +1,4 @@
+{
+    "fragment": "PBR/pbr.frag",
+    "vertex": "PBR/pbr.vert"
+}
