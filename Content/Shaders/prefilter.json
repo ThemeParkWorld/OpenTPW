@@ -1,0 +1,4 @@
+{
+    "fragment": "Prefilter/prefilter.frag",
+    "vertex": "Prefilter/prefilter.vert"
+}

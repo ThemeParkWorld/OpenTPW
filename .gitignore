@@ -354,4 +354,7 @@ MigrationBackup/
 
 # Visual Studio Code
 .vscode/
-/OpenTPW.RSSEQ/Opcodes/PROGRESS.md
+
+Content/HDRIs/
+Content/Models/
+Content/Maps/

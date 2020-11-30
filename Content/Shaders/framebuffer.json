@@ -1,0 +1,4 @@
+{
+    "fragment": "Framebuffer/framebuffer.frag",
+    "vertex": "Framebuffer/framebuffer.vert"
+}
