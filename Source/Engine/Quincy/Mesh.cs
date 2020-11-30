@@ -1,25 +1,31 @@
 ﻿using OpenGL;
+using Quincy.Components;
+using Quincy.Entities;
 using System;
 using System.Collections.Generic;
 
 namespace Quincy
 {
-    internal class Mesh
+    public class Mesh
     {
         public List<Vertex> Vertices { get; set; }
         public List<uint> Indices { get; set; }
         public List<Texture> Textures { get; set; }
 
+        public int VertexCount { get; private set; }
+        public int IndexCount { get; private set; }
+        public int TextureCount { get; private set; }
+
+        private Matrix4x4f localModelMatrix;
+
         private uint vao, vbo, ebo;
 
-        public Matrix4x4f ModelMatrix;
-
-        public Mesh(List<Vertex> vertices, List<uint> indices, List<Texture> textures, Matrix4x4f modelMatrix)
+        public Mesh(List<Vertex> vertices, List<uint> indices, List<Texture> textures, Matrix4x4f oglTransform)
         {
             Vertices = vertices;
             Indices = indices;
             Textures = textures;
-            ModelMatrix = modelMatrix;
+            localModelMatrix = oglTransform;
 
             SetupMesh();
         }
@@ -81,9 +87,20 @@ namespace Quincy
             Gl.VertexAttribPointer(4, 2, VertexAttribType.Float, false, vertexStructSize, (IntPtr)(12 * sizeof(float)));
 
             Gl.BindVertexArray(0);
+
+            // Buffered indices & vertices to GPU
+            // Keep counts, remove CPU copies
+            IndexCount = Indices.Count;
+            VertexCount = Vertices.Count;
+
+            Indices.Clear();
+            Vertices.Clear();
+
+            Indices = null;
+            Vertices = null;
         }
 
-        public void Draw(Camera camera, Shader shader, Light light, (Cubemap, Cubemap, Cubemap) pbrCubemaps, Texture brdfLut, Texture holoTexture)
+        public void Draw(CameraEntity camera, ShaderComponent shader, LightEntity light, (Cubemap, Cubemap, Cubemap) pbrCubemaps, Texture brdfLut, Matrix4x4f modelMatrix, Texture holoTexture)
         {
             Dictionary<string, uint> counts = new Dictionary<string, uint>();
             List<string> expected = new List<string>() { "texture_diffuse", "texture_emissive", "texture_unknown", "texture_normal" };
@@ -117,61 +134,59 @@ namespace Quincy
                     shader.SetBool($"material.{expectedVar}1.exists", false);
                 }
             }
+            var cameraComponent = camera.GetComponent<CameraComponent>();
+            var lightComponent = light.GetComponent<LightComponent>();
 
-            shader.SetMatrix("projectionMatrix", camera.ProjMatrix);
-            shader.SetMatrix("viewMatrix", camera.ViewMatrix);
-            shader.SetMatrix("modelMatrix", ModelMatrix);
+            shader.SetMatrix("projectionMatrix", cameraComponent.ProjMatrix);
+            shader.SetMatrix("viewMatrix", cameraComponent.ViewMatrix);
+            shader.SetMatrix("modelMatrix", modelMatrix * localModelMatrix);
 
-            shader.SetVector3("camPos", camera.Position);
-            shader.SetVector3("lightPos", light.Position);
+            shader.SetVector3d("camPos", camera.GetComponent<TransformComponent>().Position);
+            shader.SetVector3d("lightPos", light.GetComponent<TransformComponent>().Position);
 
-            shader.SetMatrix("lightProjectionMatrix", light.ProjMatrix);
-            shader.SetMatrix("lightViewMatrix", light.ViewMatrix);
+            shader.SetMatrix("lightProjectionMatrix", lightComponent.ProjMatrix);
+            shader.SetMatrix("lightViewMatrix", lightComponent.ViewMatrix);
 
-            var additionalTextures = new (string, TextureTarget, uint)[]
-            {
-                ("shadowMap", TextureTarget.Texture2d, light.ShadowMap.DepthMap),
-                ("irradianceMap", TextureTarget.TextureCubeMap, pbrCubemaps.Item2.Id),
-                ("brdfLut", TextureTarget.Texture2d, brdfLut.Id),
-                ("prefilterMap", TextureTarget.TextureCubeMap, pbrCubemaps.Item3.Id),
-                ("holoMap", TextureTarget.Texture2d, holoTexture.Id),
-            };
+            Gl.ActiveTexture(TextureUnit.Texture0 + Textures.Count);
+            Gl.BindTexture(TextureTarget.Texture2d, lightComponent.ShadowMap.DepthMap);
+            shader.SetInt("shadowMap", Textures.Count);
 
-            for (int i = 0; i < additionalTextures.Length; i++)
-            {
-                var texture = additionalTextures[i];
-                Gl.ActiveTexture(TextureUnit.Texture0 + Textures.Count + i);
-                Gl.BindTexture(texture.Item2, texture.Item3);
-                shader.SetInt(texture.Item1, Textures.Count + i);
-            }
+            Gl.ActiveTexture(TextureUnit.Texture0 + Textures.Count + 1);
+            Gl.BindTexture(TextureTarget.TextureCubeMap, pbrCubemaps.Item2.Id);
+            shader.SetInt("irradianceMap", Textures.Count + 1);
+
+            Gl.ActiveTexture(TextureUnit.Texture0 + Textures.Count + 2);
+            Gl.BindTexture(TextureTarget.Texture2d, brdfLut.Id);
+            shader.SetInt("brdfLut", Textures.Count + 2);
+
+            Gl.ActiveTexture(TextureUnit.Texture0 + Textures.Count + 3);
+            Gl.BindTexture(TextureTarget.TextureCubeMap, pbrCubemaps.Item3.Id);
+            shader.SetInt("prefilterMap", Textures.Count + 3);
+
+            Gl.ActiveTexture(TextureUnit.Texture0 + Textures.Count + 4);
+            Gl.BindTexture(TextureTarget.Texture2d, holoTexture.Id);
+            shader.SetInt("holoMap", Textures.Count + 4);
 
             Gl.ActiveTexture(TextureUnit.Texture0);
 
             Gl.BindVertexArray(vao);
-            Gl.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            Gl.DrawElements(PrimitiveType.Triangles, IndexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
             Gl.BindVertexArray(0);
         }
 
-        public void DrawShadows(Light light, Shader depthShader)
+        public void DrawShadows(LightComponent light, ShaderComponent depthShader, Matrix4x4f modelMatrix)
         {
             depthShader.Use();
 
             depthShader.SetMatrix("projectionMatrix", light.ProjMatrix);
             depthShader.SetMatrix("viewMatrix", light.ViewMatrix);
-            depthShader.SetMatrix("modelMatrix", ModelMatrix);
+            depthShader.SetMatrix("modelMatrix", modelMatrix * localModelMatrix);
 
             Gl.ActiveTexture(TextureUnit.Texture0);
 
             Gl.BindVertexArray(vao);
-            Gl.DrawElements(PrimitiveType.Triangles, Indices.Count, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            Gl.DrawElements(PrimitiveType.Triangles, IndexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
             Gl.BindVertexArray(0);
-        }
-
-        public void Update(float deltaTime)
-        {
-            ModelMatrix = Matrix4x4f.Identity;
-            var scale = Constants.scale;
-            ModelMatrix.Scale(scale, scale, scale);
         }
     }
 }

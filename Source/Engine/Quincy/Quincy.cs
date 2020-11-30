@@ -1,6 +1,7 @@
-﻿using OpenGL;
+﻿using Engine.Utils.DebugUtils;
+using OpenGL;
 using OpenGL.CoreUI;
-using Quincy.DebugUtils;
+using Quincy.Managers;
 using System;
 using System.Runtime.InteropServices;
 
@@ -12,7 +13,6 @@ namespace Quincy
         protected NativeWindow window;
 
         public bool isRunning = true;
-        private Scene scene;
         private Gl.DebugProc debugProc;
         private QuincyImGui imgui;
         #endregion
@@ -52,7 +52,6 @@ namespace Quincy
             Gl.Enable((EnableCap)Gl.TEXTURE_CUBE_MAP_SEAMLESS);
             Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             imgui = new QuincyImGui();
-            scene = new Scene();
         }
 
         private void GlDebugCallback(DebugSource source, DebugType type, uint id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
@@ -65,12 +64,12 @@ namespace Quincy
 
         private void RenderToScreen()
         {
-            scene.Render();
+            SceneManager.Instance.Render();
         }
 
         private void RenderToShadowMap()
         {
-            scene.RenderShadows();
+            SceneManager.Instance.RenderShadows();
         }
 
         private void Render(object sender, NativeWindowEventArgs e)

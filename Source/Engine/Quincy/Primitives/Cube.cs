@@ -1,4 +1,5 @@
-﻿using OpenGL;
+﻿using Engine.Utils.MathUtils;
+using OpenGL;
 using System;
 using System.Collections.Generic;
 
@@ -64,13 +65,13 @@ namespace Quincy.Primitives
 
                     tmp.Add(new Vertex()
                     {
-                        Position = new MathUtils.Vector3f(x, y, z),
+                        Position = new Vector3f(x, y, z),
 
                         // TODO:
-                        TexCoords = new MathUtils.Vector2f(0, 0),
-                        BiTangent = new MathUtils.Vector3f(0, 0, 0),
-                        Normal = new MathUtils.Vector3f(0, 0, 0),
-                        Tangent = new MathUtils.Vector3f(0, 0, 0),
+                        TexCoords = new Vector2f(0, 0),
+                        BiTangent = new Vector3f(0, 0, 0),
+                        Normal = new Vector3f(0, 0, 0),
+                        Tangent = new Vector3f(0, 0, 0),
                     });
                 }
 

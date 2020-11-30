@@ -1,14 +1,12 @@
 ﻿using Engine;
 using Engine.ECS.Entities;
-using Engine.Gui.Managers;
-using Engine.Gui.Managers.ImGuiWindows.Theming;
-using Engine.Renderer.GL.Managers;
 using Engine.Utils.DebugUtils;
 using Engine.Utils.MathUtils;
 using ImGuiNET;
 using OpenTPW.Entities;
 using OpenTPW.Entities.UI;
 using OpenTPW.Files;
+using Quincy.Managers;
 using System.Collections.Generic;
 
 namespace OpenTPW
@@ -29,8 +27,8 @@ namespace OpenTPW
                 new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/Bouncy.wad")
             };
 
-            var uiText = FileManager.Instance.ReadFile($"{GameSettings.Default.gameDir}/data/Language/English/UITEXT.str");
-            foreach (var textElement in uiText.Data as List<string>)
+            var uiText = FileManager.Instance.ReadFile<List<string>>($"{GameSettings.Default.gameDir}/data/Language/English/UITEXT.str");
+            foreach (var textElement in uiText.Data)
             {
                 Logging.Log(textElement);
             }

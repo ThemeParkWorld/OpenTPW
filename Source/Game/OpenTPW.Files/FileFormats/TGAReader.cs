@@ -1,4 +1,4 @@
-﻿using Engine.Renderer.GL.Render;
+﻿using Quincy;
 using Engine.Utils.DebugUtils;
 using OpenGL;
 using System;
@@ -76,7 +76,7 @@ namespace OpenTPW.Files.FileFormats
                 i++;
             }
 
-            return new AssetContainer<Texture2D>(new Texture2D(colorData, width, height));
+            return new AssetContainer<Texture>(Texture.LoadFromColorData(colorData, width, height, "texture_diffuse"));
         }
     }
 }

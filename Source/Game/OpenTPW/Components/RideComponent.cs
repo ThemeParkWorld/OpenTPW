@@ -1,6 +1,6 @@
 ﻿using Engine.Assets;
 using Engine.ECS.Components;
-using Engine.Gui.Attributes;
+using Engine.Utils.Attributes;
 using ImGuiNET;
 using OpenTPW.Files;
 using OpenTPW.Files.FileFormats;
@@ -32,7 +32,7 @@ namespace OpenTPW.Components
 
             data = rseFile.data;
             vmInstance = new VM(data);
-            samContents = FileManager.Instance.ReadFile(rideArchivePath, $"{rideName}.SAM").Data as List<SAMPair>;
+            samContents = FileManager.Instance.ReadFile<List<SAMPair>>(rideArchivePath, $"{rideName}.SAM").Data;
         }
 
         public override void Update(float deltaTime)

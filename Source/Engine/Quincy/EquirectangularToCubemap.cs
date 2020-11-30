@@ -1,4 +1,7 @@
-﻿using OpenGL;
+﻿using Engine.Utils;
+using Engine.Utils.FileUtils;
+using OpenGL;
+using Quincy.Components;
 using Quincy.Primitives;
 using System;
 
@@ -9,10 +12,12 @@ namespace Quincy
         public static (Cubemap, Cubemap, Cubemap) Convert(string hdriPath)
         {
             Gl.Disable(EnableCap.CullFace);
-            var equirectangularToCubemapShader = new Shader("Content/Shaders/EquirectangularToCubemap/EquirectangularToCubemap.frag", "Content/Shaders/EquirectangularToCubemap/EquirectangularToCubemap.vert");
-            var convolutionShader = new Shader("Content/Shaders/Convolution/convolution.frag", "Content/Shaders/Convolution/convolution.vert");
-            var prefilterShader = new Shader("Content/Shaders/Prefilter/prefilter.frag", "Content/Shaders/Prefilter/prefilter.vert");
-            var skyHdri = HdriTexture.LoadFromFile(hdriPath);
+
+            var fs = ServiceLocator.FileSystem;
+            var equirectangularToCubemapShader = new ShaderComponent(fs.GetAsset("Shaders/EquirectangularToCubemap/EquirectangularToCubemap.frag"), fs.GetAsset("Shaders/EquirectangularToCubemap/EquirectangularToCubemap.vert"));
+            var convolutionShader = new ShaderComponent(fs.GetAsset("Shaders/Convolution/convolution.frag"), fs.GetAsset("Shaders/Convolution/convolution.vert"));
+            var prefilterShader = new ShaderComponent(fs.GetAsset("Shaders/Prefilter/prefilter.frag"), fs.GetAsset("Shaders/Prefilter/prefilter.vert"));
+            var skyHdri = HdriTexture.LoadFromAsset(fs.GetAsset(hdriPath));
 
             var envMap = new Cubemap(RenderToCubemap(equirectangularToCubemapShader, 512, () =>
             {
@@ -41,7 +46,7 @@ namespace Quincy
             );
         }
 
-        public static uint RenderToCubemap(Shader shader, int resolution, Action preRender)
+        public static uint RenderToCubemap(ShaderComponent shader, int resolution, Action preRender)
         {
             var cube = new Cube();
             var captureFbo = Gl.GenFramebuffer();
@@ -49,7 +54,7 @@ namespace Quincy
 
             var colorTexture = Gl.GenTexture();
             Gl.BindTexture(TextureTarget.Texture2d, colorTexture);
-            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Srgb, Constants.renderWidth, Constants.renderHeight, 0, PixelFormat.Rgb, PixelType.Float, IntPtr.Zero);
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Srgb, GameSettings.GameResolutionX, GameSettings.GameResolutionY, 0, PixelFormat.Rgb, PixelType.Float, IntPtr.Zero);
 
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.NearestMipmapNearest);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
@@ -101,7 +106,8 @@ namespace Quincy
 
         public static uint CreateBrdfLut()
         {
-            var shader = new Shader("Content/Shaders/BrdfLut/brdfLut.frag", "Content/Shaders/BrdfLut/brdfLut.vert");
+            var fs = ServiceLocator.FileSystem;
+            var shader = new ShaderComponent(fs.GetAsset("Shaders/BrdfLut/brdfLut.frag"), fs.GetAsset("Shaders/BrdfLut/brdfLut.vert"));
             var brdfLutTexture = Gl.GenTexture();
             var plane = new Plane();
             Gl.BindTexture(TextureTarget.Texture2d, brdfLutTexture);
@@ -131,7 +137,7 @@ namespace Quincy
             return brdfLutTexture;
         }
 
-        private static uint CreatePrefilteredEnvironmentMap(Shader shader, Action preRender)
+        private static uint CreatePrefilteredEnvironmentMap(ShaderComponent shader, Action preRender)
         {
             var cube = new Cube();
             var captureFbo = Gl.GenFramebuffer();

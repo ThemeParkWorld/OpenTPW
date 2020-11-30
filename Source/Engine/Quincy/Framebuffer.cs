@@ -3,20 +3,20 @@ using System;
 
 namespace Quincy
 {
-    internal class Framebuffer
+    public class Framebuffer
     {
         public uint Fbo { get; }
         public uint DepthTexture { get; }
         public uint ColorTexture { get; }
 
-        public Framebuffer()
+        public Framebuffer(int resX, int resY)
         {
             Fbo = Gl.GenFramebuffer();
             Gl.BindFramebuffer(FramebufferTarget.Framebuffer, Fbo);
 
             ColorTexture = Gl.GenTexture();
             Gl.BindTexture(TextureTarget.Texture2d, ColorTexture);
-            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Srgb, Constants.renderWidth, Constants.renderHeight, 0, PixelFormat.Rgb, PixelType.Float, IntPtr.Zero);
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Srgb, resX, resY, 0, PixelFormat.Rgb, PixelType.Float, IntPtr.Zero);
 
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -27,7 +27,7 @@ namespace Quincy
 
             DepthTexture = Gl.GenTexture();
             Gl.BindTexture(TextureTarget.Texture2d, DepthTexture);
-            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.DepthComponent, Constants.renderWidth, Constants.renderHeight, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.DepthComponent, resX, resY, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
 
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);

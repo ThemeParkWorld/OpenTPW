@@ -1,7 +1,9 @@
-﻿using ImGuiNET;
+﻿using Engine.Utils;
+using Engine.Utils.MathUtils;
+using ImGuiNET;
 using OpenGL;
 using OpenGL.CoreUI;
-using Quincy.MathUtils;
+using Quincy.Components;
 using System;
 using System.Numerics;
 
@@ -12,7 +14,7 @@ namespace Quincy
         private const float PT_TO_PX = 1.3281472327365f;
 
         private Texture defaultFontTexture;
-        private Shader imguiShader;
+        private ShaderComponent imguiShader;
         private Vector2 windowSize;
 
         private readonly ImGuiIOPtr io;
@@ -48,7 +50,7 @@ namespace Quincy
 
         private void InitGl()
         {
-            imguiShader = new Shader("Content/Shaders/ImGUI/imgui.frag", "Content/Shaders/ImGUI/imgui.vert");
+            imguiShader = new ShaderComponent(ServiceLocator.FileSystem.GetAsset("Content/Shaders/ImGUI/imgui.frag"), ServiceLocator.FileSystem.GetAsset("Content/Shaders/ImGUI/imgui.vert"));
 
             vao = Gl.GenVertexArray();
             vbo = Gl.GenBuffer();
@@ -74,7 +76,7 @@ namespace Quincy
             {
                 var stdConfig = ImGuiNative.ImFontConfig_ImFontConfig();
 
-                MonospacedFont = io.Fonts.AddFontFromFileTTF("Content/Fonts/IBMPlexMono/IBMPlexMono-SemiBold.ttf", fontSizePixels, stdConfig).NativePtr;
+                MonospacedFont = io.Fonts.AddFontFromFileTTF("Content/Fonts/IBMPlexMono/SourceCodePros-SemiBold.ttf", fontSizePixels, stdConfig).NativePtr;
 
                 ImGuiNative.ImFontConfig_destroy(stdConfig);
             }

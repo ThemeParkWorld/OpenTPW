@@ -8,7 +8,7 @@
     "name":"TestScript",
     "license":"MPL-2.0",
     "author":"xezno",
-    "description":"Test Script for Ulaid",
-    "keywords":"ulaid,test,script",
+    "description":"Test Script for Example Game",
+    "keywords":"example,test,script",
     "version":"0.1.0"
 }

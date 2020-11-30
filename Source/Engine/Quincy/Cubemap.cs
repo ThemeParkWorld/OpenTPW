@@ -1,12 +1,12 @@
-﻿using OpenGL;
-using Quincy.DebugUtils;
+﻿using Engine.Utils.DebugUtils;
+using OpenGL;
 using StbiSharp;
 using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Quincy
 {
-    internal struct Cubemap
+    public struct Cubemap
     {
         public uint Id { get; }
 

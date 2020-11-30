@@ -1,7 +1,7 @@
-﻿using Engine.Renderer.GL.Render;
-using Engine.Utils.DebugUtils;
+﻿using Engine.Utils.DebugUtils;
 using Ionic.Zlib;
 using OpenGL;
+using Quincy;
 using System;
 using System.IO;
 using System.Text;
@@ -124,11 +124,11 @@ namespace OpenTPW.Files.FileFormats
 
             Logging.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
 
-            var imageData = new ColorRGB24[width * height];
+            var imageData = new ColorRGBA32[width * height];
 
             for (var i = 0; i < width * height; ++i)
             {
-                imageData[i] = new ColorRGB24(255, 0, 255);
+                imageData[i] = new ColorRGBA32(255, 0, 255, 255);
             }
 
             decmpMemoryStream.Seek(0, SeekOrigin.Begin);
@@ -139,12 +139,12 @@ namespace OpenTPW.Files.FileFormats
                 {
                     var bytes = new byte[1];
                     decmpMemoryStream.Read(bytes, 0, bytes.Length);
-                    imageData[dataPos] = new ColorRGB24(bytes[0], bytes[0], bytes[0]);
+                    imageData[dataPos] = new ColorRGBA32(bytes[0], bytes[0], bytes[0], 255);
                     dataPos++;
                 }
             }
 
-            return new AssetContainer<Texture2D>(new Texture2D(imageData, width, height));
+            return new AssetContainer<Texture>(Texture.LoadFromColorData(imageData, width, height, "texture_diffuse"));
         }
     }
 }

@@ -1,0 +1,4 @@
+{
+    "fragment": "EquirectangularToCubemap/EquirectangularToCubemap.frag",
+    "vertex": "EquirectangularToCubemap/EquirectangularToCubemap.vert"
+}

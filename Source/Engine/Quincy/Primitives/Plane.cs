@@ -1,4 +1,6 @@
-﻿using OpenGL;
+﻿using Engine.Utils.MathUtils;
+using OpenGL;
+using Quincy.Components;
 using System;
 using System.Collections.Generic;
 
@@ -11,35 +13,35 @@ namespace Quincy.Primitives
             // TODO: Tangent, bi-tangent
             new Vertex()
             {
-                Position = new MathUtils.Vector3f(-1.0f, -1.0f, 0.0f),
-                TexCoords = new MathUtils.Vector2f(0.0f, 0.0f),
-                Normal = new MathUtils.Vector3f(0.0f, 0.0f, 1.0f),
-                Tangent = new MathUtils.Vector3f(0, 0, 0),
-                BiTangent = new MathUtils.Vector3f(0, 0, 0)
+                Position = new Vector3f(-1.0f, -1.0f, 0.0f),
+                TexCoords = new Vector2f(0.0f, 0.0f),
+                Normal = new Vector3f(0.0f, 0.0f, 1.0f),
+                Tangent = new Vector3f(0, 0, 0),
+                BiTangent = new Vector3f(0, 0, 0)
             },
             new Vertex()
             {
-                Position = new MathUtils.Vector3f(1.0f, -1.0f, 0.0f),
-                TexCoords = new MathUtils.Vector2f(1.0f, 0.0f),
-                Normal = new MathUtils.Vector3f(0.0f, 0.0f, 1.0f),
-                Tangent = new MathUtils.Vector3f(0, 0, 0),
-                BiTangent = new MathUtils.Vector3f(0, 0, 0)
+                Position = new Vector3f(1.0f, -1.0f, 0.0f),
+                TexCoords = new Vector2f(1.0f, 0.0f),
+                Normal = new Vector3f(0.0f, 0.0f, 1.0f),
+                Tangent = new Vector3f(0, 0, 0),
+                BiTangent = new Vector3f(0, 0, 0)
             },
             new Vertex()
             {
-                Position = new MathUtils.Vector3f(-1.0f, 1.0f, 0.0f),
-                TexCoords = new MathUtils.Vector2f(0.0f, 1.0f),
-                Normal = new MathUtils.Vector3f(0.0f, 0.0f, 1.0f),
-                Tangent = new MathUtils.Vector3f(0, 0, 0),
-                BiTangent = new MathUtils.Vector3f(0, 0, 0)
+                Position = new Vector3f(-1.0f, 1.0f, 0.0f),
+                TexCoords = new Vector2f(0.0f, 1.0f),
+                Normal = new Vector3f(0.0f, 0.0f, 1.0f),
+                Tangent = new Vector3f(0, 0, 0),
+                BiTangent = new Vector3f(0, 0, 0)
             },
             new Vertex()
             {
-                Position = new MathUtils.Vector3f(1.0f, 1.0f, 0.0f),
-                TexCoords = new MathUtils.Vector2f(1.0f, 1.0f),
-                Normal = new MathUtils.Vector3f(0.0f, 0.0f, 1.0f),
-                Tangent = new MathUtils.Vector3f(0, 0, 0),
-                BiTangent = new MathUtils.Vector3f(0, 0, 0)
+                Position = new Vector3f(1.0f, 1.0f, 0.0f),
+                TexCoords = new Vector2f(1.0f, 1.0f),
+                Normal = new Vector3f(0.0f, 0.0f, 1.0f),
+                Tangent = new Vector3f(0, 0, 0),
+                BiTangent = new Vector3f(0, 0, 0)
             }
         };
 
@@ -116,7 +118,7 @@ namespace Quincy.Primitives
             Gl.BindVertexArray(0);
         }
 
-        public void Draw(Shader shader, uint diffuseTexture)
+        public void Draw(ShaderComponent shader, uint diffuseTexture)
         {
             shader.Use();
 

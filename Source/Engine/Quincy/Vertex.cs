@@ -1,10 +1,10 @@
-﻿using Quincy.MathUtils;
+﻿using Engine.Utils.MathUtils;
 using System.Runtime.InteropServices;
 
 namespace Quincy
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct Vertex
+    public unsafe struct Vertex
     {
         public Vector3f Position { get; set; }
         public Vector3f Normal { get; set; }

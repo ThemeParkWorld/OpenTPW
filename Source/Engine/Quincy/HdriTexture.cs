@@ -1,9 +1,9 @@
-﻿using OpenGL;
-using Quincy.DebugUtils;
+﻿using Engine.Utils.DebugUtils;
+using Engine.Utils.FileUtils;
+using OpenGL;
 using StbiSharp;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Quincy
@@ -17,10 +17,9 @@ namespace Quincy
             Id = id;
         }
 
-        public static HdriTexture LoadFromFile(string filePath)
+        public static HdriTexture LoadFromAsset(Asset asset)
         {
-            var fileData = File.ReadAllBytes(filePath);
-            var image = Stbi.LoadfFromMemory(fileData, 3);
+            var image = Stbi.LoadfFromMemory(asset.Data, 3);
             var imageBytes = new List<byte>();
             foreach (var fl in image.Data)
             {
@@ -38,7 +37,7 @@ namespace Quincy
 
             Marshal.FreeHGlobal(textureDataPtr);
 
-            Logging.Log($"Loaded cubemap texture {filePath}, ptr {texturePtr}");
+            Logging.Log($"Loaded cubemap texture {asset.MountPath}, ptr {texturePtr}");
 
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);

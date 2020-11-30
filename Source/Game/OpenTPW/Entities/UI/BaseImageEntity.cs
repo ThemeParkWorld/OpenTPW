@@ -1,16 +1,14 @@
 ﻿using Engine.ECS.Entities;
-using Engine.Renderer.GL.Components;
-using Engine.Renderer.GL.Render;
+using Engine.Utils;
 using Engine.Utils.MathUtils;
+using Quincy;
+using Quincy.Components;
 
 namespace OpenTPW.Entities.UI
 {
     public class BaseImageEntity : Entity<BaseImageEntity>
     {
-        protected Material material;
-
-        protected Mesh imageMesh;
-        protected Texture2D texture;
+        protected Texture texture;
 
         protected Vector2d position;
         protected Vector2d scale;
@@ -18,17 +16,10 @@ namespace OpenTPW.Entities.UI
         public BaseImageEntity(Vector2d position, Vector2d scale)
         {
             // Add components
-            AddComponent(new ShaderComponent(new Shader("Content/Shaders/2D/2D.frag", Shader.Type.FragmentShader),
-                new Shader("Content/Shaders/2D/2D.vert", Shader.Type.VertexShader)));
+            var fileSystem = ServiceLocator.FileSystem;
+            AddComponent(new ShaderComponent(fileSystem.GetAsset("Shaders/2D/2D.frag"), fileSystem.GetAsset("Shaders/2D/2D.vert")));
             AddComponent(new TransformComponent(new Vector3d(0, 0, 0.1f), Quaternion.FromEulerAngles(new Vector3f(90f, 0, 0)), new Vector3d(1, 1, 1)));
-            AddComponent(new MaterialComponent(material));
-            AddComponent(new MeshComponent("Content/plane.obj"));
-        }
-
-        protected void SetupMaterial()
-        {
-            // Setup material
-            material = new Material("Content/plane.mtl");
+            AddComponent(new ModelComponent(fileSystem.GetAsset("plane.obj")));
         }
     }
 }

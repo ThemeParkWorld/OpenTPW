@@ -1,0 +1,4 @@
+{
+    "fragment": "Convolution/convolution.frag",
+    "vertex": "Convolution/convolution.vert"
+}

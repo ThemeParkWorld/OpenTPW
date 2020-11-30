@@ -1,0 +1,4 @@
+{
+    "fragment": "BrdfLut/brdfLut.frag",
+    "vertex": "BrdfLut/brdfLut.vert"
+}

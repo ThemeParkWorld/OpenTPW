@@ -1,10 +1,10 @@
-﻿using OpenGL;
-using Quincy.MathUtils;
+﻿using Engine.Utils.MathUtils;
+using OpenGL;
 using System;
 
 namespace Quincy
 {
-    internal class ShadowMap
+    public class ShadowMap
     {
         public uint DepthMapFbo { get; private set; }
         public uint DepthMap { get; private set; }
