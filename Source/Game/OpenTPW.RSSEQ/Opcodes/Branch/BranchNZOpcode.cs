@@ -6,7 +6,7 @@
 
         public override void Invoke(Operand[] args)
         {
-            if (vmInstance.Flags.Zero)
+            if (!vmInstance.Flags.Zero)
                 vmInstance.BranchTo(args[0].Value);
         }
 
