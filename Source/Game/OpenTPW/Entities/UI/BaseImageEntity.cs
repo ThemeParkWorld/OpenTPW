@@ -17,7 +17,7 @@ namespace OpenTPW.Entities.UI
         {
             // Add components
             var fileSystem = ServiceLocator.FileSystem;
-            AddComponent(new ShaderComponent(fileSystem.GetAsset("Shaders/2D/2D.frag"), fileSystem.GetAsset("Shaders/2D/2D.vert")));
+            AddComponent(new ShaderComponent(fileSystem.GetAsset("Shaders/Unlit/Unlit.frag"), fileSystem.GetAsset("Shaders/Unlit/Unlit.vert")));
             AddComponent(new TransformComponent(new Vector3d(0, 0, 0.1f), Quaternion.FromEulerAngles(new Vector3f(90f, 0, 0)), new Vector3d(1, 1, 1)));
             AddComponent(new ModelComponent(fileSystem.GetAsset("plane.obj")));
         }

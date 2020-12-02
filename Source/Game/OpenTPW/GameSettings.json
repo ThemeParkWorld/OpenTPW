@@ -14,5 +14,5 @@
 	"updateTimeStep": 0.004,
 	"shadowMapX": 1024,
 	"shadowMapY": 1024,
-	"editorTheme": "vgui"
+	"editorTheme": "yadt"
 }
