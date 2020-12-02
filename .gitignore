@@ -355,6 +355,4 @@ MigrationBackup/
 # Visual Studio Code
 .vscode/
 
-Content/HDRIs/
-Content/Models/
-Content/Maps/
+!Content/*
