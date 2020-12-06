@@ -9,7 +9,7 @@
             if (!vmInstance.Flags.Zero)
                 vmInstance.BranchTo(args[0].Value);
         }
-
+        
         public override int MinArgs => 1;
         public override int MaxArgs => 1;
         public override string Description => "Branch to another location if the 'zero' flag has a value of zero.";

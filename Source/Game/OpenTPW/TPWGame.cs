@@ -24,7 +24,7 @@ namespace OpenTPW
             {
                 // new WCTImageEntity($"{GameSettings.Default.gameDir}/data/ui.wad", $"b_upgrade.wct", new Vector2d(0, 0), new Vector2d(1280, 720)),
                 new TGAImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2d(0, 0), new Vector2d(1280, 720)),
-                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/jungle/rides/Bouncy.wad")
+                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/space/rides/Wateride.wad")
             };
 
             var uiText = FileManager.Instance.ReadFile<List<string>>($"{GameSettings.Default.gameDir}/data/Language/English/UITEXT.str");
