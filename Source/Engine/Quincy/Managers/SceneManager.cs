@@ -74,7 +74,7 @@ namespace Quincy.Managers
 
             // TODO: make this modifiable at run-time or by the game itself.
             Cameras = ImmutableList.Create(
-                new CameraEntity(new Vector3d(0, 2, 0), GameSettings.GameResolutionX, GameSettings.GameResolutionY)
+                new CameraEntity(new Vector3d(0, 2, 0))
                 {
                     Name = "Main Camera"
                 }

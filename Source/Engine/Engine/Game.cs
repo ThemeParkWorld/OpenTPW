@@ -89,6 +89,7 @@ namespace Engine
             nativeWindow.MouseLeave += NativeWindowOnMouseLeave;
             nativeWindow.MouseEnter += NativeWindowOnMouseEnter;
             nativeWindow.Close += Closing;
+            nativeWindow.Resize += Resize;
 
             nativeWindow.CursorVisible = true;
             nativeWindow.Animation = false;
@@ -96,8 +97,7 @@ namespace Engine
             nativeWindow.MultisampleBits = 8;
 
             nativeWindow.SwapInterval = 0;
-            nativeWindow.Resize += Resize;
-            nativeWindow.Create(GameSettings.GamePosX, GameSettings.GamePosY, (uint)GameSettings.GameResolutionX + 16, (uint)GameSettings.GameResolutionY + 16, NativeWindowStyles.Caption | NativeWindowStyles.Border);
+            nativeWindow.Create(GameSettings.GamePosX, GameSettings.GamePosY, (uint)GameSettings.GameResolutionX, (uint)GameSettings.GameResolutionY, NativeWindowStyles.Resizeable);
 
             nativeWindow.Fullscreen = GameSettings.Fullscreen;
             nativeWindow.Caption = FormatWindowTitle(gameProperties.WindowTitle) ?? "Engine Game";
@@ -216,7 +216,8 @@ namespace Engine
         {
             var windowSize = new Vector2f(nativeWindow.ClientSize.Width, nativeWindow.ClientSize.Height);
 
-            // renderer.SetViewportSize();
+            GameSettings.GameResolutionX = nativeWindow.ClientSize.Width;
+            GameSettings.GameResolutionY = nativeWindow.ClientSize.Height;
 
             Broadcast.Notify(NotifyType.WindowResized, new WindowResizeNotifyArgs(windowSize, this));
         }

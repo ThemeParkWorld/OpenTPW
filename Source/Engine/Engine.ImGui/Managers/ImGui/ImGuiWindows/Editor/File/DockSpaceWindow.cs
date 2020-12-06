@@ -21,7 +21,7 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor.Engine
             var dockSpaceId = ImGui.GetID("mainDockSpace");
             ImGui.DockSpace(dockSpaceId, new Vector2(-1, -1), ImGuiDockNodeFlags.PassthruCentralNode);
 
-            ImGui.SetWindowSize(new Vector2(GameSettings.GameResolutionX, GameSettings.GameResolutionY));
+            ImGui.SetWindowSize(new Vector2(GameSettings.GameResolutionX, GameSettings.GameResolutionY));   
             ImGui.SetWindowPos(new Vector2(0, 18 /* Menu bar hack */));
         }
     }

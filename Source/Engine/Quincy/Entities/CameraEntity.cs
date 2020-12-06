@@ -16,13 +16,12 @@ namespace Quincy.Entities
         /// <summary>
         /// Constructs the camera entity with a transform component and a camera component.
         /// </summary>
-        public CameraEntity(Vector3d position, int resolutionX, int resolutionY)
+        public CameraEntity(Vector3d position)
         {
             AddComponent(new TransformComponent(position, Quaternion.identity, new Vector3d(1, 1, 1)));
             AddComponent(new CameraComponent()
             {
-                FieldOfView = 90f,
-                Resolution = new Vector2f(resolutionX, resolutionY)
+                FieldOfView = 90f
             });
         }
     }

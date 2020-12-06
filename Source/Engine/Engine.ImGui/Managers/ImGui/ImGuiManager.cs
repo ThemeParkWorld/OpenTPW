@@ -476,6 +476,7 @@ namespace Engine.Gui.Managers
                     {
                         var windowResizeEventArgs = (WindowResizeNotifyArgs)notifyArgs;
                         windowSize = new Vector2(windowResizeEventArgs.WindowSize.x, windowResizeEventArgs.WindowSize.y);
+                        io.DisplaySize = new Vector2(windowSize.X, windowSize.Y);
                         break;
                     }
                 default:

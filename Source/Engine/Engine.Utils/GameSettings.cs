@@ -33,7 +33,7 @@ namespace Engine.Utils
         private static GameSettingsValues values;
 
         public static int GameResolutionX { get => values.gameResolutionX; set => values.gameResolutionX = value; }
-        public static int GameResolutionY { get => values.gameResolutionY; set => values.gameResolutionX = value; }
+        public static int GameResolutionY { get => values.gameResolutionY; set => values.gameResolutionY = value; }
         public static bool VsyncEnabled { get => values.vsyncEnabled; set => values.vsyncEnabled = value; }
         public static int FramerateLimit { get => values.framerateLimit; set => values.framerateLimit = value; }
         public static int GamePosX { get => values.gamePosX; set => values.gamePosX = value; }

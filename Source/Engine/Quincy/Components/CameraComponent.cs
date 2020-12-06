@@ -1,4 +1,5 @@
 ﻿using Engine.ECS.Components;
+using Engine.ECS.Observer;
 using Engine.Utils;
 using Engine.Utils.Attributes;
 using Engine.Utils.MathUtils;
@@ -23,10 +24,11 @@ namespace Quincy.Components
         public float NearPlane { get => nearPlane; set { nearPlane = value; CreateProjectionMatrix(); } }
         public float FarPlane { get => farPlane; set { farPlane = value; CreateProjectionMatrix(); } }
 
-        private Vector2f resolution = new Vector2f(GameSettings.GameResolutionX, GameSettings.GameResolutionY);
+        private Vector2f? resolution = null;
+
         public Vector2f Resolution
         {
-            get => resolution;
+            get => resolution ?? new Vector2f(GameSettings.GameResolutionX, GameSettings.GameResolutionY);
             set
             {
                 resolution = value;
@@ -78,6 +80,21 @@ namespace Quincy.Components
                 new Vertex3f((float)transformComponent.Position.x, (float)transformComponent.Position.y, (float)transformComponent.Position.z),
                 new Vertex3f(0f, 0f, -1f),
                 new Vertex3f(0f, 1f, 0f)));
+        }
+
+        public override void OnNotify(NotifyType notifyType, INotifyArgs notifyArgs)
+        {
+            switch (notifyType)
+            {
+                case NotifyType.WindowResized:
+                    if (resolution != null)
+                        break;
+
+                    // Assume res is correct, just refresh everything.
+                    CreateProjectionMatrix();
+                    CreateFramebuffer();
+                    break;
+            }
         }
     }
 }
