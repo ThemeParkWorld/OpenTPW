@@ -5,7 +5,6 @@ using Engine.Managers;
 using Engine.Types;
 using Engine.Utils;
 using Engine.Utils.DebugUtils;
-using Engine.Utils.FileUtils;
 using Engine.Utils.FileUtils.FileSystems;
 using Engine.Utils.MathUtils;
 using Newtonsoft.Json;
@@ -67,8 +66,10 @@ namespace Engine
 
         public void Close()
         {
-            nativeWindow.Stop();
+            Logging.Log("Close()");
+            isRunning = false;
             nativeWindow.Destroy();
+            Environment.Exit(0);
         }
         #endregion
 
@@ -106,13 +107,12 @@ namespace Engine
 
             nativeWindow.Show();
             nativeWindow.Run();
-            nativeWindow.Destroy();
         }
 
         private void Closing(object sender, EventArgs e)
         {
             Logging.Log("Closing game...");
-            isRunning = false;
+            Close();
         }
 
         private void NativeWindowOnMouseEnter(object sender, NativeWindowMouseEventArgs e)
