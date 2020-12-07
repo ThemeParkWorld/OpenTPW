@@ -3,7 +3,6 @@ using Engine.ECS.Observer;
 using Engine.Utils;
 using Engine.Utils.DebugUtils;
 using ImGuiNET;
-using OpenGL.CoreUI;
 using System.Numerics;
 
 namespace Engine.Gui.Managers.ImGuiWindows.Editor
