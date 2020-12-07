@@ -97,7 +97,7 @@ namespace Engine
             nativeWindow.MultisampleBits = 8;
 
             nativeWindow.SwapInterval = 0;
-            nativeWindow.Create(GameSettings.GamePosX, GameSettings.GamePosY, (uint)GameSettings.GameResolutionX, (uint)GameSettings.GameResolutionY, NativeWindowStyles.Resizeable);
+            nativeWindow.Create(GameSettings.GamePosX, GameSettings.GamePosY, (uint)GameSettings.GameResolutionX, (uint)GameSettings.GameResolutionY, NativeWindowStyles.Overlapped);
 
             nativeWindow.Fullscreen = GameSettings.Fullscreen;
             nativeWindow.Caption = FormatWindowTitle(gameProperties.WindowTitle) ?? "Engine Game";

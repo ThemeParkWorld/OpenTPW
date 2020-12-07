@@ -27,7 +27,7 @@ namespace Quincy.Components
         private Vector2f? resolution = null;
 
         public Vector2f Resolution
-        {
+        { 
             get => resolution ?? new Vector2f(GameSettings.GameResolutionX, GameSettings.GameResolutionY);
             set
             {

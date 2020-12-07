@@ -21,14 +21,16 @@ namespace Engine.Gui.Managers.ImGuiWindows
             Broadcast.AddManager(this);
         }
 
-        protected void DrawShadowLabel(string str, Vector2 position)
+        protected void DrawShadowLabel(string str, Vector2? position = null)
         {
             var shadowOffset = new Vector2(1, 1);
+            var initialPosition = position ?? ImGui.GetCursorPos();
 
-            ImGui.GetBackgroundDrawList().AddText(
-                position + shadowOffset, 0x44000000, str); // Shadow
-            ImGui.GetBackgroundDrawList().AddText(
-                position, 0xFFFFFFFF, str);
+            ImGui.SetCursorPos(initialPosition + shadowOffset);
+            ImGui.TextColored(new Vector4(0, 0, 0, .4f), str);
+
+            ImGui.SetCursorPos(initialPosition);
+            ImGui.Text(str);
         }
 
         public virtual void OnNotify(NotifyType eventType, INotifyArgs notifyArgs) { }

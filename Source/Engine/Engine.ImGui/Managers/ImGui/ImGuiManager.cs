@@ -245,7 +245,11 @@ namespace Engine.Gui.Managers
                 {
                     var window = Overlays[i];
                     if (window != null && window.Render)
+                    {
+                        ImGui.Begin($"{window.IconGlyph} {window.Title}", window.Flags);
                         window.Draw();
+                        ImGui.End();
+                    }
                 }
             }
 

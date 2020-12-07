@@ -11,15 +11,24 @@ namespace Engine.Gui.Managers.ImGuiWindows.Overlays
         public override bool Render { get; set; } = true;
         public override string IconGlyph { get; } = FontAwesome5.Question;
         public override string Title { get; } = "Performance Overlay";
+        public override ImGuiWindowFlags Flags => ImGuiWindowFlags.NoTitleBar
+                                                  | ImGuiWindowFlags.NoResize
+                                                  | ImGuiWindowFlags.NoMove
+                                                  | ImGuiWindowFlags.NoDocking
+                                                  | ImGuiWindowFlags.NoDecoration
+                                                  | ImGuiWindowFlags.NoBackground;
 
         public override void Draw()
         {
+            ImGui.SetWindowSize(new Vector2(0, 0));
+            ImGui.SetWindowPos(new Vector2(GameSettings.GameResolutionX - 150 - ImGui.GetStyle().WindowPadding.X - ImGui.GetStyle().FramePadding.X, 0));
+
             var debugText = FontAwesome5.SpaceShuttle + " Engine\n" +
                             "F1 for editor\n" +
                             "F2 for cursor lock toggle\n" +
                             "F3 for console toggle";
 
-            ImGui.Begin("perfOverlayGraphs##hidelabel", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoInputs);
+            DrawShadowLabel(debugText);
 
             ImGui.PlotHistogram(
                 $"{RenderManager.Instance.LastFrameTime}ms",
@@ -38,15 +47,6 @@ namespace Engine.Gui.Managers.ImGuiWindows.Overlays
                 "",
                 0
             );
-
-            ImGui.End();
-
-            var labelPosition = new Vector2(GameSettings.GameResolutionX - 192, ImGui.GetStyle().WindowPadding.Y);
-            DrawShadowLabel(debugText, labelPosition);
-            var labelEnd = ImGui.CalcTextSize(debugText) + labelPosition;
-
-            ImGui.SetWindowSize("perfOverlayGraphs##hidelabel", new Vector2(0, 0));
-            ImGui.SetWindowPos("perfOverlayGraphs##hidelabel", new Vector2(labelPosition.X - ImGui.GetStyle().WindowPadding.X - ImGui.GetStyle().FramePadding.X, labelEnd.Y));
         }
     }
 }
