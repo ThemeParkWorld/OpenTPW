@@ -21,6 +21,7 @@ namespace OpenTPW.Files.FileFormats
         public string[] Extensions => new[] { ".tpws", ".ints", ".lays" };
 
         private SaveFile saveFile;
+        public string AssetName => "TPWS / INTS / LAYS (Save files)";
 
         public IAssetContainer LoadAsset(byte[] data)
         {

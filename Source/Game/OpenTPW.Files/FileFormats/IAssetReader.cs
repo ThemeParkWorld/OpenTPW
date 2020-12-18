@@ -1,7 +1,8 @@
 ﻿namespace OpenTPW.Files.FileFormats
 {
-    internal interface IAssetReader
+    public interface IAssetReader
     {
+        string AssetName { get; }
         string[] Extensions { get; }
         IAssetContainer LoadAsset(byte[] data);
     }

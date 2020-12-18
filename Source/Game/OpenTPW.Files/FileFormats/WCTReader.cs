@@ -26,6 +26,7 @@ namespace OpenTPW.Files.FileFormats
     public class WCTReader : IAssetReader
     {
         public string[] Extensions => new[] { ".wct" };
+        public string AssetName => "WCT (Texture)";
 
         public IAssetContainer LoadAsset(byte[] data)
         {

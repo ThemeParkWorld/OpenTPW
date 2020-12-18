@@ -11,6 +11,7 @@ namespace OpenTPW.Files.FileFormats
     {
         private List<char> characters = new List<char>();
         public string[] Extensions => new[] { ".dat" };
+        public string AssetName => "BFMU (Bullfrog Multibyte to Unicode)";
 
         public char GetChar(byte b)
         {

@@ -9,6 +9,7 @@ namespace OpenTPW.Files.FileFormats
     public class BFSTReader : IAssetReader
     {
         public string[] Extensions => new[] { ".str" };
+        public string AssetName => "BFST (Bullfrog String)";
 
         public IAssetContainer LoadAsset(byte[] data)
         {

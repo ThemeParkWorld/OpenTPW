@@ -18,6 +18,7 @@ namespace OpenTPW.Files.FileFormats
         private bool IsWhiteSpace(char character) => character == ' ' || character == '\t';
 
         private bool IsNewLine(char character) => character == '\n' || character == '\r';
+        public string AssetName => "SAM (Settings and Modifiers)";
 
         public IAssetContainer LoadAsset(byte[] data)
         {

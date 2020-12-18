@@ -10,6 +10,7 @@ namespace OpenTPW.Files.FileFormats
     public class TGAReader : IAssetReader
     {
         public string[] Extensions => new[] { ".tga" };
+        public string AssetName => "TGA (Targa image)";
 
         public IAssetContainer LoadAsset(byte[] data)
         {
