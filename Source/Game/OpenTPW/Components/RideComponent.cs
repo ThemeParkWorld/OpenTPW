@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Engine.Gui.Managers;
+using Engine.Gui.Managers.ImGuiWindows;
 
 namespace OpenTPW.Components
 {
@@ -22,9 +24,12 @@ namespace OpenTPW.Components
         private float totalTime, lastUpdate;
         private byte[] data;
         private float columnWidth = 400f;
+        private string rideArchivePath;
 
         public RideComponent(string rideArchivePath)
         {
+            this.rideArchivePath = rideArchivePath;
+            
             var rideName = Path.GetFileNameWithoutExtension(rideArchivePath);
             var rideArchive = new BFWDArchive(rideArchivePath);
 
@@ -53,6 +58,12 @@ namespace OpenTPW.Components
             if (ImGui.Button("Toggle window"))
             {
                 showImGUIWindow = !showImGUIWindow;
+            }
+
+            if (ImGui.Button("Open Loc"))
+            {
+                string directory = Path.GetDirectoryName(rideArchivePath);
+                ImGuiManager.Instance.Windows.Add(new FileBrowserWindow(directory));
             }
 
             if (showImGUIWindow)

@@ -49,6 +49,8 @@ namespace Engine.Gui.Managers
             }
         }
 
+        public List<ImGuiWindow> Windows { get; } = new List<ImGuiWindow>();
+
         public List<ImGuiMenu> Menus { get; } = new List<ImGuiMenu>();
 
         public List<ImGuiWindow> Overlays { get; } = new List<ImGuiWindow>()
@@ -219,6 +221,17 @@ namespace Engine.Gui.Managers
 
         public override void Run()
         {
+            void DrawWindow(ImGuiWindow window)
+            {
+                if (window != null && window.Render)
+                {
+                    // GetHashCode ensures that each window is given a unique instance
+                    // and prevents collisions
+                    ImGui.Begin($"{window.IconGlyph} {window.Title}##{window.GetHashCode()}", window.Flags);
+                    window.Draw();
+                    ImGui.End();
+                }
+            }
 #if DEBUG
             ImGui.NewFrame();
 
@@ -230,13 +243,13 @@ namespace Engine.Gui.Managers
                 {
                     foreach (var window in menu.Windows)
                     {
-                        if (window.Render)
-                        {
-                            ImGui.Begin($"{window.IconGlyph} {window.Title}", window.Flags);
-                            window.Draw();
-                            ImGui.End();
-                        }
+                        DrawWindow(window);
                     }
+                }
+                
+                foreach (var window in Windows)
+                {
+                    DrawWindow(window);
                 }
             }
             else
@@ -244,12 +257,7 @@ namespace Engine.Gui.Managers
                 for (int i = 0; i < Overlays.Count; ++i)
                 {
                     var window = Overlays[i];
-                    if (window != null && window.Render)
-                    {
-                        ImGui.Begin($"{window.IconGlyph} {window.Title}", window.Flags);
-                        window.Draw();
-                        ImGui.End();
-                    }
+                    DrawWindow(window);
                 }
             }
 

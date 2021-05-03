@@ -17,12 +17,9 @@ namespace OpenTPW
 
         protected override void InitScene()
         {
-            // FileManager.Instance.ReadFile($"{GameSettings.Default.gameDir}/data/generic/dynamic/textures/red.wct");
-
             base.InitScene();
             var entities = new List<IEntity>
             {
-                // new WCTImageEntity($"{GameSettings.Default.gameDir}/data/ui.wad", $"b_upgrade.wct", new Vector2d(0, 0), new Vector2d(1280, 720)),
                 new TGAImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2d(0, 0), new Vector2d(1280, 720)),
                 new RideEntity($"{GameSettings.Default.gameDir}/data/levels/space/rides/Wateride.wad")
             };
