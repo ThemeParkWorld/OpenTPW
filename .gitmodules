@@ -1,9 +1,6 @@
 [submodule "Other/OpenGL.Net"]
 	path = Other/OpenGL.Net
 	url = https://github.com/xezno/OpenGL.Net
-[submodule "Other/stbi-sharp"]
-	path = Other/stbi-sharp
-	url = https://github.com/xezno/stbi-sharp
 [submodule "Tools/RSSEQ-VSCode-Highlighting"]
 	path = Tools/RSSEQ-VSCode-Highlighting
 	url = https://github.com/ThemeParkWorld/RSSEQ-VSCode-Highlighting

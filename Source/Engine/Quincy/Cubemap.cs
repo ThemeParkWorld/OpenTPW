@@ -1,8 +1,9 @@
 ﻿using Engine.Utils.DebugUtils;
 using OpenGL;
-using StbiSharp;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using StbImageSharp;
 
 namespace Quincy
 {
@@ -23,22 +24,20 @@ namespace Quincy
             for (int i = 0; i < faces.Length; ++i)
             {
                 var fileData = File.ReadAllBytes(faces[i]);
-                var image = Stbi.LoadFromMemory(fileData, 4);
+                var image = ImageResult.FromMemory(fileData, ColorComponents.RedGreenBlueAlpha);
 
                 var imageFormat = PixelFormat.Rgb;
-                if (image.NumChannels == 4)
+                if (image.Comp == ColorComponents.RedGreenBlueAlpha)
                 {
                     imageFormat = PixelFormat.Rgba;
                 }
 
                 var textureDataPtr = Marshal.AllocHGlobal(image.Data.Length);
-                Marshal.Copy(image.Data.ToArray(), 0, textureDataPtr, image.Data.Length);
+                Marshal.Copy(image.Data, 0, textureDataPtr, image.Data.Length);
 
                 var internalFormat = InternalFormat.Rgb;
 
                 Gl.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, internalFormat, image.Width, image.Height, 0, imageFormat, PixelType.UnsignedByte, textureDataPtr);
-
-                image.Dispose();
                 Marshal.FreeHGlobal(textureDataPtr);
 
                 Logging.Log($"Loaded cubemap texture {faces[i]}, ptr {texturePtr}");
@@ -50,7 +49,6 @@ namespace Quincy
                 Gl.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
 
                 Gl.BindTexture(TextureTarget.TextureCubeMap, 0);
-                image.Dispose();
             }
 
             return new Cubemap(texturePtr);

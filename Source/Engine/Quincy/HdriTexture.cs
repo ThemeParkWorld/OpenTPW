@@ -1,7 +1,7 @@
 ﻿using Engine.Utils.DebugUtils;
 using Engine.Utils.FileUtils;
 using OpenGL;
-using StbiSharp;
+using StbImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -19,7 +19,7 @@ namespace Quincy
 
         public static HdriTexture LoadFromAsset(Asset asset)
         {
-            var image = Stbi.LoadfFromMemory(asset.Data, 3);
+            var image = ImageResultFloat.FromMemory(asset.Data, ColorComponents.RedGreenBlue);
             var imageBytes = new List<byte>();
             foreach (var fl in image.Data)
             {
@@ -45,7 +45,6 @@ namespace Quincy
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
 
             Gl.BindTexture(TextureTarget.Texture2d, 0);
-            image.Dispose();
 
             return new HdriTexture(texturePtr);
         }

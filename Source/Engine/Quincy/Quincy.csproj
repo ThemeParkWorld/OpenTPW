@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Platforms>x64;x86</Platforms>
   </PropertyGroup>
 
@@ -25,6 +25,7 @@
   <ItemGroup>
     <PackageReference Include="AssimpNet" Version="4.1.0" />
     <PackageReference Include="ImGui.NET" Version="1.78.0" />
+    <PackageReference Include="StbImageSharp" Version="2.22.5" />
   </ItemGroup>
 
   <ItemGroup>
