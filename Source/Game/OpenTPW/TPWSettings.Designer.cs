@@ -12,12 +12,12 @@ namespace OpenTPW {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
-    internal sealed partial class GameSettings : global::System.Configuration.ApplicationSettingsBase {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    internal sealed partial class TPWSettings : global::System.Configuration.ApplicationSettingsBase {
         
-        private static GameSettings defaultInstance = ((GameSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new GameSettings())));
+        private static TPWSettings defaultInstance = ((TPWSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new TPWSettings())));
         
-        public static GameSettings Default {
+        public static TPWSettings Default {
             get {
                 return defaultInstance;
             }

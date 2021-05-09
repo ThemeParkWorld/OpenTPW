@@ -8,7 +8,7 @@
         {
             game = new TPWGame("GameProperties.json");
             game.Run();
-            while (game.isRunning) ;
+            while (true);
         }
     }
 }

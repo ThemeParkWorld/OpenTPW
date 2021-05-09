@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Engine.Utils
 {
-    struct GameSettingsValues
+    struct EngineSettingsValues
     {
         #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value 'null'
         public int gameResolutionX;
@@ -28,9 +28,9 @@ namespace Engine.Utils
         #pragma warning restore CS0649
     }
 
-    public sealed class GameSettings
+    public sealed class EngineSettings
     {
-        private static GameSettingsValues values;
+        private static EngineSettingsValues values;
 
         public static int GameResolutionX { get => values.gameResolutionX; set => values.gameResolutionX = value; }
         public static int GameResolutionY { get => values.gameResolutionY; set => values.gameResolutionY = value; }
@@ -53,9 +53,9 @@ namespace Engine.Utils
         public static void LoadValues()
         {
             Logging.Log("Loading game settings");
-            var fileContents = System.IO.File.ReadAllText("GameSettings.json");
+            var fileContents = System.IO.File.ReadAllText("EngineSettings.json");
             Logging.Log(fileContents);
-            values = JsonConvert.DeserializeObject<GameSettingsValues>(fileContents);
+            values = JsonConvert.DeserializeObject<EngineSettingsValues>(fileContents);
         }
 
         public static void SaveValues()
@@ -63,7 +63,7 @@ namespace Engine.Utils
             Logging.Log("Saving game settings");
             var fileContents = JsonConvert.SerializeObject(values);
             Logging.Log(fileContents);
-            System.IO.File.WriteAllText("GameSettings.json", fileContents);
+            System.IO.File.WriteAllText("EngineSettings.json", fileContents);
         }
     }
 }

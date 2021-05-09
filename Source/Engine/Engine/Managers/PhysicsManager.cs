@@ -30,7 +30,7 @@ namespace Engine.Managers
         public override void Run()
         {
             base.Run();
-            Simulation.Timestep(GameSettings.PhysTimeStep, ThreadDispatcher);
+            Simulation.Timestep(EngineSettings.PhysTimeStep, ThreadDispatcher);
         }
     }
 

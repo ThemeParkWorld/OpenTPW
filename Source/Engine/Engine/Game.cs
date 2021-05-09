@@ -33,8 +33,6 @@ namespace Engine
         private Vector2f lastMousePos;
         private bool ignoreSingleMouseDelta;
 
-        public bool isRunning = true; // TODO: properly detect window close event (needs adding within nativewindow)
-
         public IHasParent Parent { get; set; }
         public MouseMode MouseMode { get; set; } = MouseMode.Locked;
         #endregion
@@ -49,7 +47,7 @@ namespace Engine
 
         public void Run()
         {
-            GameSettings.LoadValues();
+            EngineSettings.LoadValues();
 
             LoadGameProperties();
             InitNativeWindow();
@@ -67,7 +65,6 @@ namespace Engine
         public void Close()
         {
             Logging.Log("Close()");
-            isRunning = false;
             nativeWindow.Destroy();
             Environment.Exit(0);
         }
@@ -79,7 +76,6 @@ namespace Engine
             nativeWindow = NativeWindow.Create();
 
             nativeWindow.ContextCreated += ContextCreated;
-            nativeWindow.ContextDestroying += ContextDestroyed;
             nativeWindow.Render += Render;
             nativeWindow.KeyDown += KeyDown;
             nativeWindow.KeyUp += KeyUp;
@@ -98,9 +94,9 @@ namespace Engine
             nativeWindow.MultisampleBits = 8;
 
             nativeWindow.SwapInterval = 0;
-            nativeWindow.Create(GameSettings.GamePosX, GameSettings.GamePosY, (uint)GameSettings.GameResolutionX, (uint)GameSettings.GameResolutionY, NativeWindowStyles.Overlapped);
+            nativeWindow.Create(EngineSettings.GamePosX, EngineSettings.GamePosY, (uint)EngineSettings.GameResolutionX, (uint)EngineSettings.GameResolutionY, NativeWindowStyles.Overlapped);
 
-            nativeWindow.Fullscreen = GameSettings.Fullscreen;
+            nativeWindow.Fullscreen = EngineSettings.Fullscreen;
             nativeWindow.Caption = FormatWindowTitle(gameProperties.WindowTitle) ?? "Engine Game";
 
             // TODO: get choice of monitor to use.
@@ -172,12 +168,12 @@ namespace Engine
 
                 threads.Add(new Thread(() =>
                 {
-                    while (isRunning)
+                    while (true)
                     {
                         multiThreadedManager.Run();
 
                         // Only update once every frame. Prevents multi-frame updating, but might break physics somewhere down the line
-                        Thread.Sleep((int)(GameSettings.UpdateTimeStep * 1000f));
+                        Thread.Sleep((int)(EngineSettings.UpdateTimeStep * 1000f));
                     }
                 }));
             }
@@ -218,8 +214,8 @@ namespace Engine
         {
             var windowSize = new Vector2f(nativeWindow.ClientSize.Width, nativeWindow.ClientSize.Height);
 
-            GameSettings.GameResolutionX = nativeWindow.ClientSize.Width;
-            GameSettings.GameResolutionY = nativeWindow.ClientSize.Height;
+            EngineSettings.GameResolutionX = nativeWindow.ClientSize.Width;
+            EngineSettings.GameResolutionY = nativeWindow.ClientSize.Height;
 
             Broadcast.Notify(NotifyType.WindowResized, new WindowResizeNotifyArgs(windowSize, this));
         }
@@ -273,11 +269,6 @@ namespace Engine
         private void KeyUp(object sender, NativeWindowKeyEventArgs e) => Broadcast.Notify(NotifyType.KeyUp, new KeyboardNotifyArgs((int)e.Key, this));
 
         private void KeyDown(object sender, NativeWindowKeyEventArgs e) => Broadcast.Notify(NotifyType.KeyDown, new KeyboardNotifyArgs((int)e.Key, this));
-
-        private void ContextDestroyed(object sender, NativeWindowEventArgs e)
-        {
-            isRunning = false;
-        }
 
         public virtual void OnNotify(NotifyType eventType, INotifyArgs notifyArgs)
         {

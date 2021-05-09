@@ -124,7 +124,7 @@ namespace Quincy.Managers
         private void RenderFramebufferToScreen()
         {
             var cameraComponent = MainCamera.GetComponent<CameraComponent>();
-            Gl.Viewport(0, 0, GameSettings.GameResolutionX, GameSettings.GameResolutionY);
+            Gl.Viewport(0, 0, EngineSettings.GameResolutionX, EngineSettings.GameResolutionY);
             Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             Gl.ClearDepth(1.0f);
             Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);

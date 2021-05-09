@@ -20,11 +20,12 @@ namespace OpenTPW
             base.InitScene();
             var entities = new List<IEntity>
             {
-                new TGAImageEntity($"{GameSettings.Default.gameDir}/data/Init/{GameSettings.Default.res}/Welcome.tga", new Vector2d(0, 0), new Vector2d(1280, 720)),
-                new RideEntity($"{GameSettings.Default.gameDir}/data/levels/space/rides/Wateride.wad")
+                new TGAImageEntity($"{TPWSettings.Default.gameDir}/data/Init/{TPWSettings.Default.res}/Welcome.tga", new Vector2d(0, 0), new Vector2d(1280, 720)),
+                new WCTImageEntity(@$"C:\Program Files (x86)\Bullfrog\Theme Park World\data\ui.wad", "b_ardown.wct", new Vector2d(0, 0), new Vector2d(1280, 720)),
+                new RideEntity($"{TPWSettings.Default.gameDir}/data/levels/space/rides/Wateride.wad")
             };
 
-            var uiText = FileManager.Instance.ReadFile<List<string>>($"{GameSettings.Default.gameDir}/data/Language/English/UITEXT.str");
+            var uiText = FileManager.Instance.ReadFile<List<string>>($"{TPWSettings.Default.gameDir}/data/Language/English/UITEXT.str");
             foreach (var textElement in uiText.Data)
             {
                 Logging.Log(textElement);

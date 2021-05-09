@@ -9,7 +9,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
      * WATTO: http://wiki.xentax.com/index.php/WAD_DWFB, 
      * and Rhys: https://github.com/RHY3756547/FreeSO/blob/master/TSOClient/tso.files/FAR3/Decompresser.cs.
      */
-    public class BFWDArchive : IArchive
+    public class BFWDArchive
     {
         private BFWDMemoryStream memoryStream;
         private int version;

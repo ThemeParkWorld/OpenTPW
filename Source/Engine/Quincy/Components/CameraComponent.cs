@@ -28,7 +28,7 @@ namespace Quincy.Components
 
         public Vector2f Resolution
         { 
-            get => resolution ?? new Vector2f(GameSettings.GameResolutionX, GameSettings.GameResolutionY);
+            get => resolution ?? new Vector2f(EngineSettings.GameResolutionX, EngineSettings.GameResolutionY);
             set
             {
                 resolution = value;
@@ -70,7 +70,7 @@ namespace Quincy.Components
 
         public override void Update(float deltaTime)
         {
-            // TODO: Better double->float conversion
+            // TODO: Switch to System.Numerics
             var transformComponent = GetComponent<TransformComponent>();
             viewMatrix = Matrix4x4f.Identity;
             viewMatrix.RotateX((float)transformComponent.RotationEuler.x);

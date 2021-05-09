@@ -27,7 +27,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="GameSettings.Designer.cs">
+    <Compile Update="TPWSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>GameSettings.settings</DependentUpon>
@@ -37,12 +37,12 @@
     <None Update="GameProperties.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="GameSettings.json">
+    <None Update="EngineSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="GameSettings.settings">
+    <None Update="TPWSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>GameSettings.Designer.cs</LastGenOutput>
+      <LastGenOutput>TPWSettings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

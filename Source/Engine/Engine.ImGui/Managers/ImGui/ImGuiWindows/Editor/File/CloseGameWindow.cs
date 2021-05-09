@@ -32,7 +32,7 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor
 
             ImGui.SetWindowSize(new Vector2(0, 0));
             var windowSize = ImGui.GetWindowSize();
-            var windowPos = (new Vector2(GameSettings.GameResolutionX, GameSettings.GameResolutionY) / 2f) - (windowSize / 2f);
+            var windowPos = (new Vector2(EngineSettings.GameResolutionX, EngineSettings.GameResolutionY) / 2f) - (windowSize / 2f);
             ImGui.SetWindowPos(windowPos);
         }
     }

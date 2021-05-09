@@ -48,7 +48,7 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor.Engine
 
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetNextWindowSize(new Vector2(GameSettings.GameResolutionX / 2f, -1));
+                    ImGui.SetNextWindowSize(new Vector2(EngineSettings.GameResolutionX / 2f, -1));
 
                     ImGui.BeginTooltip();
 

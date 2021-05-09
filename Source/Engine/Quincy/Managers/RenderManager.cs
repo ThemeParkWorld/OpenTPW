@@ -27,7 +27,7 @@ namespace Quincy.Managers
         private int currentFrametimeIndex;
         private int currentFramerateIndex;
         private const int FramesToCount = 480;
-        private float framerateLimitAsMs = 1000f / GameSettings.FramerateLimit;
+        private float framerateLimitAsMs = 1000f / EngineSettings.FramerateLimit;
         public float LastFrameTime { get; private set; }
         public int CalculatedFramerate => (int)(1000f / Math.Max(LastFrameTime, 0.001f));
         public float[] FrametimeHistory { get; } = new float[FramesToCount];
@@ -80,7 +80,7 @@ namespace Quincy.Managers
             lastRender = DateTime.Now;
 
             // Slow down rendering if it's going past the framerate limit
-            if (LastFrameTime < framerateLimitAsMs && GameSettings.FramerateLimit > 0)
+            if (LastFrameTime < framerateLimitAsMs && EngineSettings.FramerateLimit > 0)
             {
                 var nextFrameDelay = (int)Math.Ceiling(framerateLimitAsMs - LastFrameTime);
                 Thread.Sleep(nextFrameDelay);

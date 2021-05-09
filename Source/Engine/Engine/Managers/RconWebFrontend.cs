@@ -17,14 +17,14 @@ namespace Engine.Managers
 
         public RconWebFrontendManager()
         {
-            if (!GameSettings.RconEnabled)
+            if (!EngineSettings.RconEnabled)
                 return;
 
             listener = new HttpListener();
-            listener.Prefixes.Add($"http://127.0.0.1:{GameSettings.WebPort}/");
+            listener.Prefixes.Add($"http://127.0.0.1:{EngineSettings.WebPort}/");
             listener.Start();
 
-            Logging.Log($"Web console is listening on :{GameSettings.WebPort}");
+            Logging.Log($"Web console is listening on :{EngineSettings.WebPort}");
 
             httpThread = new Thread(HttpThread);
             httpThread.Start();

@@ -6,8 +6,8 @@ using System;
 using System.IO;
 using System.Text;
 
-// TODO: Re-write this
-
+// This is a mess, sorry.
+// TODO: REWRITE THIS!
 namespace OpenTPW.Files.FileFormats
 {
     /*
@@ -145,7 +145,7 @@ namespace OpenTPW.Files.FileFormats
                 }
             }
 
-            return new AssetContainer<Texture>(Texture.LoadFromColorData(imageData, width, height, "texture_diffuse"));
+            return new AssetContainer<Texture>(Texture.LoadFromFloatData(decmpMemoryStreamFile2.ToArray(), width, height, "texture_diffuse"));
         }
     }
 }

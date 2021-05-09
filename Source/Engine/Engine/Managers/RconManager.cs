@@ -10,9 +10,6 @@ using System.Text;
 
 namespace Engine.Managers
 {
-    // TODO: either optimize this or scrap it
-    //          - protobufs?
-    // TODO: switch to more extensible (i.e. use class-based solution)
     public sealed class RconManager : Manager<RconManager>
     {
         #region Fields
@@ -26,12 +23,12 @@ namespace Engine.Managers
         {
             // WARNING! DO NOT LOGGING.LOG IN HERE!
 
-            if (!GameSettings.RconEnabled)
+            if (!EngineSettings.RconEnabled)
                 return;
 
             FleckLog.LogAction = CustomFleckLog;
 
-            var socketServer = new WebSocketServer($"ws://0.0.0.0:{GameSettings.RconPort}")
+            var socketServer = new WebSocketServer($"ws://0.0.0.0:{EngineSettings.RconPort}")
             {
                 SupportedSubProtocols = new[] { "engineRcon" },
                 ListenerSocket =
@@ -129,7 +126,7 @@ namespace Engine.Managers
         private void HandleHandshake(RconPacket rconPacket)
         {
             Logging.Log("Received handshake from client.");
-            if (string.IsNullOrEmpty(GameSettings.RconPassword))
+            if (string.IsNullOrEmpty(EngineSettings.RconPassword))
             {
                 Logging.Log("Rcon authentication is disabled! Please enter a password in GameSettings if this is incorrect", Logging.Severity.Medium);
 
@@ -147,7 +144,7 @@ namespace Engine.Managers
 
         private void HandleAuthentication(RconPacket rconPacket)
         {
-            if (rconPacket.data["password"] == GameSettings.RconPassword)
+            if (rconPacket.data["password"] == EngineSettings.RconPassword)
             {
                 authenticated = true;
                 SendLogHistory();

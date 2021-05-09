@@ -26,7 +26,7 @@ namespace Engine.Gui.Managers.ImGuiWindows.Overlays
         {
             ImGui.PushFont(ImGuiManager.Instance.MonospacedFont);
             ImGui.SetWindowPos(new Vector2(0, 0));
-            ImGui.SetWindowSize(new Vector2(-1, Math.Min(GameSettings.GameResolutionX - 250, 500)));
+            ImGui.SetWindowSize(new Vector2(-1, Math.Min(EngineSettings.GameResolutionX - 250, 500)));
 
             // This isn't 100% correct (TakeLast and Where should really be swapped), but it's faster than having linq loop 
             // through every single log entry every frame...

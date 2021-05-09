@@ -25,7 +25,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
         public string name { get; set; }
         public bool compressed { get; set; }
         public uint decompressedSize { get; set; }
-        public IArchive parentArchive { get; set; }
+        public BFWDArchive parentArchive { get; set; }
         public int archiveOffset { get; set; }
         public byte[] data
         {

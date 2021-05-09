@@ -15,7 +15,7 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor
 
         public override void Draw()
         {
-            GameSettings.SaveValues();
+            EngineSettings.SaveValues();
             Render = false;
         }
     }

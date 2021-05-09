@@ -2,7 +2,7 @@
 
 namespace OpenTPW.Files.FileFormats.BFWD.Refpack
 {
-    public static class RefpackUtils
+    public static class Refpack
     {
         public static void DecompressData(byte[] data, ref List<byte> outputData, int offset, int opcodeLength, uint proceedingDataLength, uint referencedDataLength, uint referencedDataDistance)
         {

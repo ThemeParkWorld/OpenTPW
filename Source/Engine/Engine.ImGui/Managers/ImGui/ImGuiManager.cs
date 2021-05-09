@@ -76,7 +76,7 @@ namespace Engine.Gui.Managers
             ImGui.StyleColorsDark();
 
             // Set default theme from game settings
-            Theme = ImGuiTheme.Load(ServiceLocator.FileSystem.GetAsset($"Themes/{GameSettings.EditorTheme}.json"));
+            Theme = ImGuiTheme.Load(ServiceLocator.FileSystem.GetAsset($"Themes/{EngineSettings.EditorTheme}.json"));
             // TODO: Check if theme doesn't exist, set a default
             // TODO: Move code to somewhere that makes more sense?
 
@@ -275,7 +275,7 @@ namespace Engine.Gui.Managers
             Gl.Disable(EnableCap.DepthTest);
             Gl.Enable(EnableCap.ScissorTest);
 
-            io.DisplaySize = new Vector2(GameSettings.GameResolutionX, GameSettings.GameResolutionY);
+            io.DisplaySize = new Vector2(EngineSettings.GameResolutionX, EngineSettings.GameResolutionY);
             var projectionMatrix = Matrix4x4f.Ortho2D(0f, io.DisplaySize.X, io.DisplaySize.Y, 0.0f);
 
             shaderComponent.Use();
