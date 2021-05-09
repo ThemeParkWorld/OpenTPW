@@ -63,12 +63,16 @@ namespace Quincy
             Logging.Log($"Loaded texture {asset.MountPath}, ptr {texturePtr}");
             Gl.BindTexture(TextureTarget.Texture2d, 0);
 
-            return new Texture()
+            var texture = new Texture()
             {
                 Id = texturePtr,
                 Path = asset.MountPath,
                 Type = typeName
             };
+            
+            TextureContainer.Textures.Add(texture);
+            TextureContainer.TexturePaths.Add(texture.Path);
+            return texture;
         }
 
         public static Texture LoadFromData(byte[] data, int width, int height, int bpp, string typeName)
@@ -105,12 +109,16 @@ namespace Quincy
             Logging.Log($"Loaded texture from bytes, ptr {texturePtr}");
             Gl.BindTexture(TextureTarget.Texture2d, 0);
 
-            return new Texture()
+            var texture = new Texture()
             {
                 Id = texturePtr,
                 Path = $"Bytes{data.Length}",
                 Type = typeName
             };
+            
+            TextureContainer.Textures.Add(texture);
+            TextureContainer.TexturePaths.Add(texture.Path);
+            return texture;
         }
 
         public static Texture LoadFromPtr(IntPtr pixels, int width, int height, int bytesPerPixel, string typeName)
@@ -140,12 +148,16 @@ namespace Quincy
             Logging.Log($"Loaded texture from ptr {pixels}, ptr {texturePtr}");
             Gl.BindTexture(TextureTarget.Texture2d, 0);
 
-            return new Texture()
+            var texture = new Texture()
             {
                 Id = texturePtr,
                 Path = $"{pixels}",
                 Type = typeName
             };
+            
+            TextureContainer.Textures.Add(texture);
+            TextureContainer.TexturePaths.Add(texture.Path);
+            return texture;
         }
 
         public void Bind(TextureTarget target = TextureTarget.Texture2d)
@@ -168,10 +180,55 @@ namespace Quincy
 
             return LoadFromData(data, width, height, 4, typeName);
         }
-    }
 
+        public static Texture LoadFromFloatData(byte[] data, int width, int height, string typeName)
+        {
+            var textureDataPtr = Marshal.AllocHGlobal(data.Length);
+            Marshal.Copy(data, 0, textureDataPtr, data.Length);
+
+            uint texturePtr = Gl.GenTexture();
+            Gl.BindTexture(TextureTarget.Texture2d, texturePtr);
+
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba16f, width, height, 0, PixelFormat.Rgba, PixelType.Float, textureDataPtr);
+
+            Marshal.FreeHGlobal(textureDataPtr);
+            
+            Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+
+            Gl.BindTexture(TextureTarget.Texture2d, 0);
+
+            var texture = new Texture()
+            {
+                Id = texturePtr,
+                Path = $"Bytes{data.Length}",
+                Type = typeName
+            };
+            
+            TextureContainer.Textures.Add(texture);
+            TextureContainer.TexturePaths.Add(texture.Path);
+            return texture;
+        }
+
+        public static Texture LoadFromFloatData(float[] data, int width, int height, string typeName)
+        {
+            var imageBytes = new List<byte>();
+            // Convert floats into bytes - so we can hand them over to ogl
+            foreach (var fl in data)
+            {
+                var imageDataByteArray = BitConverter.GetBytes(fl);
+                imageBytes.AddRange(imageDataByteArray);
+            }
+
+            return LoadFromFloatData(imageBytes.ToArray(), width, height, typeName);
+        }
+    }
+    
     public class TextureContainer
     {
+        public static List<string> TexturePaths { get; } = new List<string>();
         public static List<Texture> Textures { get; } = new List<Texture>();
     }
 }

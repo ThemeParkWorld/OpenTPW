@@ -1,11 +1,12 @@
 ﻿using Engine.Assets;
 using ImGuiNET;
-using Quincy;
 using System;
-using System.Linq;
 using System.Numerics;
+using Engine.Gui.Managers;
+using Engine.Gui.Managers.ImGuiWindows;
+using Quincy;
 
-namespace Engine.Gui.Managers.ImGuiWindows.Editor
+namespace Engine.GUI.Managers.ImGuiWindows.Editor
 {
     [ImGuiMenuPath(ImGuiMenus.Menu.Engine)]
     class TextureBrowserWindow : ImGuiWindow
@@ -19,16 +20,15 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor
         public override void Draw()
         {
             var textureList = TextureContainer.Textures;
+            var texturePaths = TextureContainer.TexturePaths;
 
-            // TODO: Fix this entire thing
-            // ImGui.Combo("Texture", ref selectedTexture, textureList, textureList.Count);
-            ImGui.DragInt("Texture Id", ref selectedTexture, 1.0f, 0);
-
-            if (selectedTexture < 0)
-                selectedTexture = 0;
+            ImGui.Combo("Texture", ref selectedTexture, texturePaths.ToArray(), texturePaths.Count);
 
             if (selectedTexture > textureList.Count - 1)
                 selectedTexture = textureList.Count - 1;
+
+            if (selectedTexture < 0)
+                selectedTexture = 0;
 
             var texture = textureList[selectedTexture];
 
