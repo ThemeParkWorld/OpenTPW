@@ -31,7 +31,8 @@ namespace Engine.Gui.Managers.ImGuiWindows
         public override string Title { get; }
         public override string IconGlyph { get; }
 
-        private string currentDirectory = @"C:\Program Files (x86)\Bullfrog\Theme Park World\data";
+        private string currentDirectory = @"C:\";
+        
         public string CurrentDirectory
         {
             get => currentDirectory;

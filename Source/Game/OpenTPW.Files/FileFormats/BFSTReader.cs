@@ -15,6 +15,7 @@ namespace OpenTPW.Files.FileFormats
         {
             var strings = new List<string>();
             var characters = new BFMUReader();
+            // TODO: Move over to Asset-based solution that loads this with the requested data
             characters.LoadAsset(@"C:\Program Files (x86)\Bullfrog\Theme Park World\data\Language\English\MBToUni.dat");
 
             using var memoryStream = new MemoryStream(data);

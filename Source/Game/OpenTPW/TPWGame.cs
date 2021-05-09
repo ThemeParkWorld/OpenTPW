@@ -21,7 +21,7 @@ namespace OpenTPW
             var entities = new List<IEntity>
             {
                 new TGAImageEntity($"{TPWSettings.Default.gameDir}/data/Init/{TPWSettings.Default.res}/Welcome.tga", new Vector2d(0, 0), new Vector2d(1280, 720)),
-                new WCTImageEntity(@$"C:\Program Files (x86)\Bullfrog\Theme Park World\data\ui.wad", "b_ardown.wct", new Vector2d(0, 0), new Vector2d(1280, 720)),
+                new WCTImageEntity(@$"{TPWSettings.Default.gameDir}/data/ui.wad", "b_ardown.wct", new Vector2d(0, 0), new Vector2d(1280, 720)),
                 new RideEntity($"{TPWSettings.Default.gameDir}/data/levels/space/rides/Wateride.wad")
             };
 
