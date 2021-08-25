@@ -115,7 +115,7 @@ namespace Engine.Utils.DebugUtils
         /// <param name="memberInfo"></param>
         /// <param name="depth"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public static void RenderImGuiMember(object obj, MemberInfo memberInfo, ref int depth)
+        public static bool RenderImGuiMember(object obj, MemberInfo memberInfo, ref int depth)
         {
             Type type;
             dynamic memberValue;
@@ -138,7 +138,7 @@ namespace Engine.Utils.DebugUtils
 
             if (Attribute.IsDefined(memberInfo, typeof(HideInImGuiAttribute)))
             {
-                return;
+                return false;
             }
 
             if (type == typeof(float))
@@ -183,8 +183,14 @@ namespace Engine.Utils.DebugUtils
             }
             else
             {
-                ImGui.LabelText($"{memberInfo.Name}", $"{memberValue}");
+                return false;
             }
+
+            return true;
+            // else
+            // {
+            //     ImGui.LabelText($"{memberInfo.Name}", $"{memberValue}");
+            // }
         }
 
         /// <summary>
@@ -194,14 +200,22 @@ namespace Engine.Utils.DebugUtils
         public static void RenderImGuiMembers(object obj, int depth = 0)
         {
             if (depth > 1) return; // Prevent any dumb stack overflow errors
+            int count = 0;
 
             foreach (var field in obj.GetType().GetFields())
             {
-                RenderImGuiMember(obj, field, ref depth);
+                if ( RenderImGuiMember( obj, field, ref depth ) )
+                    count++;
             }
             foreach (var property in obj.GetType().GetProperties())
             {
-                RenderImGuiMember(obj, property, ref depth);
+                if ( RenderImGuiMember(obj, property, ref depth) )
+                    count++;
+            }
+
+            if ( count == 0 )
+            {
+                ImGui.Text( "No available properties" );
             }
         }
     }

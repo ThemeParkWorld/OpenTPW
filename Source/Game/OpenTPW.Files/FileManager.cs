@@ -38,11 +38,11 @@ namespace OpenTPW.Files
         public AssetContainer<T> ReadFile<T>(string assetArchivePath, string assetName)
         {
             var fileArchive = new BFWDArchive(assetArchivePath);
-            var assetFile = fileArchive.files.First(file => file.name.Equals($"{assetName}\0", StringComparison.OrdinalIgnoreCase));
+            var assetFile = fileArchive.Files.First(file => file.Name.Equals($"{assetName}\0", StringComparison.OrdinalIgnoreCase));
 
-            var assetReader = GetAssetReader(assetFile.name);
+            var assetReader = GetAssetReader(assetFile.Name);
 
-            return (AssetContainer<T>)assetReader.LoadAsset(assetFile.data);
+            return (AssetContainer<T>)assetReader.LoadAsset(assetFile.CompressedData);
         }
 
         public AssetContainer<T> ReadFile<T>(string assetFilePath)

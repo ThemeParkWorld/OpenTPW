@@ -16,10 +16,8 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor.Engine
         public override string IconGlyph { get; } = FontAwesome5.Terminal;
         public override string Title { get; } = "Console";
 
-        private string currentConsoleFilter = "", currentConsoleInput = "";
-
-        private const int logLimit = 1024;
-
+        private const int LOG_LIMIT = 1024;
+        private string currentConsoleFilter = "";
         private bool scrollQueued = true;
 
         public ConsoleWindow()
@@ -32,20 +30,25 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor.Engine
 
         public override void Draw()
         {
-            ImGui.BeginChild("ConsoleInner", new Vector2(-1, -64));
+            ImGui.BeginChild("ConsoleInner", new Vector2(-1, -24));
             ImGui.PushFont(ImGuiManager.Instance.MonospacedFont);
 
-            foreach (var logEntry in Logging.LogEntries.TakeLast(logLimit))
-            {                
+            var logEntries = Logging.LogEntries.TakeLast( LOG_LIMIT ).ToArray();
+
+            for ( int i = 0; i < logEntries.Length; ++i )
+            {
+                var logEntry = logEntries[i];
                 if (!string.IsNullOrWhiteSpace(currentConsoleFilter) && !GetFilterMatch(logEntry, currentConsoleFilter))
                     continue;
 
                 ImGui.TextWrapped(logEntry.timestamp.TimeOfDay.ToString());
                 ImGui.SameLine();
                 ImGui.PushStyleColor(ImGuiCol.Text, SeverityToColor(logEntry.severity));
-                ImGui.TextWrapped(logEntry.str);
-                ImGui.PopStyleColor();
 
+                ImGui.TextWrapped(logEntry.str);
+                
+                ImGui.PopStyleColor();
+                
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetNextWindowSize(new Vector2(EngineSettings.GameResolutionX / 2f, -1));
@@ -58,7 +61,7 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor.Engine
                     ImGui.EndTooltip();
                 }
 
-                ImGui.Separator();
+                // ImGui.Separator();
             }
 
             if (scrollQueued)
@@ -71,14 +74,6 @@ namespace Engine.Gui.Managers.ImGuiWindows.Editor.Engine
             ImGui.EndChild();
             
             ImGui.InputText("Filter", ref currentConsoleFilter, 256);
-
-            ImGui.InputText("Input", ref currentConsoleInput, 256);
-            ImGui.SameLine();
-            if (ImGui.Button("Submit"))
-            {
-                CommandRegistry.ParseAndExecute(currentConsoleInput);
-                currentConsoleInput = "";
-            }
         }
 
         public override void OnNotify(NotifyType eventType, INotifyArgs notifyArgs)

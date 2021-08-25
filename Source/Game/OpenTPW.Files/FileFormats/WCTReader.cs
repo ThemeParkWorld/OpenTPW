@@ -55,10 +55,13 @@ namespace OpenTPW.Files.FileFormats
             int versionMajor = binaryReader.ReadByte();
             int versionMinor = binaryReader.ReadByte();
             int bpp = binaryReader.ReadByte();
-            bpp = 32;
+            bpp = 24;
             int unknown0 = binaryReader.ReadByte();
             width = (binaryReader.ReadInt16());
             height = (binaryReader.ReadInt16());
+
+            width = 32;
+            height = 32;
 
             binaryReader.BaseStream.Seek(8, SeekOrigin.Current);
             file1Len = binaryReader.ReadInt32();
@@ -67,7 +70,6 @@ namespace OpenTPW.Files.FileFormats
 
             var zlibFile = Encoding.ASCII.GetString(binaryReader.ReadBytes(4)) == "BILZ";
             var decmpMemoryStream = new MemoryStream();
-            var decmpMemoryStreamFile2 = new MemoryStream();
             if (zlibFile)
             {
                 // 4 bytes - decompressed size
@@ -75,15 +77,13 @@ namespace OpenTPW.Files.FileFormats
                 // rest unknown
 
                 binaryReader.BaseStream.Seek(24, SeekOrigin.Current);
-
-                // File 1
                 var cmpMemoryStream = new MemoryStream();
-                cmpMemoryStream.Write(binaryReader.ReadBytes(file1Len - 28), 0, file1Len - 28);
-                cmpMemoryStream.Seek(0, SeekOrigin.Begin);
+                cmpMemoryStream.Write(binaryReader.ReadBytes(file1Len), 0, file1Len);
+                cmpMemoryStream.Seek(0, SeekOrigin.Begin); // Rewind
 
-                using (var decompressionStream = new ZlibStream(cmpMemoryStream, Ionic.Zlib.CompressionMode.Decompress, true))
+                using (var decompressionStream = new ZlibStream(cmpMemoryStream, CompressionMode.Decompress, true))
                     decompressionStream.CopyTo(decmpMemoryStream);
-
+                
                 // Dump file 1
                 decmpMemoryStream.Seek(0, SeekOrigin.Begin);
                 if (File.Exists("file1Dump"))
@@ -92,31 +92,6 @@ namespace OpenTPW.Files.FileFormats
                 decmpMemoryStream.Read(file1Contents, 0, (int)decmpMemoryStream.Length);
                 using (var fileStream = new FileStream("file1Dump", FileMode.OpenOrCreate))
                     fileStream.Write(file1Contents, 0, file1Contents.Length);
-
-                // Fast-forward to file 2 content
-                binaryReader.BaseStream.Seek(28, SeekOrigin.Current);
-
-                if (file2Len != 0)
-                {
-                    // File 2
-                    var cmpMemoryStreamFile2 = new MemoryStream();
-                    cmpMemoryStreamFile2.Write(binaryReader.ReadBytes(file2Len - 28), 0, file2Len - 28);
-                    cmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
-
-                    using (var decompressionStream = new ZlibStream(cmpMemoryStreamFile2, Ionic.Zlib.CompressionMode.Decompress, true))
-                        decompressionStream.CopyTo(decmpMemoryStreamFile2);
-
-                    // Dump file 2
-                    decmpMemoryStreamFile2.Seek(0, SeekOrigin.Begin);
-                    if (File.Exists("file2Dump"))
-                        File.Delete("file2Dump");
-                    var file2Contents = new byte[decmpMemoryStreamFile2.Length];
-                    decmpMemoryStreamFile2.Read(file2Contents, 0, (int)decmpMemoryStreamFile2.Length);
-                    using (var fileStream = new FileStream("file2Dump", FileMode.OpenOrCreate))
-                        fileStream.Write(file2Contents, 0, file2Contents.Length);
-
-                    cmpMemoryStreamFile2.Close();
-                }
             }
             else
             {
@@ -125,27 +100,86 @@ namespace OpenTPW.Files.FileFormats
 
             Logging.Log($"WCT file has a width of {width} and a height of {height}, and uses {bpp} bits per pixel.  Compressed: {zlibFile.ToString()} - decompressed data length: {decmpMemoryStream.Length} (should be ~{(width * height * bpp) / 8})");
 
-            var imageData = new ColorRGBA32[width * height];
-
-            for (var i = 0; i < width * height; ++i)
-            {
-                imageData[i] = new ColorRGBA32(255, 0, 255, 255);
-            }
+            var imageData = new ColorRGBA32[decmpMemoryStream.Length];
 
             decmpMemoryStream.Seek(0, SeekOrigin.Begin);
-            var dataPos = 0;
-            for (var y = height - 1; y >= 0; --y)
+            var dataBuffer = new byte[decmpMemoryStream.Length];
+            decmpMemoryStream.Read(dataBuffer, 0, (int)decmpMemoryStream.Length);
+            decmpMemoryStream.Close();
+
+            int stride = 0;
+            var convertedBuffer = ConvertTo8Bit(dataBuffer, width, height, 0, 1, false, ref stride);
+            var dataPos = imageData.Length - 1;
+            
+            for (int i = 0; i < convertedBuffer.Length; ++i)
             {
-                for (var x = 0; x < width; ++x)
+                var b = convertedBuffer[i];
+                // Console.WriteLine(b);
+
+                if (b == 1)
                 {
-                    var bytes = new byte[1];
-                    decmpMemoryStream.Read(bytes, 0, bytes.Length);
-                    imageData[dataPos] = new ColorRGBA32(bytes[0], bytes[0], bytes[0], 255);
-                    dataPos++;
+                    imageData[dataPos] = new ColorRGBA32(255, 255, 255, 255);    
                 }
+                else
+                {
+                    imageData[dataPos] = new ColorRGBA32(0, 0, 0, 255);
+                }
+                    
+                if (dataPos > 0)
+                    dataPos--;
             }
 
-            return new AssetContainer<Texture>(Texture.LoadFromFloatData(decmpMemoryStreamFile2.ToArray(), width, height, "texture_diffuse"));
+            return new AssetContainer<Texture>(Texture.LoadFromColorData(imageData, width, height, "texture_diffuse"));
+        }
+        
+        // Code below stolen from https://stackoverflow.com/a/51124131.
+        /// <summary>
+        /// Converts given raw image data for a paletted image to 8-bit, so we have a simple one-byte-per-pixel format to work with.
+        /// </summary>
+        /// <param name="fileData">The file data.</param>
+        /// <param name="width">Width of the image.</param>
+        /// <param name="height">Height of the image.</param>
+        /// <param name="start">Start offset of the image data in the fileData parameter.</param>
+        /// <param name="bitsLength">Amount of bits used by one pixel.</param>
+        /// <param name="bigEndian">True if the bits in the original image data are stored as big-endian.</param>
+        /// <param name="stride">Stride used in the original image data. Will be adjusted to the new stride value.</param>
+        /// <returns>The image data in a 1-byte-per-pixel format, with a stride exactly the same as the width.</returns>
+        public static Byte[] ConvertTo8Bit(byte[] fileData, int width, int height, int start, int bitsLength, bool bigEndian, ref int stride)
+        {
+            if (bitsLength != 1 && bitsLength != 2 && bitsLength != 4 && bitsLength != 8)
+                throw new ArgumentOutOfRangeException("Cannot handle image data with " + bitsLength + "bits per pixel.");
+            // Full array
+            Byte[] data8bit = new Byte[width * height];
+            // Amount of pixels that end up on the same byte
+            int parts = 8 / bitsLength;
+            // Amount of bytes to write per line
+            int newStride = width;
+            // Bit mask for reducing read and shifted data to actual bits length
+            int bitmask = (1 << bitsLength) - 1;
+            int size = stride * height;
+            // File check, and getting actual data.
+            if (start + size > fileData.Length)
+                throw new IndexOutOfRangeException("Data exceeds array bounds!");
+            // Actual conversion process.
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    // This will hit the same byte multiple times
+                    int indexXbit = start + y * stride + x / parts;
+                    // This will always get a new index
+                    int index8bit = y * newStride + x;
+                    // Amount of bits to shift the data to get to the current pixel data
+                    int shift = (x % parts) * bitsLength;
+                    // Reversed for big-endian
+                    if (bigEndian)
+                        shift = 8 - shift - bitsLength;
+                    // Get data and store it.
+                    data8bit[index8bit] = (Byte)((fileData[indexXbit] >> shift) & bitmask);
+                }
+            }
+            stride = newStride;
+            return data8bit;
         }
     }
 }

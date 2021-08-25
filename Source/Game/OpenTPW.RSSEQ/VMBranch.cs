@@ -8,17 +8,17 @@ namespace OpenTPW.RSSEQ
         /// <summary>
         /// Instruction count (vm offset);
         /// </summary>
-        public int instructionOffset { get; set; }
+        public int InstructionOffset { get; set; }
 
         /// <summary>
         /// Instruction count + opcode count (compiled value)
         /// </summary>
-        public int compiledOffset { get; set; }
+        public int CompiledOffset { get; set; }
 
         public VMBranch(int instructionOffset, int compiledOffset)
         {
-            this.instructionOffset = instructionOffset;
-            this.compiledOffset = compiledOffset;
+            this.InstructionOffset = instructionOffset;
+            this.CompiledOffset = compiledOffset;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace OpenTPW.Files.FileFormats
              * each character comes from the BFMU file "MBToUni.dat"
              */
 
-            foreach (int offset in offsets)
+            foreach (uint offset in offsets)
             {
                 binaryReader.BaseStream.Seek(offset + 12, SeekOrigin.Begin);
                 byte byte0;
@@ -57,7 +57,7 @@ namespace OpenTPW.Files.FileFormats
                 var byte1 = binaryReader.ReadByte();
                 var byte2 = binaryReader.ReadByte();
                 var byte3 = binaryReader.ReadByte();
-                var stringLength = ((uint)byte3 << 16 | (uint)byte2 << 8 | (uint)byte1);
+                var stringLength = ((uint)byte3 << 16 | (uint)byte2 << 8 | byte1);
                 var str = "";
                 for (var i = 0; i < stringLength; ++i)
                 {

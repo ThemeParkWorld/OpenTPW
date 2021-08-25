@@ -70,7 +70,7 @@ namespace OpenTPW.Files.FileFormats
                             if (lineBuffer.Key == null)
                             {
                                 lineBuffer.Key = wordBuffer;
-                                isKey = !isKey;
+                                isKey = false;
                             }
                         }
                         else
@@ -78,7 +78,7 @@ namespace OpenTPW.Files.FileFormats
                             if (lineBuffer.Value == null)
                             {
                                 lineBuffer.Value = wordBuffer;
-                                isKey = !isKey;
+                                isKey = true;
                             }
                         }
                     }

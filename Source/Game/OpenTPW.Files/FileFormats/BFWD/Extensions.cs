@@ -4,17 +4,17 @@ namespace OpenTPW.Files.FileFormats.BFWD
 {
     public static class ByteExtension
     {
-        public static bool GetBit(this byte byte_, int index)
+        public static bool GetBit(this byte @byte, int index)
         {
-            var value = ((byte_ >> (7 - index)) & 1) != 0;
+            var value = ((@byte >> (7 - index)) & 1) != 0;
             return value;
         }
-        public static bool[] GetBits(this byte byte_, params int[] indices)
+        public static bool[] GetBits(this byte @byte, params int[] indices)
         {
             var bits = new bool[indices.Length];
             for (var i = 0; i < indices.Length; ++i)
             {
-                bits[i] = byte_.GetBit(indices[i]);
+                bits[i] = @byte.GetBit(indices[i]);
             }
             return bits;
         }

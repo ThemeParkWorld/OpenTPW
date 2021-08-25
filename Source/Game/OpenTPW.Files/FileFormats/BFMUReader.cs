@@ -15,12 +15,12 @@ namespace OpenTPW.Files.FileFormats
 
         public char GetChar(byte b)
         {
-            return characters[(int)b - 0x01]; // BFMU characters are offset by 0x01
+            return characters[b - 0x01]; // BFMU characters are offset by 0x01
         }
 
         public IAssetContainer LoadAsset(ArchiveFile file)
         {
-            return LoadAsset(file.data);
+            return LoadAsset(file.CompressedData);
         }
 
         public IAssetContainer LoadAsset(byte[] data)

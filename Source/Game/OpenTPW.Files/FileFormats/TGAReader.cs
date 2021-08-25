@@ -2,7 +2,6 @@
 using Engine.Utils.DebugUtils;
 using OpenGL;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace OpenTPW.Files.FileFormats
@@ -21,19 +20,19 @@ namespace OpenTPW.Files.FileFormats
             using var binaryReader = new BinaryReader(memoryReader);
 
             int width, height;
-            int idLength = binaryReader.ReadByte();
+            _ = binaryReader.ReadByte(); // idLength
             int colorMapType = binaryReader.ReadByte();
             int dataTypeCode = binaryReader.ReadByte();
-            int colorMapOrigin = binaryReader.ReadInt16();
-            int colorMapLength = binaryReader.ReadInt16();
-            int colorMapDepth = binaryReader.ReadByte();
+            _ = binaryReader.ReadInt16(); // colorMapOrigin
+            _ = binaryReader.ReadInt16(); // colorMapLength
+            _ = binaryReader.ReadByte(); // colorMapDepth
 
-            int xOrigin = binaryReader.ReadInt16();
-            int yOrigin = binaryReader.ReadInt16();
+            _ = binaryReader.ReadInt16(); // xOrigin
+            _ = binaryReader.ReadInt16(); // yOrigin
             width = binaryReader.ReadInt16();
             height = binaryReader.ReadInt16() + 1;
             int bpp = binaryReader.ReadByte();
-            int descriptor = binaryReader.ReadByte();
+            _ = binaryReader.ReadByte(); // descriptor
             
             var colorData = new ColorRGBA32[width * height];
 

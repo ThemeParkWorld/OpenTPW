@@ -75,8 +75,8 @@ namespace OpenTPW.RSSEQ
 
         public void BranchTo(int value)
         {
-            var destBranch = Branches.First(b => b.compiledOffset == value);
-            CurrentPos = destBranch.instructionOffset;
+            var destBranch = Branches.First(b => b.CompiledOffset == value);
+            CurrentPos = destBranch.InstructionOffset;
         }
     }
 }

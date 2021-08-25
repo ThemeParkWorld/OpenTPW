@@ -1,8 +1,6 @@
 ﻿using Ionic.Zlib;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace OpenTPW.Files.FileFormats
 {
@@ -84,7 +82,7 @@ namespace OpenTPW.Files.FileFormats
 
             binaryReader.ReadBytes(4);
 
-            var compressedLength = binaryReader.ReadInt32();
+            _ = binaryReader.ReadInt32(); // compressedLength
             binaryReader.ReadBytes(16);
             
             // Read all data (from here til the end of the file)

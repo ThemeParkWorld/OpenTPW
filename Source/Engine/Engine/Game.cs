@@ -156,9 +156,6 @@ namespace Engine
                 UpdateManager.Instance,
                 PhysicsManager.Instance,
                 SceneManager.Instance,
-                // ScriptManager.Instance,
-                RconManager.Instance,
-                RconWebFrontendManager.Instance,
             };
 
             foreach (var multiThreadedManager in multiThreadedManagers)

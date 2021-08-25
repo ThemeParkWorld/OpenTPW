@@ -1,5 +1,4 @@
 ﻿using Engine.Utils;
-using Engine.Utils.FileUtils;
 using OpenGL;
 using Quincy.Components;
 using Quincy.Primitives;
@@ -77,7 +76,7 @@ namespace Quincy
             Gl.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
 
             var projMatrix = Matrix4x4f.Perspective(90f, 1.0f, 0.1f, 10.0f);
-            var viewMatrices = new Matrix4x4f[]
+            var viewMatrices = new[]
             {
                 Matrix4x4f.LookAt(new Vertex3f(0f, 0f, 0f), new Vertex3f(1f, 0f, 0f), new Vertex3f(0f, -1f, 0f)),
                 Matrix4x4f.LookAt(new Vertex3f(0f, 0f, 0f), new Vertex3f(-1f, 0f, 0f), new Vertex3f(0f, -1f, 0f)),
@@ -164,7 +163,7 @@ namespace Quincy
             Gl.GenerateMipmap(TextureTarget.TextureCubeMap);
 
             var projMatrix = Matrix4x4f.Perspective(90f, 1.0f, 0.1f, 10.0f);
-            var viewMatrices = new Matrix4x4f[]
+            var viewMatrices = new[]
             {
                 Matrix4x4f.LookAt(new Vertex3f(0f, 0f, 0f), new Vertex3f(1f, 0f, 0f), new Vertex3f(0f, -1f, 0f)),
                 Matrix4x4f.LookAt(new Vertex3f(0f, 0f, 0f), new Vertex3f(-1f, 0f, 0f), new Vertex3f(0f, -1f, 0f)),

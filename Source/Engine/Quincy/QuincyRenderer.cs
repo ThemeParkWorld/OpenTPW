@@ -6,8 +6,6 @@ namespace Quincy
 {
     public class QuincyRenderer : IRenderer
     {
-        public QuincyRenderer() { }
-
         public void ContextCreated()
         {
             Gl.Enable(EnableCap.DepthTest);

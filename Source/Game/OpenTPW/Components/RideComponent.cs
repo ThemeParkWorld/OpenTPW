@@ -33,9 +33,9 @@ namespace OpenTPW.Components
             var rideName = Path.GetFileNameWithoutExtension(rideArchivePath);
             var rideArchive = new BFWDArchive(rideArchivePath);
 
-            var rseFile = rideArchive.files.First(file => file.name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
+            var rseFile = rideArchive.Files.First(file => file.Name.Equals($"{rideName}.RSE\0", StringComparison.OrdinalIgnoreCase));
 
-            data = rseFile.data;
+            data = rseFile.CompressedData;
             vmInstance = new VM(data);
             samContents = FileManager.Instance.ReadFile<List<SAMPair>>(rideArchivePath, $"{rideName}.SAM").Data;
         }
@@ -70,8 +70,6 @@ namespace OpenTPW.Components
             {
                 DrawImGuiWindow();
             }
-
-            ImGui.ShowStyleEditor();
         }
 
         private void DrawProperties()
@@ -102,7 +100,7 @@ namespace OpenTPW.Components
                 var propName = property.Name;
                 var propValue = property.GetValue(obj);
 
-                if (propValue == null || propName == null || property.GetCustomAttribute(typeof(HideInImGuiAttribute)) != null)
+                if (propValue == null || property.GetCustomAttribute(typeof(HideInImGuiAttribute)) != null)
                     continue;
 
                 ImGui.Text(propName);
@@ -184,7 +182,7 @@ namespace OpenTPW.Components
             int jumpOffset = 0;
             foreach (var instruction in vmInstance.Instructions)
             {
-                if (vmInstance.Branches.Any(b => b.compiledOffset == jumpOffset - 1))
+                if (vmInstance.Branches.Any(b => b.CompiledOffset == jumpOffset - 1))
                 {
                     ImGui.Text($".jump_{jumpOffset - 1}");
                     ImGui.NextColumn();
@@ -228,7 +226,7 @@ namespace OpenTPW.Components
                             var argStr = "";
                             for (int i = 0; i < instructionHandler.Args.Length; ++i)
                             {
-                                argStr += instructionHandler.Args[i].ToString();
+                                argStr += instructionHandler.Args[i];
                                 if (i != instructionHandler.Args.Length - 1)
                                     argStr += ", ";
                             }

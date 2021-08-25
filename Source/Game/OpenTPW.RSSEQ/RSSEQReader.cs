@@ -170,7 +170,7 @@ namespace OpenTPW.RSSEQ
 
             for (var i = 0; i < vmInstance.Instructions.Count; ++i)
             {
-                if (vmInstance.Branches.Any(b => b.compiledOffset == currentCount - 1))
+                if (vmInstance.Branches.Any(b => b.CompiledOffset == currentCount - 1))
                 {
                     Disassembly += $".branch_{currentCount - 1}\n";
                 }

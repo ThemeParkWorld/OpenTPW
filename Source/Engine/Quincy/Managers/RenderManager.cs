@@ -26,12 +26,12 @@ namespace Quincy.Managers
         private DateTime lastRender;
         private int currentFrametimeIndex;
         private int currentFramerateIndex;
-        private const int FramesToCount = 480;
+        private const int FRAMES_TO_COUNT = 480;
         private float framerateLimitAsMs = 1000f / EngineSettings.FramerateLimit;
         public float LastFrameTime { get; private set; }
         public int CalculatedFramerate => (int)(1000f / Math.Max(LastFrameTime, 0.001f));
-        public float[] FrametimeHistory { get; } = new float[FramesToCount];
-        public float[] FramerateHistory { get; } = new float[FramesToCount];
+        public float[] FrametimeHistory { get; } = new float[FRAMES_TO_COUNT];
+        public float[] FramerateHistory { get; } = new float[FRAMES_TO_COUNT];
 
         public bool RenderShadowMap { get; set; }
         public bool Paused { get; set; }

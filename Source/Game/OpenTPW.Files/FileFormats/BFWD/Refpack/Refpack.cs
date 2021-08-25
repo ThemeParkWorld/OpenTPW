@@ -10,7 +10,7 @@ namespace OpenTPW.Files.FileFormats.BFWD.Refpack
             for (var i = 0; i < proceedingDataLength; ++i) // Proceeding data comes from the source buffer (compressed data)
             {
                 var pos = (uint)(offset + opcodeLength + i);
-                if (pos < 0 || pos >= data.Length) break;  // Prevent any overflowing
+                if ( pos >= data.Length ) break;  // Prevent any overflowing
                 outputData.Add(data[pos]);
             }
 

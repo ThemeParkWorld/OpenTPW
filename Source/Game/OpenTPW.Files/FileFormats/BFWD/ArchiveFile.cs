@@ -19,24 +19,24 @@ namespace OpenTPW.Files.FileFormats.BFWD
         4 - decompressed size
         12 - null*/
 
-        private byte[] _data;
-        private bool _hasBeenDecompressed;
+        private byte[] compressedData;
+        private bool hasBeenDecompressed;
 
-        public string name { get; set; }
-        public bool compressed { get; set; }
-        public uint decompressedSize { get; set; }
-        public BFWDArchive parentArchive { get; set; }
-        public int archiveOffset { get; set; }
-        public byte[] data
+        public string Name { get; set; }
+        public bool Compressed { get; set; }
+        public uint DecompressedSize { get; set; }
+        public BFWDArchive ParentArchive { get; set; }
+        public int ArchiveOffset { get; set; }
+        public byte[] CompressedData
         {
             get
             {
                 // Refpack is big-endian, unlike the rest of the DWFB format
                 // Therefore all memorystream operations have bigEndian set to true
-                if (compressed && !_hasBeenDecompressed)
+                if (Compressed && !hasBeenDecompressed)
                 {
                     var decompressedData = new List<byte>();
-                    using (var memoryStream = new BFWDMemoryStream(_data))
+                    using (var memoryStream = new BFWDMemoryStream(compressedData))
                     {
                         var refpackHeader = memoryStream.ReadBytes(2, bigEndian: true);
                         if (refpackHeader[0] != 0xFB || refpackHeader[1] != 0x10) // 0x10: LU01000C - 00010000 - large files & compressed size are not supported.
@@ -59,7 +59,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
                             }
                         }
 
-                        while (memoryStream.Position < _data.Length)
+                        while (memoryStream.Position < compressedData.Length)
                         {
                             foreach (var command in commands)
                             {
@@ -72,8 +72,8 @@ namespace OpenTPW.Files.FileFormats.BFWD
                                         commandCount.Add(commandType, 1);
                                     try
                                     {
-                                        command.Decompress(_data, ref decompressedData, (int)memoryStream.Position - 1, out var skipAhead);
-                                        memoryStream.Seek(command.length + skipAhead - 1, SeekOrigin.Current);
+                                        command.Decompress(compressedData, ref decompressedData, (int)memoryStream.Position - 1, out var skipAhead);
+                                        memoryStream.Seek(command.Length + skipAhead - 1, SeekOrigin.Current);
                                     }
                                     catch (Exception ex)
                                     {
@@ -81,7 +81,7 @@ namespace OpenTPW.Files.FileFormats.BFWD
                                     }
 
 
-                                    if (command.stopAfterFound) memoryStream.Seek(_data.Length, SeekOrigin.Current); // stop
+                                    if (command.StopAfterFound) memoryStream.Seek(compressedData.Length, SeekOrigin.Current); // stop
                                 }
                             }
                             currentByte = memoryStream.ReadBytes(1, bigEndian: true);
@@ -89,14 +89,14 @@ namespace OpenTPW.Files.FileFormats.BFWD
                     }
 
                     // Avoid decompressing after we've already done it once! Store the result in case its used later.
-                    _hasBeenDecompressed = true;
-                    _data = decompressedData.ToArray();
+                    hasBeenDecompressed = true;
+                    compressedData = decompressedData.ToArray();
                 }
-                return _data;
+                return compressedData;
             }
             set
             {
-                _data = value;
+                compressedData = value;
             }
         }
     }

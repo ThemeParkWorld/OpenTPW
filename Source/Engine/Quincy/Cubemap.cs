@@ -1,7 +1,6 @@
 ﻿using Engine.Utils.DebugUtils;
 using OpenGL;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using StbImageSharp;
 

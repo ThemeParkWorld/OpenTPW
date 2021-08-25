@@ -1,6 +1,5 @@
 ﻿using Engine.ECS.Components;
 using Engine.Utils;
-using Engine.Utils.FileUtils;
 using OpenGL;
 using Quincy.Entities;
 using Quincy.Primitives;
