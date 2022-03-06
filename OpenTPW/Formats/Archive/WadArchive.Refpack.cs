@@ -4,7 +4,7 @@ public static class Refpack
 {
     public interface IRefpackCommand
     {
-        bool StopAfterFound { get; }
+        bool StopAfterFound => false;
         int Length { get; }
 
         void Decompress( byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead );
@@ -21,6 +21,7 @@ public static class Refpack
         }
 
         var outputDataLen = outputData.Count;
+
         for ( var i = 0; i < referencedDataLength; ++i ) // Referenced data comes from the output buffer (decompressed data)
         {
             var pos = (int)(outputDataLen - referencedDataDistance);
@@ -32,7 +33,7 @@ public static class Refpack
     internal class FourByteCommand : IRefpackCommand
     {
         public int Length => 4;
-        public bool StopAfterFound => false;
+
         public void Decompress( byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead )
         {
             var proceedingDataLength = (uint)((data[offset] & 0x03));
@@ -42,6 +43,7 @@ public static class Refpack
 
             DecompressData( data, ref decompressedData, offset, Length, proceedingDataLength, referencedDataLength, referencedDataDistance );
         }
+
         public bool OpcodeMatches( byte firstByte ) => firstByte.GetBits( 0, 1, 2 ).ValuesEqual( new[] {
             true,
             true,
@@ -52,7 +54,7 @@ public static class Refpack
     internal class ThreeByteCommand : IRefpackCommand
     {
         public int Length => 3;
-        public bool StopAfterFound => false;
+
         public void Decompress( byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead )
         {
             var proceedingDataLength = (uint)((data[offset + 1] & 0xC0) >> 6);
@@ -62,6 +64,7 @@ public static class Refpack
 
             DecompressData( data, ref decompressedData, offset, Length, proceedingDataLength, referencedDataLength, referencedDataDistance );
         }
+
         public bool OpcodeMatches( byte firstByte ) => firstByte.GetBits( 0, 1 ).ValuesEqual( new[] {
             true,
             false
@@ -71,7 +74,7 @@ public static class Refpack
     internal class TwoByteCommand : IRefpackCommand
     {
         public int Length => 2;
-        public bool StopAfterFound => false;
+
         public void Decompress( byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead )
         {
             var proceedingDataLength = (uint)((data[offset] & 0x03));
@@ -87,7 +90,6 @@ public static class Refpack
     internal class OneByteCommand : IRefpackCommand
     {
         public int Length => 1;
-        public bool StopAfterFound => false;
 
         public void Decompress( byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead )
         {
@@ -97,6 +99,7 @@ public static class Refpack
             skipAhead = proceedingDataLength;
             DecompressData( data, ref decompressedData, offset, Length, proceedingDataLength, 0, 0 );
         }
+
         public bool OpcodeMatches( byte firstByte ) => ((firstByte & 0x1F) + 1) << 2 <= 0x70 && firstByte.GetBits( 0, 1, 2 ).ValuesEqual( new[] {
             true,
             true,
@@ -108,12 +111,14 @@ public static class Refpack
     {
         public int Length => 1;
         public bool StopAfterFound => true;
+
         public void Decompress( byte[] data, ref List<byte> decompressedData, int offset, out uint skipAhead )
         {
             var proceedingDataLength = (uint)((data[offset] & 0x03));
             skipAhead = proceedingDataLength;
             DecompressData( data, ref decompressedData, offset, Length, proceedingDataLength, 0, 0 );
         }
+
         public bool OpcodeMatches( byte firstByte ) => ((firstByte & 0x1F) + 1) << 2 > 0x70 && firstByte.GetBits( 0, 1, 2 ).ValuesEqual( new[] {
             true,
             true,
