@@ -17,7 +17,7 @@ internal class Window
 		windowOptions.Position = new Point2( 32, 32 );
 
 		window = Silk.NET.Windowing.Window.Create( windowOptions );
-		window.Size = new Point2( 1280, 720 );
+		window.Size = new Point2( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y );
 		window.Title = "OpenTPW";
 
 		window.Load += Window_Load;
@@ -52,6 +52,8 @@ internal class Window
 
 		testPlane = new();
 		testShader = Shader.Builder.WithVertex( "content/shaders/test.vert" ).WithFragment( "content/shaders/test.frag" ).Build();
-		testTexture = TextureBuilder.FromPath( "content/textures/test.png" ).UseSrgbFormat( false ).Build();
+		testTexture = TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Splash_English.tga" ) )
+							  .UseSrgbFormat( false )
+							  .Build();
 	}
 }

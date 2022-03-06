@@ -1,8 +1,7 @@
-﻿namespace OpenTPW
+﻿namespace OpenTPW;
+
+public class Asset
 {
-	public class Asset
-	{
-		public string Path { get; set; }
-		public static List<Asset> All { get; private set; } = new();
-	}
+	public string Path { get; set; }
+	public static List<Asset> All { get; private set; } = new();
 }
