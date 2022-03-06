@@ -24,7 +24,9 @@ public class WadArchive
 	private void ReadArchive()
 	{
 		memoryStream.Seek( 0, SeekOrigin.Begin );
-		/* Header:
+
+		/* 
+		 * Header:
 		 * 4 - magic number ('DWFB')
 		 * 4 - version
 		 * 64 - padding??
@@ -35,33 +37,69 @@ public class WadArchive
 		 */
 
 		var magicNumber = memoryStream.ReadString( 4 );
+
+		// Magic number
 		if ( magicNumber != "DWFB" )
 			throw new Exception( $"Magic number did not match: {magicNumber}" );
-		_ = memoryStream.ReadInt32(); // version
+
+		// Version
+		_ = memoryStream.ReadInt32();
+
+		// Padding
 		memoryStream.Seek( 64, SeekOrigin.Current ); // Skip padding
+
+		// File count
 		var fileCount = memoryStream.ReadInt32();
 
-		_ = memoryStream.ReadInt32(); // fileDirectoryOffset
-		_ = memoryStream.ReadInt32(); // fileDirectoryLength
+		// File list offset
+		_ = memoryStream.ReadInt32();
 
-		memoryStream.Seek( 4, SeekOrigin.Current ); // Skip 'null'
+		// File list length
+		_ = memoryStream.ReadInt32();
+
+		// Unused / unknown
+		_ = memoryStream.ReadInt32();
 
 		// Details directory
-		// See DWFBFile for more info
 		for ( var i = 0; i < fileCount; ++i )
 		{
+			/*
+			 * File
+			 * 4 - unused
+			 * 4 - filename offset
+			 * 4 - filename length
+			 * 4 - data offset
+			 * 4 - data length
+			 * 4 - compression type ('4' for refpack)
+			 * 4 - decompressed size
+			 * 12 - null
+			 */
+
 			GC.Collect();
 			// Save the current position so that we can go back to it later
 			var initialPos = memoryStream.Position;
 
 			var newFile = new ArchiveFile();
-			memoryStream.Seek( 4, SeekOrigin.Current ); // Skip 'null'
+
+			// Unused / unknown
+			memoryStream.Seek( 4, SeekOrigin.Current );
+
+			// Filename offset
 			var filenameOffset = memoryStream.ReadUInt32();
+
+			// Filename length
 			var filenameLength = memoryStream.ReadUInt32();
+
+			// Data offset
 			var dataOffset = memoryStream.ReadUInt32();
+
+			// Data length
 			var dataLength = memoryStream.ReadUInt32();
 
+			// Compression type
 			newFile.Compressed = memoryStream.ReadUInt32() == 4;
+
+			// Decompressed size
 			newFile.DecompressedSize = memoryStream.ReadUInt32();
 
 			// Set file's name name
@@ -70,13 +108,16 @@ public class WadArchive
 
 			// Get file's raw data
 			memoryStream.Seek( dataOffset, SeekOrigin.Begin );
-			newFile.CompressedData = memoryStream.ReadBytes( (int)dataLength );
+			newFile.Data = memoryStream.ReadBytes( (int)dataLength );
 
 			newFile.ArchiveOffset = (int)dataOffset;
 			newFile.ParentArchive = this;
 
+			newFile.Decompress();
 			Files.Add( newFile );
-			memoryStream.Seek( initialPos + 40, SeekOrigin.Begin ); // Return to initial position, skip to the next file's data
+
+			// Return to initial position, skip to the next file's data
+			memoryStream.Seek( initialPos + 40, SeekOrigin.Begin );
 		}
 	}
 
@@ -85,6 +126,7 @@ public class WadArchive
 		// Set up read buffer
 		var tempStreamReader = new StreamReader( path );
 		var fileLength = (int)tempStreamReader.BaseStream.Length;
+
 		Buffer = new byte[fileLength];
 		tempStreamReader.BaseStream.Read( Buffer, 0, fileLength );
 		tempStreamReader.Close();
