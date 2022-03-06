@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OpenTPW": {
+      "commandName": "Project",
+      "workingDirectory": "F:\\Projects\\OpenTPW"
+    }
+  }
+}

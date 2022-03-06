@@ -7,6 +7,10 @@ internal class Window
 {
 	private IWindow window;
 
+	private Shader testShader;
+	private Texture testTexture;
+	private Primitives.Plane testPlane;
+
 	public Window()
 	{
 		var windowOptions = WindowOptions.Default;
@@ -38,10 +42,16 @@ internal class Window
 	{
 		Gl.ClearColor( 1, 0, 1, 1 );
 		Gl.Clear( ClearBufferMask.ColorBufferBit );
+
+		testPlane.Draw( testShader, testTexture );
 	}
 
 	private void Window_Load()
 	{
 		Global.Gl = window.CreateOpenGL();
+
+		testPlane = new();
+		testShader = Shader.Builder.WithVertex( "content/shaders/test.vert" ).WithFragment( "content/shaders/test.frag" ).Build();
+		testTexture = TextureBuilder.FromPath( "content/textures/test.png" ).UseSrgbFormat( false ).Build();
 	}
 }
