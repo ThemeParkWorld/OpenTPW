@@ -6,6 +6,6 @@ public class Program
 {
 	public static void Main( string[] args )
 	{
-		Log.Trace( "Hello!" );
+		var game = new Game();
 	}
 }
