@@ -7,9 +7,9 @@ internal class Window
 {
 	private IWindow window;
 
-	private Shader testShader;
-	private Texture testTexture;
-	private Primitives.Plane testPlane;
+	private Shader? testShader;
+	private Texture? testTexture;
+	private Primitives.Plane? testPlane;
 
 	public Window()
 	{
@@ -43,7 +43,7 @@ internal class Window
 		Gl.ClearColor( 1, 0, 1, 1 );
 		Gl.Clear( ClearBufferMask.ColorBufferBit );
 
-		testPlane.Draw( testShader, testTexture );
+		testPlane?.Draw( testShader, testTexture );
 	}
 
 	private void Window_Load()

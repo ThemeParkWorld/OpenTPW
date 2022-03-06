@@ -12,7 +12,7 @@ public partial class TextureBuilder
 	private PixelFormat pixelFormat = PixelFormat.Rgba;
 	private PixelType pixelType = PixelType.UnsignedByte;
 
-	private byte[] data;
+	private byte[]? data;
 	private uint width;
 	private uint height;
 
@@ -23,7 +23,7 @@ public partial class TextureBuilder
 		path = GetHashCode().ToString();
 	}
 
-	private static bool TryGetExistingTexture( string path, out Texture texture )
+	private static bool TryGetExistingTexture( string path, out Texture? texture )
 	{
 		var existingTexture = Asset.All.OfType<Texture>().ToList().FirstOrDefault( t => t.Path == path );
 		if ( existingTexture != null )
