@@ -55,5 +55,8 @@ internal class Window
 		testTexture = TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Splash_English.tga" ) )
 							  .UseSrgbFormat( false )
 							  .Build();
+
+		var testFile = new WadArchive( GameDir.GetPath( "data/lobby.wad" ) );
+		testFile.Files.ForEach( f => Log.Trace( f.Name ?? "Unnamed file" ) );
 	}
 }
