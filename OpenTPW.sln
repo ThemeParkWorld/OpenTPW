@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTPW", "OpenTPW\OpenTPW.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {501E447E-DCFC-42D2-AF68-88486D3529DD}
+	EndGlobalSection
+EndGlobal
