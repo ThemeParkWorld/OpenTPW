@@ -7,8 +7,10 @@ global using Point2 = Silk.NET.Maths.Vector2D<int>;
 global using Point3 = Silk.NET.Maths.Vector3D<int>;
 
 using OpenTPW;
+using Silk.NET.OpenGL;
 
 public static class Global
 {
-	public static Logger Log { get; set; } = new();
+	public static Logger Log { get; } = new();
+	public static GL Gl { get; internal set; }
 }

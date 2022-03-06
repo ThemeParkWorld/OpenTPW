@@ -1,4 +1,5 @@
-﻿using Silk.NET.Windowing;
+﻿using Silk.NET.OpenGL;
+using Silk.NET.Windowing;
 
 namespace OpenTPW;
 
@@ -25,6 +26,7 @@ internal class Window
 
 	private void Window_Resize( Silk.NET.Maths.Vector2D<int> newSize )
 	{
+		Gl.Viewport( newSize );
 	}
 
 	private void Window_Closing()
@@ -34,9 +36,12 @@ internal class Window
 
 	private void Window_Render( double deltaTime )
 	{
+		Gl.ClearColor( 1, 0, 1, 1 );
+		Gl.Clear( ClearBufferMask.ColorBufferBit );
 	}
 
 	private void Window_Load()
 	{
+		Global.Gl = window.CreateOpenGL();
 	}
 }
