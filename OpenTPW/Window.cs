@@ -1,4 +1,6 @@
-﻿using Silk.NET.OpenGL;
+﻿using Silk.NET.Input;
+using Silk.NET.OpenGL;
+using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
 namespace OpenTPW;
@@ -10,6 +12,11 @@ internal class Window
 	private Shader? testShader;
 	private Texture? testTexture;
 	private Primitives.Plane? testPlane;
+
+	private Editor? editor;
+
+	private ImGuiController? imgui;
+	private IInputContext inputContext;
 
 	public Window()
 	{
@@ -40,18 +47,28 @@ internal class Window
 
 	private void Window_Render( double deltaTime )
 	{
+		Time.Delta = (float)deltaTime;
+
 		Gl.ClearColor( 1, 0, 1, 1 );
 		Gl.Clear( ClearBufferMask.ColorBufferBit );
 
 		testPlane?.Draw( testShader, testTexture );
+
+		editor?.Update();
+		imgui?.Render();
 	}
 
 	private void Window_Load()
 	{
 		Global.Gl = window.CreateOpenGL();
+		inputContext = window.CreateInput();
+		imgui = new( Global.Gl, window, inputContext );
 
 		testPlane = new();
-		testShader = Shader.Builder.WithVertex( "content/shaders/test.vert" ).WithFragment( "content/shaders/test.frag" ).Build();
+		testShader = Shader.Builder.WithVertex( "content/shaders/test.vert" )
+							 .WithFragment( "content/shaders/test.frag" )
+							 .Build();
+
 		testTexture = TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Splash_English.tga" ) )
 							  .UseSrgbFormat( false )
 							  .Build();
@@ -61,5 +78,7 @@ internal class Window
 
 		var testSettings = new SettingsFile( GameDir.GetPath( "data/Online.sam" ) );
 		testSettings.Entries.ForEach( e => Log.Trace( $"{e.Item1}: {e.Item2}" ) );
+
+		editor = new Editor( imgui );
 	}
 }
