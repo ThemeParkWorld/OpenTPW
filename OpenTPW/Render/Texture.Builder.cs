@@ -116,7 +116,7 @@ public partial class TextureBuilder
 		return textureBuilder;
 	}
 
-	public static TextureBuilder FromPath( string path, bool flipY = false )
+	public static TextureBuilder FromPath( string path, bool flipY = true )
 	{
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
