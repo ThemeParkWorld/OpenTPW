@@ -1,5 +1,7 @@
 ﻿namespace OpenTPW;
 
+using SettingsPair = MutablePair<string, string>;
+
 public class SettingsFile
 {
 	// TODO: Read hoarding & shape data
@@ -54,17 +56,17 @@ public class SettingsFile
 				{
 					if ( isKey )
 					{
-						if ( lineBuffer.Key == null )
+						if ( lineBuffer.Item1 == null )
 						{
-							lineBuffer.Key = wordBuffer;
+							lineBuffer.Item1 = wordBuffer ?? default;
 							isKey = false;
 						}
 					}
 					else
 					{
-						if ( lineBuffer.Value == null )
+						if ( lineBuffer.Item2 == null )
 						{
-							lineBuffer.Value = wordBuffer;
+							lineBuffer.Item2 = wordBuffer ?? default;
 							isKey = true;
 						}
 					}
@@ -72,7 +74,7 @@ public class SettingsFile
 
 				if ( IsNewLine( character ) )
 				{
-					if ( lineBuffer.Key != null && lineBuffer.Value != null )
+					if ( lineBuffer.Item1 != null && lineBuffer.Item2 != null )
 						samPairs.Add( lineBuffer );
 
 					lineBuffer = new SettingsPair();

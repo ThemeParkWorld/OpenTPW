@@ -60,6 +60,6 @@ internal class Window
 		testArchive.Files.ForEach( f => Log.Trace( f.Name ?? "Unnamed file" ) );
 
 		var testSettings = new SettingsFile( GameDir.GetPath( "data/Online.sam" ) );
-		testSettings.Entries.ForEach( e => Log.Trace( $"{e.Key}: {e.Value}" ) );
+		testSettings.Entries.ForEach( e => Log.Trace( $"{e.Item1}: {e.Item2}" ) );
 	}
 }
