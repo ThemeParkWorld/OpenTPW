@@ -48,48 +48,8 @@ internal class Window
 
 	private void Window_Render( double deltaTime )
 	{
-		Time.Delta = (float)deltaTime;
-		Time.Now += (float)deltaTime;
-
-		var io = ImGui.GetIO();
-		if ( !io.WantCaptureMouse )
-		{
-			var mouse = inputContext.Mice.First();
-			var mousePos = new Vector2( mouse.Position.X, mouse.Position.Y );
-
-			var mouseInfo = new Input.MouseInfo
-			{
-				Delta = Input.Mouse.Position - mousePos,
-				Position = mousePos,
-				Left = mouse.IsButtonPressed( MouseButton.Left ),
-				Right = mouse.IsButtonPressed( MouseButton.Right ),
-				Wheel = mouse.ScrollWheels.First().Y
-			};
-			Input.Mouse = mouseInfo;
-
-			var keyboard = inputContext.Keyboards.First();
-
-			Input.Right = 0;
-			Input.Forward = 0;
-
-			if ( keyboard.IsKeyPressed( Key.A ) )
-				Input.Right -= 1;
-			if ( keyboard.IsKeyPressed( Key.D ) )
-				Input.Right += 1;
-			if ( keyboard.IsKeyPressed( Key.W ) )
-				Input.Forward += 1;
-			if ( keyboard.IsKeyPressed( Key.S ) )
-				Input.Forward -= 1;
-
-			Input.LastKeysDown = Input.KeysDown.ToList();
-			Input.KeysDown.Clear();
-			if ( keyboard.IsKeyPressed( Key.F1 ) )
-				Input.KeysDown.Add( InputButton.ConsoleToggle );
-		}
-		else
-		{
-			Input.Mouse = new Input.MouseInfo();
-		}
+		Time.UpdateFrom( (float)deltaTime );
+		Input.UpdateFrom( inputContext );
 
 		Gl.ClearColor( 1, 0, 1, 1 );
 		Gl.Clear( ClearBufferMask.ColorBufferBit );
@@ -97,23 +57,6 @@ internal class Window
 		testPlane?.Draw( testShader, testTexture );
 
 		editor?.Update();
-
-		{
-			ImGui.Text( $"Time: {Time.Now}" );
-
-			ImGui.Text( $"Last keys down:" );
-			foreach ( var key in Input.LastKeysDown )
-			{
-				ImGui.Text( $"\t{key}" );
-			}
-
-			ImGui.Text( $"\n\nKeys down:" );
-			foreach ( var key in Input.KeysDown )
-			{
-				ImGui.Text( $"\t{key}" );
-			}
-		}
-
 		imgui?.Render();
 	}
 
