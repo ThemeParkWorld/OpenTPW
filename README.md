@@ -28,18 +28,6 @@ OpenTPW is a re-implementation of [Sim Theme Park / Theme Park World](https://en
 - A copy of the original game (either Theme Park World or Sim Theme Park)
 - A decent graphics card & processor
 
-## Building
-
-This project is a bit of a mess right now.
-
-Some things to note:
-
-- Some paths are hard-coded, and therefore the game must be located at "C:\Program Files (x86)\Bullfrog\Theme Park World"
-- The whole "Content/" directory is not currently included (due to copyright concerns)
-- A junction must be created in the build target directory - there's a "CreateJunction.bat" file for this
-
-Expect all of these to be resolved over time.
-
 ## Documentation
 
 File format information is available within this repo's [wiki](https://github.com/xezno/OpenTPW/wiki).  Keep in mind that this information is a work-in-progress, and therefore might not be of incredible detail - however, upon completion, it still aims to be as useful, detailed, and as in-depth as possible.
