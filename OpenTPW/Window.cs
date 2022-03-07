@@ -1,8 +1,9 @@
-﻿using ImGuiNET;
-using Silk.NET.Input;
+﻿using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
+
+using OpenTPW.UI;
 
 namespace OpenTPW;
 
@@ -10,14 +11,12 @@ internal class Window
 {
 	private IWindow window;
 
-	private Shader? testShader;
-	private Texture? testTexture;
-	private Primitives.Plane? testPlane;
-
 	private Editor? editor;
 
 	private ImGuiController? imgui;
 	private IInputContext inputContext;
+
+	private World world;
 
 	public Window()
 	{
@@ -36,7 +35,7 @@ internal class Window
 		window.Run();
 	}
 
-	private void Window_Resize( Silk.NET.Maths.Vector2D<int> newSize )
+	private void Window_Resize( Point2 newSize )
 	{
 		Gl.Viewport( newSize );
 	}
@@ -54,7 +53,8 @@ internal class Window
 		Gl.ClearColor( 1, 0, 1, 1 );
 		Gl.Clear( ClearBufferMask.ColorBufferBit );
 
-		testPlane?.Draw( testShader, testTexture );
+		world.Update();
+		world.Render();
 
 		editor?.Update();
 		imgui?.Render();
@@ -66,20 +66,7 @@ internal class Window
 		inputContext = window.CreateInput();
 		imgui = new( Global.Gl, window, inputContext );
 
-		testPlane = new();
-		testShader = Shader.Builder.WithVertex( "content/shaders/test.vert" )
-							 .WithFragment( "content/shaders/test.frag" )
-							 .Build();
-
-		testTexture = TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Splash_English.tga" ) )
-							  .UseSrgbFormat( false )
-							  .Build();
-
-		var testArchive = new WadArchive( GameDir.GetPath( "data/lobby.wad" ) );
-		testArchive.Files.ForEach( f => Log.Trace( f.Name ?? "Unnamed file" ) );
-
-		var testSettings = new SettingsFile( GameDir.GetPath( "data/Online.sam" ) );
-		testSettings.Entries.ForEach( e => Log.Trace( $"{e.Item1}: {e.Item2}" ) );
+		world = new();
 
 		editor = new Editor( imgui );
 	}
