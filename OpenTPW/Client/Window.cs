@@ -3,8 +3,6 @@ using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
-using OpenTPW.UI;
-
 namespace OpenTPW;
 
 internal class Window
