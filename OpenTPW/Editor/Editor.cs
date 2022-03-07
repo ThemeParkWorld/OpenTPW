@@ -5,11 +5,12 @@ using System.Runtime.InteropServices;
 namespace OpenTPW;
 internal partial class Editor
 {
-	ImGuiController ImGuiController;
+	private ImGuiController ImGuiController;
+	private Texture defaultFontTexture;
 
-	List<BaseTab> tabs = new();
+	private List<BaseTab> tabs = new();
 
-	Texture defaultFontTexture;
+	private bool shouldRender;
 
 	public Editor( ImGuiController imGuiController )
 	{
@@ -18,10 +19,10 @@ internal partial class Editor
 		InitIO();
 		SetTheme();
 
-		tabs.AddRange( new BaseTab[]{
-				new TexturesTab(),
-				new ConsoleTab(),
-			} );
+		tabs.AddRange( new BaseTab[] {
+			new TexturesTab(),
+			new ConsoleTab(),
+		} );
 	}
 
 	private void InitIO()
@@ -47,6 +48,12 @@ internal partial class Editor
 	public void Update()
 	{
 		ImGuiController.Update( Time.Delta );
+
+		if ( Input.Pressed( InputButton.ConsoleToggle ) )
+			shouldRender = !shouldRender;
+
+		if ( !shouldRender )
+			return;
 
 		ImGui.DockSpaceOverViewport( ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode );
 		ImGui.ShowDemoWindow();
