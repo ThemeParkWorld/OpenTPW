@@ -14,6 +14,7 @@ internal partial class Editor
 	public Editor( ImGuiController imGuiController )
 	{
 		ImGuiController = imGuiController;
+
 		InitIO();
 		SetTheme();
 
@@ -26,6 +27,8 @@ internal partial class Editor
 	private void InitIO()
 	{
 		var io = ImGui.GetIO();
+
+		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB;
 
 		io.Fonts.Clear();
 

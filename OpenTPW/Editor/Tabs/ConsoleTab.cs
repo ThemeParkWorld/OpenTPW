@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace OpenTPW;
@@ -72,7 +71,12 @@ internal class ConsoleTab : BaseTab
 		ImGui.SetNextItemWidth( -58 );
 		ImGui.InputText( "##console_input", ref consoleInput, 512 );
 		ImGui.SameLine();
-		ImGui.Button( "Submit" );
+
+		if ( ImGui.Button( "Submit" ) )
+		{
+			Log.Info( $"Console input: '{consoleInput}'" );
+			consoleInput = "";
+		}
 
 		ImGui.End();
 	}
