@@ -56,7 +56,10 @@ internal class Window
 							  .UseSrgbFormat( false )
 							  .Build();
 
-		var testFile = new WadArchive( GameDir.GetPath( "data/lobby.wad" ) );
-		testFile.Files.ForEach( f => Log.Trace( f.Name ?? "Unnamed file" ) );
+		var testArchive = new WadArchive( GameDir.GetPath( "data/lobby.wad" ) );
+		testArchive.Files.ForEach( f => Log.Trace( f.Name ?? "Unnamed file" ) );
+
+		var testSettings = new SettingsFile( GameDir.GetPath( "data/Online.sam" ) );
+		testSettings.Entries.ForEach( e => Log.Trace( $"{e.Key}: {e.Value}" ) );
 	}
 }

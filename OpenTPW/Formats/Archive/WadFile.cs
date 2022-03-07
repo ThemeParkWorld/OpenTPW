@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 
 namespace OpenTPW;
-public class ArchiveFile
+
+public class WadArchiveFile
 {
 	public string? Name { get; set; }
 	public bool Compressed { get; set; }

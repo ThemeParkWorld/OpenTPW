@@ -9,7 +9,7 @@ public class WadArchive
 {
 	private WadStream memoryStream;
 	public byte[] Buffer { get; internal set; }
-	public List<ArchiveFile> Files { get; internal set; }
+	public List<WadArchiveFile> Files { get; internal set; }
 
 	public WadArchive( string path )
 	{
@@ -79,7 +79,7 @@ public class WadArchive
 			// Save the current position so that we can go back to it later
 			var initialPos = memoryStream.Position;
 
-			var newFile = new ArchiveFile();
+			var newFile = new WadArchiveFile();
 
 			// Unused / unknown
 			memoryStream.Seek( 4, SeekOrigin.Current );
@@ -132,7 +132,7 @@ public class WadArchive
 		tempStreamReader.Close();
 
 		memoryStream = new WadStream( Buffer );
-		Files = new List<ArchiveFile>();
+		Files = new List<WadArchiveFile>();
 
 		ReadArchive();
 	}
