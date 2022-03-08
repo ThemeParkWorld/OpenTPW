@@ -25,6 +25,8 @@ internal class Window
 		window.Size = new Point2( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y );
 		window.Title = "OpenTPW";
 
+		Screen.UpdateFrom( window.Size );
+
 		window.Load += Window_Load;
 		window.Render += Window_Render;
 		window.Closing += Window_Closing;
@@ -36,6 +38,8 @@ internal class Window
 	private void Window_Resize( Point2 newSize )
 	{
 		Gl.Viewport( newSize );
+
+		Screen.UpdateFrom( newSize );
 	}
 
 	private void Window_Closing()
@@ -67,5 +71,8 @@ internal class Window
 		world = new();
 
 		editor = new Editor( imgui );
+
+		Gl.Enable( EnableCap.Blend );
+		Gl.BlendFunc( BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha );
 	}
 }

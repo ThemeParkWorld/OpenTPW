@@ -36,6 +36,7 @@ public static class MathExtensions
 {
 	public static int CeilToInt( this float x ) => (int)Math.Ceiling( x );
 	public static int FloorToInt( this float x ) => (int)Math.Floor( x );
+	public static int RoundToInt( this float x ) => (int)Math.Round( x );
 
 	public static int NearestPowerOf2( this int x ) => NearestPowerOf2( (uint)x );
 	public static int NearestPowerOf2( this uint x ) => 1 << (sizeof( uint ) * 8 - BitOperations.LeadingZeroCount( x - 1 ));

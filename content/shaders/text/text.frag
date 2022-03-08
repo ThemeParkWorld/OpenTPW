@@ -9,4 +9,5 @@ uniform sampler2D g_tDiffuse;
 
 void main() {
     fragColor = texture( g_tDiffuse, vs_out.texCoords );
+    fragColor.a = fragColor.r;
 }

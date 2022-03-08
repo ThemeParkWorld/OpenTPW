@@ -76,8 +76,8 @@ public partial class TextureBuilder
 		if ( !usePointFiltering )
 			return this;
 
-		minFilter = GLEnum.Point;
-		magFilter = GLEnum.Point;
+		minFilter = GLEnum.Nearest;
+		magFilter = GLEnum.Nearest;
 
 		return this;
 	}
