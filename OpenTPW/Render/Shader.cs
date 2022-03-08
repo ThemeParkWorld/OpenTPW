@@ -42,6 +42,14 @@ public class Shader
 		}
 	}
 
+	public void SetVector2( string name, Vector2 value )
+	{
+		if ( TryGetUniformLocation( name, out int loc ) )
+		{
+			Gl.ProgramUniform2( Id, loc, value.X, value.Y );
+		}
+	}
+
 	public void SetVector3( string name, Vector3 value )
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )

@@ -16,6 +16,9 @@ public partial class TextureBuilder
 	private uint width;
 	private uint height;
 
+	private GLEnum minFilter = GLEnum.LinearMipmapLinear;
+	private GLEnum magFilter = GLEnum.Linear;
+
 	private string path;
 
 	public TextureBuilder()
@@ -57,8 +60,8 @@ public partial class TextureBuilder
 				pixelType,
 				data );
 
-			Gl.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear );
-			Gl.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear );
+			Gl.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter );
+			Gl.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter );
 			Gl.TexParameter( TextureTarget.Texture2D, TextureParameterName.TextureMaxAnisotropy, 4.0f );
 			Gl.GenerateMipmap( TextureTarget.Texture2D );
 
@@ -66,6 +69,17 @@ public partial class TextureBuilder
 		}
 
 		return new Texture( path, id, type, (int)width, (int)height );
+	}
+
+	public TextureBuilder UsePointFiltering( bool usePointFiltering = true )
+	{
+		if ( !usePointFiltering )
+			return this;
+
+		minFilter = GLEnum.Point;
+		magFilter = GLEnum.Point;
+
+		return this;
 	}
 
 	public TextureBuilder UseNormalFormat( bool useNormal = true )

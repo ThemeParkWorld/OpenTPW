@@ -10,6 +10,7 @@ public class World
 	{
 		Hud = new();
 		Hud.AddChild( new Image( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ) );
+		Hud.AddChild( new BitmapText( "The quick brown fox jumps over the lazy dog" ) );
 	}
 
 	public void Update()
