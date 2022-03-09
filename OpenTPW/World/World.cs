@@ -8,8 +8,10 @@ public class World
 
 	public World()
 	{
-		Hud = new();
-		Hud.AddChild( new Image( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ) );
+		//Hud = new();
+		//Hud.AddChild( new Image( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ) );
+
+		_ = new Ride( @"C:\Users\Alex\BLACKHOLE\camera\camera.md2" );
 	}
 
 	public void Update()
