@@ -76,3 +76,18 @@ public static class MathExtensions
 		);
 	}
 }
+
+public static class ListExtension
+{
+	public static T Pop<T>( this IList<T> list )
+	{
+		T item = list.First();
+		list.RemoveAt( 0 );
+		return item;
+	}
+
+	public static void Push<T>( this IList<T> list, T item )
+	{
+		list.Add( item );
+	}
+}
