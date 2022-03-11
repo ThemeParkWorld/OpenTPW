@@ -6,13 +6,13 @@ public class Image : Panel
 	private Texture texture;
 	private Primitives.Plane plane;
 
-	public Image( string path )
+	public Image( Texture texture )
 	{
 		shader = Shader.Builder.WithVertex( "content/shaders/test.vert" )
 							 .WithFragment( "content/shaders/test.frag" )
 							 .Build();
 
-		texture = TextureBuilder.FromPath( path ).UseSrgbFormat( false ).Build();
+		this.texture = texture;
 		plane = new();
 	}
 

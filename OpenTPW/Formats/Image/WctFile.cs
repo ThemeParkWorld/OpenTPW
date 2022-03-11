@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.Intrinsics.X86;
 
 namespace OpenTPW;
 
@@ -41,7 +42,13 @@ public class WctFile
 			foreach ( var prop in typeof( Header ).GetProperties() )
 			{
 				if ( prop.PropertyType == typeof( byte[] ) )
-					str += $"{prop.Name}: {BitConverter.ToString( prop.GetValue( this ) as byte[] )}\n";
+				{
+					var propValue = prop?.GetValue( this );
+					if ( propValue == null )
+						str += $"{prop.Name}: null\n";
+					else
+						str += $"{prop.Name}: {BitConverter.ToString( propValue as byte[] )}\n";
+				}
 				else
 					str += $"{prop.Name}: {prop.GetValue( this )}\n";
 			}
@@ -245,14 +252,14 @@ public class WctFile
 		public List<float> DequantizationBuffer;
 		public List<float> RowDecodeBuffer;
 
-		public ImageDecodeState()
+		public ImageDecodeState( int size )
 		{
-			DequantizationBuffer = new();
-			RowDecodeBuffer = new();
+			DequantizationBuffer = Enumerable.Repeat( 0f, size * size ).ToList();
+			RowDecodeBuffer = Enumerable.Repeat( 0f, size * size ).ToList();
 		}
 	}
 
-	void D4InverseTransform3( Func<int, D4Component, int> indexLookup, Func<int, D4Component, int> outputIndexLookup, ref List<float> pSrc, ref List<float> pDest, int size, D4Coefficients coefs )
+	void D4InverseTransform3( Func<int, D4Component, int> indexLookup, Func<int, D4Component, int> outputIndexLookup, ref List<float> pSrc, ref List<float> pDest, int offset, int size, D4Coefficients coefs )
 	{
 		int i;
 
@@ -275,20 +282,20 @@ public class WctFile
 			s1i = indexLookup( i, D4Component.Scale );
 			w1i = indexLookup( i, D4Component.Wavelet );
 
-			s0 = pSrc[s0i];
-			w0 = pSrc[w0i];
-			s1 = pSrc[w1i];
-			w1 = pSrc[w1i];
+			s0 = pSrc[s0i + offset];
+			w0 = pSrc[w0i + offset];
+			s1 = pSrc[s1i + offset];
+			w1 = pSrc[w1i + offset];
 
 			int s0d = outputIndexLookup( i, D4Component.Scale );
 			int w0d = outputIndexLookup( i, D4Component.Wavelet );
 
-			pDest[s0d] = ApplyScalingCoefficientsInv3( s0, w0, s1, w1, coefs );
-			pDest[w0d] = ApplyWaveCoefficientsInv3( s0, w0, s1, w1, coefs );
+			pDest[s0d + offset] = ApplyScalingCoefficientsInv3( s0, w0, s1, w1, coefs );
+			pDest[w0d + offset] = ApplyWaveCoefficientsInv3( s0, w0, s1, w1, coefs );
 		}
 	}
 
-	private bool DecodeChannel( ref ImageDecodeState state, int size, ref int[] pSrc, ref int[] pSrcEnd, ref List<float> outputBuffer, float dequantizationScale )
+	private bool DecodeChannel( ref ImageDecodeState state, int size, ref int[] pSrc, ref List<float> outputBuffer, float dequantizationScale )
 	{
 		int i = 0, count;
 		count = size * (size / 2);
@@ -317,10 +324,10 @@ public class WctFile
 
 				//	val = *(int16_t*)pSrc;
 				//	pSrc += sizeof( int16_t );
+				val = pSrc[pSrcIndex++];
 			}
 
 			state.DequantizationBuffer[i * 2] = (float)val;
-
 
 			//if ( pSrcEnd - pSrc < sizeof( int8_t ) )
 			//{
@@ -338,6 +345,7 @@ public class WctFile
 
 				//	val = *(int16_t*)pSrc;
 				//	pSrc += sizeof( int16_t );
+				val = pSrc[pSrcIndex++];
 			}
 
 			state.DequantizationBuffer[i * 2 + 1] = (float)val;
@@ -379,7 +387,7 @@ public class WctFile
 						throw new NotImplementedException();
 				}
 			},
-			ref state.DequantizationBuffer, ref state.RowDecodeBuffer, size / 2, coefs );
+			ref state.DequantizationBuffer, ref state.RowDecodeBuffer, i * size, size / 2, coefs );
 		}
 
 		//
@@ -423,133 +431,88 @@ public class WctFile
 						throw new NotImplementedException();
 				}
 			},
-			ref state.RowDecodeBuffer, ref outputBuffer, size / 2, coefs );
+			ref state.RowDecodeBuffer, ref outputBuffer, 0, size / 2, coefs );
 		}
 
 		return true;
 	}
 
-	const int WindowSize = 4096;
-	const int MaxUncoded = 2;
-	const int MaxCoded = 18;
-	const int HashSize = 1024;
-	const int NullIndex = WindowSize + 1;
-
-	private static readonly int[] SlidingWindow = new int[WindowSize];
-	private static readonly int[] UncodedLookahead = new int[MaxCoded]; // Characters to be encoded
-
-	private static readonly int[] HashTable = new int[HashSize]; // List head for each hask key
-	private static readonly int[] Next = new int[WindowSize]; // Indices of next elements in the hash list
-
-	public struct EncodedString
+	public static uint SwapBytes( uint x )
 	{
-		// Offset to start of longest match
-		public int Offset { get; set; }
-
-		// Length of longest match
-		public int Length { get; set; }
+		return ((x & 0x000000ff) << 24) +
+			   ((x & 0x0000ff00) << 8) +
+			   ((x & 0x00ff0000) >> 8) +
+			   ((x & 0xff000000) >> 24);
 	}
 
-	private class BitReader : IDisposable
+	public class BitReader
 	{
-		private int bit;
-		private byte currentByte;
-		private Stream stream;
+		private byte[] buffer;
+		private int offset;
+		private int bitsRemaining;
+		private int value;
 
-		public Stream BaseStream => stream;
-
-		public BitReader( Stream stream )
+		public BitReader( byte[] buffer )
 		{
-			this.stream = stream;
+			this.buffer = buffer;
+			this.offset = 0;
+			this.bitsRemaining = 0;
+			this.value = 0;
 		}
 
-		public bool? ReadBit( bool bigEndian = false )
+		public int GetBits( int length )
 		{
-			if ( bit == 8 )
+			if ( bitsRemaining < length )
 			{
-				var r = stream.ReadByte();
-				if ( r == -1 ) return null;
-				bit = 0;
-				currentByte = (byte)r;
+				int fetch = (buffer[offset] | (buffer[offset + 1] << 8)) & 0xFFFF;
+				offset += 2;
+				Log.Trace( $"Fetch {fetch:X4}" );
+				value = value | (fetch << bitsRemaining);
+				bitsRemaining += 16;
 			}
 
-			bool value;
-			if ( !bigEndian )
-				value = (currentByte & (1 << bit)) > 0;
-			else
-				value = (currentByte & (1 << (7 - bit))) > 0;
+			int returnValue = value & ((1 << length) - 1);
 
-			bit++;
-			return value;
+			bitsRemaining -= length;
+			value >>= length;
+
+			return returnValue;
 		}
 
-		public BitArray ReadBits( int count, bool bigEndian = false )
+		public int GetOffset()
 		{
-			bool[] bits = new bool[count];
-			for ( int i = 0; i < count; i++ )
-				bits[i] = ReadBit( bigEndian ) ?? default;
-
-			string output = "";
-			bits.ToList().ForEach( x => output += x ? "1" : "0" );
-			Log.Trace( $"ReadBits: {output}" );
-
-			var ba = new BitArray( bits );
-			return ba;
+			return this.offset;
 		}
-
-		public int ReadByte()
-		{
-			return stream.ReadByte();
-		}
-
-		void IDisposable.Dispose()
-		{
-			stream.Dispose();
-		}
-	}
-
-	public static ushort BitArrayToUShort( BitArray ba )
-	{
-		var len = Math.Min( 64, ba.Count );
-		ushort n = 0;
-		for ( ushort i = 0; i < len; i++ )
-		{
-			if ( ba.Get( i ) )
-				n |= (ushort)((ushort)1 << i);
-		}
-		return n;
 	}
 
 	bool WCTDecompressLZSS( BitReader inputBuffer, BinaryWriter outputBuffer )
 	{
-		int bitOffset = 0;
-		bool errored = false;
-
 		while ( true )
 		{
-			bool? isDelta = inputBuffer.ReadBit();
-
-			if ( !isDelta.HasValue )
-				throw new Exception( "IsDelta no value" );
+			var isDelta = inputBuffer.GetBits( 1 );
+			Log.Trace( $"IsDelta {isDelta:D2}" );
 
 			// One byte literal
-			if ( !isDelta.Value )
+			if ( isDelta == 0 )
 			{
-				ushort literalValue = BitArrayToUShort( inputBuffer.ReadBits( 8 ) );
+				var literalValue = inputBuffer.GetBits( 8 );
 
+				Log.Trace( $"Literal {literalValue:X2}" );
 				outputBuffer.Write( literalValue );
 			}
 			else
 			{
-				ushort offset = BitArrayToUShort( inputBuffer.ReadBits( 12 ) );
+				int offset = (int)inputBuffer.GetBits( 12 );
 
 				if ( offset == 0 )
 					break;
 
-				ushort length = (ushort)(BitArrayToUShort( inputBuffer.ReadBits( 7 ) ) + 1);
+				int length = (int)(inputBuffer.GetBits( 7 )) + 1;
 
 				if ( offset > outputBuffer.BaseStream.Length )
 					throw new Exception( "Offset > stream length" );
+
+				Log.Trace( $"Delta -{offset}[{length}]" );
 
 				long initialPosition = outputBuffer.BaseStream.Position;
 				outputBuffer.BaseStream.Seek( -offset, SeekOrigin.Current );
@@ -603,9 +566,11 @@ public class WctFile
 
 		header.Block0 = binaryReader.ReadBytes( header.BlockSize0 );
 
-		_ = binaryReader.ReadInt16();
-
-		header.Block1 = binaryReader.ReadBytes( header.BlockSize1 );
+		if ( header.BlockSize1 > 0 )
+		{
+			_ = binaryReader.ReadInt16();
+			header.Block1 = binaryReader.ReadBytes( header.BlockSize1 );
+		}
 
 		Log.Trace( header );
 
@@ -618,26 +583,88 @@ public class WctFile
 		if ( header.BlockSize0 == 0 )
 			throw new Exception();
 
-		if ( header.CompressionType == CompressionType.LZSS )
+		var blockData = header.Block0;
+
+		if ( header.BlockSize1 > 0 )
+			blockData = blockData.Concat( header.Block1 ).ToArray();
+
+		var blockReader = new BitReader( blockData );
+
+		byte[] Decompress()
 		{
-			using var block0Stream = new MemoryStream( header.Block0 );
-			using var block0Reader = new BitReader( block0Stream );
+			if ( header.CompressionType == CompressionType.LZSS )
+			{
+				const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3;
+				using var outputStream = new MemoryStream( maxSize );
+				using var outputWriter = new BinaryWriter( outputStream );
 
-			Refpack.DecompressData
+				if ( !WCTDecompressLZSS( blockReader, outputWriter ) )
+				{
+					// throw new Exception();
+				}
 
-			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3;
-			using var outputStream = new MemoryStream( maxSize );
-			using var outputWriter = new BinaryWriter( outputStream );
-			if ( !WCTDecompressLZSS( block0Reader, outputWriter ) )
+				Log.Trace( BitConverter.ToString( outputStream.ToArray() ).Replace( "-", " " ) );
+				return outputStream.ToArray();
+			}
+			else
 			{
 				throw new Exception();
 			}
+		}
 
-			Log.Trace( BitConverter.ToString( outputStream.ToArray() ) );
-		}
-		else
+		var decompressedBlock0 = Decompress().Select( x => (int)x ).ToArray();
+		// var decompressedBlock1 = Decompress().Select( x => (int)x ).ToArray();
+
+		int size = (int)Math.Max( GetAlignedSize( (uint)Math.Max( header.Height, header.Width ) ), 8 );
+
+		List<float> outputY = Enumerable.Repeat( 0f, size * size ).ToList();
+		List<float> outputCb = Enumerable.Repeat( 0f, size * size ).ToList();
+		List<float> outputCr = Enumerable.Repeat( 0f, size * size ).ToList();
+		List<float> outputA = Enumerable.Repeat( 1f, size * size ).ToList();
+
+		float float8 = 1.0f - ((float)header.YChannelQuantizationScale * -0.5f);
+		float floatA = 1.0f - ((float)header.CbChannelQuantizationScale * -0.25f);
+		float floatC = 1.0f - ((float)header.CrChannelQuantizationScale * -0.25f);
+		float floatE = (float)header.AChannelQuantizationScale + 1.0f;
+
+		ImageDecodeState state = new( size );
+		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, float8 );
+		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, floatA );
+		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, floatC );
+
+		List<float> output = Enumerable.Repeat( 0f, header.Width * header.Height * 4 ).ToList();
+
+		uint alignedWidth = GetAlignedSize( (uint)header.Width );
+		uint alignedHeight = GetAlignedSize( (uint)header.Height );
+
+		int maxSize = (int)(alignedWidth < alignedHeight ? alignedHeight : alignedWidth);
+		for ( int y = 0; y < header.Height; y++ )
 		{
-			throw new Exception();
+			for ( int x = 0; x < header.Width; x++ )
+			{
+				float cy = outputY[y * maxSize + x];
+				float cb = outputCb[((y / 2) * (maxSize / 2) + (x / 2))];
+				float cr = outputCr[((y / 2) * (maxSize / 2) + (x / 2))];
+
+				float r = cy + 1.402f * (cr - 128.0f);
+				float g = cy - 0.344136f * (cb - 128.0f) - 0.714136f * (cr - 128.0f);
+				float b = cy + 1.772f * (cb - 128.0f);
+
+				output[((y * header.Width + x) * 4)] = r;
+				output[((y * header.Width + x) * 4) + 1] = g;
+				output[((y * header.Width + x) * 4) + 2] = b;
+
+				output[((y * header.Width + x) * 4) + 3] = 1.0f;
+			}
 		}
+
+		List<byte> textureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
+		for ( int i = 0; i < output.Count; i++ )
+		{
+			textureData[i] = (byte)decompressedBlock0[i];// ( byte)((output[i] * 255).FloorToInt());
+		}
+
+		var texture = TextureBuilder.FromBytes( textureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
+		this.Texture = texture;
 	}
 }

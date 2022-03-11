@@ -8,10 +8,10 @@ public class World
 
 	public World()
 	{
-		//Hud = new();
-		//Hud.AddChild( new Image( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ) );
+		Hud = new();
 
-		_ = new WctFile( GameDir.GetPath( "data/generic/dynamic/textures/blue.wct" ) );
+		var wctTest = new WctFile( "F:\\TP\\red.wct" );
+		Hud.AddChild( new Image( wctTest.Texture ?? default ) );
 	}
 
 	public void Update()
