@@ -394,7 +394,7 @@ public class WctFile
 		// Step 3: decode columns
 		//
 
-		coefs = new();
+		coefs = new( 1.0f );
 		for ( i = 0; i < size; ++i )
 		{
 			int sOffset = 0;
