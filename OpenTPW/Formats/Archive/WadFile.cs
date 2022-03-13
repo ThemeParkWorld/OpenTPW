@@ -63,6 +63,7 @@ public class WadArchiveFile
 						memoryStream.Seek( Data.Length, SeekOrigin.Current );
 				}
 			}
+
 			currentByte = memoryStream.ReadBytes( 1, bigEndian: true );
 		}
 

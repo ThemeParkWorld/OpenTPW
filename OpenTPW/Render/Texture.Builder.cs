@@ -156,11 +156,12 @@ public partial class TextureBuilder
 
 	public static TextureBuilder FromBytes( byte[] bytes, uint width, uint height )
 	{
-		var textureBuilder = new TextureBuilder();
-
-		textureBuilder.data = bytes;
-		textureBuilder.width = width;
-		textureBuilder.height = height;
+		var textureBuilder = new TextureBuilder
+		{
+			data = bytes,
+			width = width,
+			height = height
+		};
 
 		return textureBuilder;
 	}

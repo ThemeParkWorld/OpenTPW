@@ -62,8 +62,6 @@ partial class Editor
 		colors[(int)ImGuiCol.NavWindowingDimBg] = new( 0.33f, 0.67f, 0.86f, 1.00f );
 		colors[(int)ImGuiCol.ModalWindowDimBg] = new( 0.33f, 0.67f, 0.86f, 1.00f );
 
-
-
 		var style = ImGui.GetStyle();
 		style.WindowPadding = new( 8.00f, 8.00f );
 		style.FramePadding = new( 12.00f, 6.00f );

@@ -11,7 +11,8 @@ internal class WadStream : MemoryStream
 		var bytes = new byte[length];
 		Read( bytes, 0, length );
 
-		if ( bigEndian ) Array.Reverse( bytes );
+		if ( bigEndian )
+			Array.Reverse( bytes );
 		return bytes;
 	}
 

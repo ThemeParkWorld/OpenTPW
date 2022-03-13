@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenTPW.UI
+namespace OpenTPW.UI;
+
+internal class Text
 {
-	internal class Text
-	{
-	}
 }

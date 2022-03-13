@@ -1,6 +1,8 @@
 ﻿using System.Drawing;
 using System.Numerics;
 
+namespace OpenTPW;
+
 public static class ByteExtension
 {
 	public static bool GetBit( this byte self, int index )
@@ -15,6 +17,7 @@ public static class ByteExtension
 		{
 			bits[i] = self.GetBit( indices[i] );
 		}
+
 		return bits;
 	}
 }
@@ -28,6 +31,7 @@ public static class BoolArrayExtension
 			if ( self[i] != other[i] )
 				return false;
 		}
+
 		return true;
 	}
 }
@@ -46,8 +50,10 @@ public static class MathExtensions
 
 	public static float Clamp( this float v, float min, float max )
 	{
-		if ( min > max ) return max;
-		if ( v < min ) return min;
+		if ( min > max )
+			return max;
+		if ( v < min )
+			return min;
 		return v > max ? max : v;
 	}
 

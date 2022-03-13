@@ -213,7 +213,6 @@ public class WctFile
 		int outputIndexStart = size * 2;
 		int inputIndexStart = 0;
 
-
 		for ( i = 0; i < halfSize - 1; i++ )
 		{
 			for ( j = 0; j < size - 1; j++ )
