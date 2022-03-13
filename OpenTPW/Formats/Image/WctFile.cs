@@ -437,14 +437,6 @@ public class WctFile
 		return true;
 	}
 
-	public static uint SwapBytes( uint x )
-	{
-		return ((x & 0x000000ff) << 24) +
-			   ((x & 0x0000ff00) << 8) +
-			   ((x & 0x00ff0000) >> 8) +
-			   ((x & 0xff000000) >> 24);
-	}
-
 	public class BitReader
 	{
 		private byte[] buffer;
@@ -628,9 +620,9 @@ public class WctFile
 		float floatE = (float)header.AChannelQuantizationScale + 1.0f;
 
 		ImageDecodeState state = new( size );
-		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, float8 );
-		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, floatA );
-		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, floatC );
+		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, ComputeDequantizationScaleY( header.YChannelQuantizationScale ) );
+		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, ComputeDequantizationScaleCbCr( header.CbChannelQuantizationScale ) );
+		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, ComputeDequantizationScaleCbCr( header.CrChannelQuantizationScale ) );
 
 		List<float> output = Enumerable.Repeat( 0f, header.Width * header.Height * 4 ).ToList();
 
@@ -650,6 +642,8 @@ public class WctFile
 				float g = cy - 0.344136f * (cb - 128.0f) - 0.714136f * (cr - 128.0f);
 				float b = cy + 1.772f * (cb - 128.0f);
 
+				Log.Trace( $"YCbCr: {cy},{cb},{cr} :: RGB: {r},{g},{b}" );
+
 				output[((y * header.Width + x) * 4)] = r;
 				output[((y * header.Width + x) * 4) + 1] = g;
 				output[((y * header.Width + x) * 4) + 2] = b;
@@ -661,7 +655,7 @@ public class WctFile
 		List<byte> textureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
 		for ( int i = 0; i < output.Count; i++ )
 		{
-			textureData[i] = (byte)decompressedBlock0[i];// ( byte)((output[i] * 255).FloorToInt());
+			textureData[i] = (byte)decompressedBlock0[i];
 		}
 
 		var texture = TextureBuilder.FromBytes( textureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
