@@ -33,8 +33,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Formats\Compression\" />
-  </ItemGroup>
-
 </Project>

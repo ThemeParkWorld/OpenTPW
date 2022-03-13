@@ -436,92 +436,6 @@ public class WctFile
 		return true;
 	}
 
-	public class BitReader
-	{
-		private byte[] buffer;
-		private int offset;
-		private int bitsRemaining;
-		private int value;
-
-		public BitReader( byte[] buffer )
-		{
-			this.buffer = buffer;
-			this.offset = 0;
-			this.bitsRemaining = 0;
-			this.value = 0;
-		}
-
-		public int GetBits( int length )
-		{
-			if ( bitsRemaining < length )
-			{
-				int fetch = (buffer[offset] | (buffer[offset + 1] << 8)) & 0xFFFF;
-				offset += 2;
-				Log.Trace( $"Fetch {fetch:X4}" );
-				value = value | (fetch << bitsRemaining);
-				bitsRemaining += 16;
-			}
-
-			int returnValue = value & ((1 << length) - 1);
-
-			bitsRemaining -= length;
-			value >>= length;
-
-			return returnValue;
-		}
-
-		public int GetOffset()
-		{
-			return this.offset;
-		}
-	}
-
-	bool WCTDecompressLZSS( BitReader inputBuffer, BinaryWriter outputBuffer )
-	{
-		while ( true )
-		{
-			var isDelta = inputBuffer.GetBits( 1 );
-			Log.Trace( $"IsDelta {isDelta:D2}" );
-
-			// One byte literal
-			if ( isDelta == 0 )
-			{
-				var literalValue = inputBuffer.GetBits( 8 );
-
-				Log.Trace( $"Literal {literalValue:X2}" );
-				outputBuffer.Write( literalValue );
-			}
-			else
-			{
-				int offset = (int)inputBuffer.GetBits( 12 );
-
-				if ( offset == 0 )
-					break;
-
-				int length = (int)(inputBuffer.GetBits( 7 )) + 1;
-
-				if ( offset > outputBuffer.BaseStream.Length )
-					throw new Exception( "Offset > stream length" );
-
-				Log.Trace( $"Delta -{offset}[{length}]" );
-
-				long initialPosition = outputBuffer.BaseStream.Position;
-				outputBuffer.BaseStream.Seek( -offset, SeekOrigin.Current );
-
-				var buffer = new int[length];
-				for ( int i = 0; i < length; ++i )
-					buffer[i] = outputBuffer.BaseStream.ReadByte();
-
-				outputBuffer.BaseStream.Seek( initialPosition, SeekOrigin.Begin );
-
-				for ( int i = 0; i < length; ++i )
-					outputBuffer.Write( buffer[i] );
-			}
-		}
-
-		return true;
-	}
-
 	static float ComputeDequantizationScaleY( int n ) => 1.0f - ((float)n * -0.5f);
 	static float ComputeDequantizationScaleCbCr( int n ) => 1.0f - ((float)n * -0.25f);
 	static float ComputeDequantizationScaleA( int n ) => (float)n + 1.0f;
@@ -589,7 +503,7 @@ public class WctFile
 				using var outputStream = new MemoryStream( maxSize );
 				using var outputWriter = new BinaryWriter( outputStream );
 
-				if ( !WCTDecompressLZSS( blockReader, outputWriter ) )
+				if ( !LZSS.Decompress( blockReader, outputWriter ) )
 				{
 					// throw new Exception();
 				}
