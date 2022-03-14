@@ -2,14 +2,12 @@
 
 public class OpcodeHandlers
 {
-	public class Math
+	public static class Math
 	{
-		[OpcodeHandler( Opcode.ADD )]
-		public int Add( int a, int b )
+		[OpcodeHandler( Opcode.ADD, "Add two values together" )]
+		public static int Add( int a, int b )
 		{
 			return a + b;
 		}
-
-		// etc...
 	}
 }
