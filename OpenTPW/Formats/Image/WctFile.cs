@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Runtime.Intrinsics.X86;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 public class WctFile
 {
