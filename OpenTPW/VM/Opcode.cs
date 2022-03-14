@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-enum Opcode
+public enum Opcode
 {
 	NOP = 0,
 	CRIT_LOCK = 1,
