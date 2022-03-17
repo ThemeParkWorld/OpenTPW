@@ -165,4 +165,27 @@ public partial class TextureBuilder
 
 		return textureBuilder;
 	}
+
+	public static TextureBuilder FromStream( Stream stream, bool flipY = true )
+	{
+		var textureBuilder = new TextureBuilder();
+
+		// shit-tier hack
+		if ( flipY )
+			StbImage.stbi_set_flip_vertically_on_load( 1 );
+
+		var fileData = new byte[stream.Length];
+		stream.Read( fileData, 0, fileData.Length );
+
+		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
+
+		StbImage.stbi_set_flip_vertically_on_load( 0 );
+
+		textureBuilder.data = image.Data;
+		textureBuilder.width = (uint)image.Width;
+		textureBuilder.height = (uint)image.Height;
+		textureBuilder.path = $"Stream {stream.GetHashCode()}";
+
+		return textureBuilder;
+	}
 }
