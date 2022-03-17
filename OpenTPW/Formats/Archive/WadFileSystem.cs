@@ -16,7 +16,7 @@ public class WadFileSystem : IDisposable
 
 	private bool FileMatchesPredicate( WadArchiveFile file, string path )
 	{
-		return file.Name == path + "\0";
+		return file.Name?.Equals( path + "\0", StringComparison.CurrentCultureIgnoreCase ) ?? false;
 	}
 
 	public bool FileExists( string path )
