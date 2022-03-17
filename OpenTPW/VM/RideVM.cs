@@ -53,20 +53,27 @@ public class RideVM
 		instruction.Invoke();
 	}
 
-	public void CallOpcodeHandler( Opcode opcodeId )
+	public MethodInfo FindOpcodeHandler( Opcode opcodeId )
 	{
 		var handlerAttribute = Assembly.GetExecutingAssembly().GetTypes()
 					  .SelectMany( t => t.GetMethods() )
-					  .Where( m => m.GetCustomAttributes( typeof( OpcodeHandlerAttribute ), false ).Length > 0 )
+					  .Where( x => x.GetCustomAttribute<OpcodeHandlerAttribute>()?.Opcode == opcodeId )
 					  .ToArray();
 
-		if ( handlerAttribute.Length == 0 )
+		return handlerAttribute.FirstOrDefault();
+	}
+
+	public void CallOpcodeHandler( Opcode opcodeId )
+	{
+		var handlerAttribute = FindOpcodeHandler( opcodeId );
+
+		if ( handlerAttribute == null )
 		{
 			Log.Error( $"No handler for {opcodeId}, treating as no-op" );
 			return;
 		}
 
-		handlerAttribute?.First().Invoke( null, null );
+		handlerAttribute?.Invoke( null, null );
 	}
 
 	public void BranchTo( int value )

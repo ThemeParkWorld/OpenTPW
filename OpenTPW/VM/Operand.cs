@@ -56,7 +56,7 @@ public class Operand
 			case Type.Variable:
 				return vmInstance.VariableNames[nameIndex];
 			case Type.Location:
-				return $"jump_{Value}";
+				return $"label_{Value}";
 			case Type.String:
 				return $"\"{vmInstance.Strings[value]}\"";
 			default:

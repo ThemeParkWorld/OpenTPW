@@ -4,7 +4,7 @@ public class Ride : Entity
 {
 	private WadFileSystem fileSystem;
 
-	private RideVM vm;
+	public RideVM VM { get; private set; }
 
 	public Ride( string rideArchive )
 	{
@@ -12,7 +12,7 @@ public class Ride : Entity
 		var rideName = Path.GetFileNameWithoutExtension( rideArchive );
 
 		Log.Trace( $"Loading ride {rideName}" );
-		vm = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
+		VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
 	}
 
 	public override void Render()

@@ -22,7 +22,8 @@ internal partial class Editor
 		tabs.AddRange( new BaseTab[] {
 			new TexturesTab(),
 			new ConsoleTab(),
-			new InputTab()
+			new InputTab(),
+			new RidesTab()
 		} );
 	}
 
