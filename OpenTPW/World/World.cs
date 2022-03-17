@@ -13,6 +13,8 @@ public class World
 		// var wctTest = new WctFile( "F:\\TP\\red.wct" );
 		// Hud.AddChild( new Image( wctTest.Texture ?? default ) );
 		Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
+
+		var ride = new Ride( GameDir.GetPath( "data/levels/jungle/rides/monkey.wad" ) );
 	}
 
 	public void Update()

@@ -39,16 +39,10 @@ public class RideVM
 	public VMConfig Config { get; set; } = new VMConfig();
 	public List<Branch> Branches { get; set; } = new List<Branch>();
 
-	public RideVM( byte[] rseData )
+	public RideVM( Stream stream )
 	{
 		rsseqFile = new RsseqFile( this );
-		rsseqFile.ReadFile( rseData );
-	}
-
-	public RideVM( string rsePath )
-	{
-		rsseqFile = new RsseqFile( this );
-		rsseqFile.ReadFile( rsePath );
+		rsseqFile.ReadFile( stream );
 	}
 
 	public void Step()

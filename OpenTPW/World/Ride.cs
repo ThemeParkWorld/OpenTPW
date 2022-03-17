@@ -2,33 +2,24 @@
 
 public class Ride : Entity
 {
-	private MeshFile mesh;
-	private Shader shader;
-	private Texture texture;
+	private WadFileSystem fileSystem;
 
-	public Ride( string meshPath )
+	private RideVM vm;
+
+	public Ride( string rideArchive )
 	{
-		shader = Shader.Builder.WithVertex( "content/shaders/test.vert" )
-							 .WithFragment( "content/shaders/test.frag" )
-							 .Build();
+		fileSystem = new WadFileSystem( rideArchive );
+		var rideName = Path.GetFileNameWithoutExtension( rideArchive );
 
-		texture = TextureBuilder.FromPath( "content/textures/test.png" ).UseSrgbFormat( false ).Build();
-		mesh = new( meshPath );
+		Log.Trace( $"Loading ride {rideName}" );
+		vm = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
 	}
 
 	public override void Render()
 	{
-		base.Render();
-
-		var modelMatrix = Silk.NET.Maths.Matrix4X4.CreateScale( scale.X, scale.Y, scale.Z ) *
-			Silk.NET.Maths.Matrix4X4.CreateTranslation( position.X, position.Y, position.Z );
-
-		shader.SetMatrix( "g_mModel", modelMatrix );
-		mesh.Draw( shader, texture );
 	}
 
 	public override void Update()
 	{
-		base.Update();
 	}
 }

@@ -15,19 +15,9 @@ public class RsseqFile
 		this.vmInstance = vmInstance;
 	}
 
-	public void ReadFile( byte[] rseData )
+	public void ReadFile( Stream stream )
 	{
-		using var memoryStream = new MemoryStream( rseData );
-		using var binaryReader = new BinaryReader( memoryStream );
-
-		ReadFileContents( binaryReader );
-	}
-
-	public void ReadFile( string rsePath )
-	{
-		using var fileStream = new FileStream( rsePath, FileMode.Open );
-		using var binaryReader = new BinaryReader( fileStream );
-
+		using var binaryReader = new BinaryReader( stream );
 		ReadFileContents( binaryReader );
 	}
 
