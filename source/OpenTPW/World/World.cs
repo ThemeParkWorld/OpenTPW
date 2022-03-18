@@ -9,12 +9,12 @@ public class World
 	public World()
 	{
 		Hud = new();
-
-		// var wctTest = new WctFile( "F:\\TP\\red.wct" );
-		// Hud.AddChild( new Image( wctTest.Texture ?? default ) );
 		Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
 
 		var ride = new Ride( GameDir.GetPath( "data/levels/jungle/rides/monkey.wad" ) );
+
+		Event.Register( this );
+		Event.Run( Event.Game.LoadAttribute.Name );
 	}
 
 	public void Update()
@@ -25,5 +25,11 @@ public class World
 	public void Render()
 	{
 		Entity.All.ForEach( entity => entity.Render() );
+	}
+
+	[Event.Game.Load]
+	public void OnLoad()
+	{
+		Entity.All.OfType<Ride>().ToList().ForEach( x => x.VM.Run() );
 	}
 }

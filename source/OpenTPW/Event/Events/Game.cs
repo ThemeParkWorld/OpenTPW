@@ -6,8 +6,8 @@ partial class Event
 	{
 		public class LoadAttribute : EventAttribute
 		{
-			const string EventName = "Event.Game.Load";
-			public LoadAttribute() : base( EventName ) { }
+			public const string Name = "Event.Game.Load";
+			public LoadAttribute() : base( Name ) { }
 		}
 	}
 }
