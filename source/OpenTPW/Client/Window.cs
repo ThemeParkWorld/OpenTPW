@@ -64,6 +64,8 @@ internal class Window
 
 	private void Window_Load()
 	{
+		window.SetWindowIcon( IconLoader.LoadIcon( "content/icon-sm.tga" ) );
+
 		Global.Gl = window.CreateOpenGL();
 		inputContext = window.CreateInput();
 		imgui = new( Global.Gl, window, inputContext );

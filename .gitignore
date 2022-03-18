@@ -361,4 +361,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+
 [Cc]ontent/game/models/
+
+# Imgui
+imgui.ini

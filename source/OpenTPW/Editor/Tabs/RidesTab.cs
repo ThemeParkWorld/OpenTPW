@@ -8,7 +8,7 @@ internal class RidesTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Ride debug" );
+		ImGui.Begin( "Ride VM disassembly view" );
 
 		const int maxColumns = 8;
 
