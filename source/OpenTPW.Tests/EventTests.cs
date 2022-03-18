@@ -26,6 +26,9 @@ public class EventTests
 	static bool staticEventHasRun = false;
 	static bool staticEventWithParamsHasRun = false;
 
+	static bool instantiatedEventHasRun = false;
+	static bool instantiatedEventWithParamsHasRun = false;
+
 	[TestMethod]
 	public void RegisterAndRunStaticEvent()
 	{
@@ -42,6 +45,36 @@ public class EventTests
 		Event.Run( "Event.Test.TestEventWithParams", "Test" );
 
 		Assert.IsTrue( staticEventWithParamsHasRun );
+	}
+
+	[TestMethod]
+	public void RegisterAndRunInstantiatedEvent()
+	{
+		Event.Register( this );
+		Event.Run( "Event.Test.TestEvent" );
+
+		Assert.IsTrue( instantiatedEventHasRun );
+	}
+
+	[TestMethod]
+	public void RegisterAndRunInstantiatedEventWithParams()
+	{
+		Event.Register( this );
+		Event.Run( "Event.Test.TestEventWithParams", "Test" );
+
+		Assert.IsTrue( instantiatedEventWithParamsHasRun );
+	}
+
+	[TestEvent.Test.TestEvent]
+	public void InstantiatedEvent()
+	{
+		instantiatedEventHasRun = true;
+	}
+
+	[TestEvent.Test.TestEventWithParams]
+	public static void InstantiatedEventWithParams( string parameter )
+	{
+		instantiatedEventWithParamsHasRun = parameter == "Test";
 	}
 
 	[TestEvent.Test.TestEventWithParams]
