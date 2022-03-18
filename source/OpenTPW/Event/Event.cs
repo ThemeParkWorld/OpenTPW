@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace OpenTPW;
 
@@ -36,28 +35,5 @@ public static partial class Event
 			if ( e.name == name )
 				e.method?.Invoke( null, null );
 		} );
-	}
-}
-
-[AttributeUsage( AttributeTargets.Method, AllowMultiple = true )]
-public class EventAttribute : Attribute
-{
-	public string EventName { get; set; }
-
-	public EventAttribute( string eventName )
-	{
-		EventName = eventName;
-	}
-}
-
-partial class Event
-{
-	public class Game
-	{
-		public class LoadAttribute : EventAttribute
-		{
-			const string EventName = "Event.Game.Load";
-			public LoadAttribute() : base( EventName ) { }
-		}
 	}
 }
