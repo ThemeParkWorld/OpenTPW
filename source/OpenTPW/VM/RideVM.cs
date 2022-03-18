@@ -23,7 +23,7 @@ public class RideVM
 
 	public string ScriptName { get; set; } = "Unnamed";
 
-	public bool Run { get; set; }
+	public bool IsRunning { get; set; }
 	public int CurrentPos { get; set; }
 	public string Disassembly => rsseqFile.Disassembly;
 	public List<Instruction> Instructions { get; } = new List<Instruction>();
@@ -80,5 +80,10 @@ public class RideVM
 	{
 		var destBranch = Branches.First( b => b.CompiledOffset == value );
 		CurrentPos = destBranch.InstructionOffset;
+	}
+
+	public void Run( bool run = true )
+	{
+		this.IsRunning = run;
 	}
 }

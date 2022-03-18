@@ -29,7 +29,7 @@ internal class RidesTab : BaseTab
 		//
 		{
 			if ( ImGui.Button( "Debug" ) )
-				vm.Run = !vm.Run;
+				vm.Run();
 
 			ImGui.SameLine();
 			if ( ImGui.Button( "Step" ) )
