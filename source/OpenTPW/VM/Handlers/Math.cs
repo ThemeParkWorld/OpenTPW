@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-public class OpcodeHandlers
+partial class OpcodeHandlers
 {
 	public static class Math
 	{

@@ -28,7 +28,6 @@ public class Logger
 
 		Console.ForegroundColor = SeverityToConsoleColor( severity );
 		Console.WriteLine( $"[{DateTime.Now.ToLongTimeString()}] {str}" );
-		;
 
 		OnLog?.Invoke( severity, str );
 	}
