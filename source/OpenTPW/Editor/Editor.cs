@@ -39,7 +39,7 @@ internal partial class Editor
 		io.Fonts.Clear();
 
 		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
-		MonospaceFont = io.Fonts.AddFontFromFileTTF( @"C:\Windows\Fonts\CascadiaCode.ttf", 12f );
+		MonospaceFont = io.Fonts.AddFontFromFileTTF( @"C:\Windows\Fonts\CascadiaCode.ttf", 12.5f );
 
 		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
 
