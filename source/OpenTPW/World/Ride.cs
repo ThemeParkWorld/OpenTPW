@@ -4,6 +4,7 @@ public class Ride : Entity
 {
 	private WadFileSystem fileSystem;
 	private FileSystemWatcher watcher;
+	private const string testScriptPath = "content/testscripts/test.rse";
 
 	public RideVM VM { get; private set; }
 
@@ -14,7 +15,7 @@ public class Ride : Entity
 
 		Log.Trace( $"Loading ride {rideName}" );
 
-		watcher = new FileSystemWatcher( "content/testscripts", "test.rse" );
+		watcher = new FileSystemWatcher( Path.GetDirectoryName( testScriptPath ), Path.GetFileName( testScriptPath ) );
 
 		watcher.NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
@@ -23,18 +24,19 @@ public class Ride : Entity
 							 | NotifyFilters.LastAccess
 							 | NotifyFilters.LastWrite
 							 | NotifyFilters.Size;
+
 		watcher.EnableRaisingEvents = true;
 		watcher.Changed += Watcher_Changed;
 
 		CreateVM();
-
-		// VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
 	}
 
 	private void Watcher_Changed( object sender, FileSystemEventArgs e )
 	{
 		Log.Trace( $"File {e.Name} changed" );
-		CreateVM();
+
+		while ( !IsFileReady( e.Name ) ) ;
+		Event.Run( Event.FileSystem.HotLoadAttribute.Name );
 	}
 	public static bool IsFileReady( string path )
 	{
@@ -49,20 +51,10 @@ public class Ride : Entity
 		}
 	}
 
+	[Event.FileSystem.HotLoad]
 	private void CreateVM()
 	{
-		var path = "content/testscripts/test.rse";
-		while ( !IsFileReady( path ) ) ;
-
-		using var testScriptStream = File.OpenRead( path );
+		using var testScriptStream = File.OpenRead( testScriptPath );
 		VM = new RideVM( testScriptStream );
-	}
-
-	public override void Render()
-	{
-	}
-
-	public override void Update()
-	{
 	}
 }
