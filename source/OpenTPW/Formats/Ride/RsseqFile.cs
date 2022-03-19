@@ -84,7 +84,7 @@ public class RsseqFile
 			if ( (binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions + 1 )
 			{
 				Log.Warning( $"Hit max instruction count" );
-				vmInstance.Instructions.Add( new Instruction( vmInstance, (Opcode)currentOpcode, currentOperands.ToArray() ) );
+				vmInstance.Instructions.Add( new Instruction( vmInstance, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 				break;
 			}
 
@@ -92,7 +92,7 @@ public class RsseqFile
 			{
 				case 0x80:
 					// Opcode
-					vmInstance.Instructions.Add( new Instruction( vmInstance, (Opcode)currentOpcode, currentOperands.ToArray() ) );
+					vmInstance.Instructions.Add( new Instruction( vmInstance, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 					currentOpcode = (short)currentValue;
 					currentOperands = new List<Operand>();
 					break;
@@ -146,7 +146,7 @@ public class RsseqFile
 			var variableNameLength = binaryReader.ReadInt32();
 			var stringChars = binaryReader.ReadChars( variableNameLength );
 
-			vmInstance.VariableNames.Add( new string( stringChars ) );
+			vmInstance.VariableNames.Add( new string( stringChars ).Replace( "\0", "" ) );
 			vmInstance.Variables.Add( 0 );
 		}
 	}

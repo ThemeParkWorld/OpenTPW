@@ -12,7 +12,7 @@ public class Operand
 
 	private int value;
 	private readonly RideVM vmInstance;
-	private readonly Type type;
+	public readonly Type type;
 	private readonly int nameIndex;
 
 	public Operand( RideVM vmInstance, Type type, int value, int nameIndex = -1 )

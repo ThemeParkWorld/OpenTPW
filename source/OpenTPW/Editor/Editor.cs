@@ -12,6 +12,9 @@ internal partial class Editor
 
 	private bool shouldRender;
 
+	public static ImFontPtr MonospaceFont { get; private set; }
+	public static ImFontPtr SansSerifFont { get; private set; }
+
 	public Editor( ImGuiController imGuiController )
 	{
 		ImGuiController = imGuiController;
@@ -35,7 +38,9 @@ internal partial class Editor
 
 		io.Fonts.Clear();
 
-		io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
+		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
+		MonospaceFont = io.Fonts.AddFontFromFileTTF( @"C:\Windows\Fonts\CascadiaCode.ttf", 12f );
+
 		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
 
 		int size = width * height * bpp;

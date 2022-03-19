@@ -1,16 +1,41 @@
 ﻿using ImGuiNET;
-using System.Reflection;
+using System.Numerics;
 
 namespace OpenTPW;
 internal class RidesTab : BaseTab
 {
 	private int selectedRide = 0;
 
+	struct Colors
+	{
+		public System.Numerics.Vector4 Background => MathExtensions.GetColor( "#282C34" );
+		public System.Numerics.Vector4 Error => MathExtensions.GetColor( "#E06C75" );
+		public System.Numerics.Vector4 String => MathExtensions.GetColor( "#98C379" );
+		public System.Numerics.Vector4 Literal => MathExtensions.GetColor( "#E5C07B" );
+		public System.Numerics.Vector4 Label => MathExtensions.GetColor( "#61AFEF" );
+		public System.Numerics.Vector4 Instruction => MathExtensions.GetColor( "#C678DD" );
+		public System.Numerics.Vector4 Comment => MathExtensions.GetColor( "#56B6C2" );
+		public System.Numerics.Vector4 Generic => MathExtensions.GetColor( "#ABB2BF" );
+	}
+
+	private static Colors colors = new();
+
+	private string Align( string str ) => str.PadRight( 16, ' ' );
+
+	private void DrawColoredText( string str, System.Numerics.Vector4 col, bool align = true )
+	{
+		ImGui.PushStyleColor( ImGuiCol.Text, col );
+
+		if ( align )
+			str = Align( str );
+		ImGui.Text( str );
+
+		ImGui.PopStyleColor();
+	}
+
 	public override void Draw()
 	{
 		ImGui.Begin( "Ride VM disassembly view" );
-
-		const int maxColumns = 8;
 
 		var rides = Entity.All.OfType<Ride>().ToList();
 
@@ -41,62 +66,60 @@ internal class RidesTab : BaseTab
 
 		ImGui.Separator();
 
-		ImGui.BeginChild( "ride_disassembly" );
-		ImGui.Columns( maxColumns, null, false );
 
 		//
 		// Disassembly view
 		//
+		ImGui.PushStyleColor( ImGuiCol.ChildBg, colors.Background );
+		ImGui.BeginChild( "ride_disassembly" );
+		ImGui.PushFont( Editor.MonospaceFont );
+
 		{
-			int instructionIndex = 0;
-			int labelOffset = 0;
+			int labelOffset = -1;
+			var padding = new System.Numerics.Vector2( 4, 4 );
 
 			foreach ( var instruction in vm.Instructions )
 			{
-				if ( vm.Branches.Any( b => b.CompiledOffset == labelOffset - 1 ) )
+				//
+				// Check if we have any branches pointing here
+				//
+				if ( vm.Branches.Any( b => b.CompiledOffset == labelOffset ) )
 				{
-					ImGui.Text( $".label_{labelOffset - 1}" );
-					ImGui.NextColumn();
-
-					for ( int i = 0; i < maxColumns - 1; ++i )
-						ImGui.NextColumn();
+					ImGui.NewLine();
+					DrawColoredText( $".label_{labelOffset}", colors.Label );
 				}
 
-				ImGui.Text( vm.CurrentPos == instructionIndex ? ">" : "" );
-				ImGui.NextColumn();
-				ImGui.Text( instruction.opcode.ToString() );
+				ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
+				DrawColoredText( $"0x{instruction.offset:X4}: ", colors.Comment );
+				ImGui.SameLine();
+				DrawColoredText( $"{instruction.opcode}", colors.Instruction );
 
-				if ( ImGui.IsItemHovered() )
+				//
+				// Draw operands
+				//
+				foreach ( var operand in instruction.operands )
 				{
-					ImGui.BeginTooltip();
-					ImGui.Text( instruction.opcode.ToString() );
+					ImGui.SameLine();
 
-					var instructionHandler = vm.FindOpcodeHandler( instruction.opcode )?.GetCustomAttribute<OpcodeHandlerAttribute>();
+					var color = operand.type switch
+					{
+						Operand.Type.Variable => colors.Generic,
+						Operand.Type.Literal => colors.Literal,
+						Operand.Type.String => colors.String,
+						Operand.Type.Location => colors.Label,
+						_ => colors.Generic
+					};
 
-					if ( instructionHandler == null )
-						ImGui.Text( "No handler found." );
-					else
-						ImGui.Text( instructionHandler.Description );
-
-					ImGui.EndTooltip();
+					DrawColoredText( $"{operand}", color );
 				}
 
-				ImGui.NextColumn();
-				for ( int i = 0; i < maxColumns - 2; ++i )
-				{
-					if ( i <= instruction.operands.Length - 1 && instruction.operands.Length > 0 )
-						ImGui.Text( instruction.operands[i].ToString() );
-
-					ImGui.NextColumn();
-				}
-
-				instructionIndex++;
 				labelOffset += instruction.GetCount();
 			}
 		}
 
-		ImGui.Columns( 1 );
 		ImGui.EndChild();
+		ImGui.PopStyleColor();
+		ImGui.PopFont();
 
 		ImGui.End();
 	}

@@ -4,11 +4,13 @@ public struct Instruction
 {
 	public readonly Operand[] operands;
 	public readonly Opcode opcode;
+	public readonly long offset;
 
 	private RideVM vmInstance;
 
-	public Instruction( RideVM vmInstance, Opcode opcode, Operand[] operands )
+	public Instruction( RideVM vmInstance, long offset, Opcode opcode, Operand[] operands )
 	{
+		this.offset = offset;
 		this.operands = operands;
 		this.opcode = opcode;
 
@@ -22,7 +24,7 @@ public struct Instruction
 
 	public void Invoke()
 	{
-		vmInstance.CallOpcodeHandler( opcode );
+		vmInstance.CallOpcodeHandler( opcode, operands );
 	}
 
 	public override string ToString()
