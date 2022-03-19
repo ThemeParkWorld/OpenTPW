@@ -17,6 +17,8 @@ internal class RidesTab : BaseTab
 		public System.Numerics.Vector4 Instruction => MathExtensions.GetColor( "#C678DD" );
 		public System.Numerics.Vector4 Comment => MathExtensions.GetColor( "#56B6C2" );
 		public System.Numerics.Vector4 Generic => MathExtensions.GetColor( "#ABB2BF" );
+		public System.Numerics.Vector4 Step => MathExtensions.GetColor( "#C8CC76" );
+		public System.Numerics.Vector4 Black => MathExtensions.GetColor( "#000000" );
 	}
 
 	private static Colors colors = new();
@@ -80,8 +82,10 @@ internal class RidesTab : BaseTab
 			int labelOffset = -1;
 			var padding = new System.Numerics.Vector2( 4, 4 );
 
-			foreach ( var instruction in vm.Instructions )
+			for ( int i = 0; i < vm.Instructions.Count; i++ )
 			{
+				Instruction instruction = vm.Instructions[i];
+
 				//
 				// Check if we have any branches pointing here
 				//
@@ -96,9 +100,14 @@ internal class RidesTab : BaseTab
 				}
 
 				ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
-				DrawColoredText( $"0x{instruction.offset:X4}: ", colors.Generic );
-				ImGui.SameLine();
 
+				// Draw file offset
+				{
+					var col = (i == vm.CurrentPos) ? colors.Step : colors.Generic;
+					DrawColoredText( $"0x{instruction.offset:X4}: ", col );
+				}
+
+				ImGui.SameLine();
 				DrawColoredText( $"{instruction.opcode}", colors.Instruction );
 
 				// Opcode info tooltip
