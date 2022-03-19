@@ -81,9 +81,9 @@ public class RsseqFile
 			var flag = (currentValue >> 24 & 0xFF);
 			int truncValue = (short)currentValue;
 
-			if ( (binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions )
+			if ( (binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions + 1 )
 			{
-				Log.Warning( $"Hit max count ({(binaryReader.BaseStream.Position - instructionOffset) / 4} of {expectedInstructions})" );
+				Log.Warning( $"Hit max instruction count" );
 				vmInstance.Instructions.Add( new Instruction( vmInstance, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 				break;
 			}
