@@ -15,6 +15,11 @@ public class Ride : Entity
 
 		Log.Trace( $"Loading ride {rideName}" );
 
+		VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
+	}
+
+	public void LoadDebugScript()
+	{
 		watcher = new FileSystemWatcher( Path.GetDirectoryName( testScriptPath ), Path.GetFileName( testScriptPath ) );
 
 		watcher.NotifyFilter = NotifyFilters.Attributes
@@ -28,7 +33,7 @@ public class Ride : Entity
 		watcher.EnableRaisingEvents = true;
 		watcher.Changed += Watcher_Changed;
 
-		CreateVM();
+		OnHotLoad();
 	}
 
 	private void Watcher_Changed( object sender, FileSystemEventArgs e )
@@ -52,8 +57,10 @@ public class Ride : Entity
 	}
 
 	[Event.FileSystem.HotLoad]
-	private void CreateVM()
+	private void OnHotLoad()
 	{
+		Log.Trace( $"File {testScriptPath} was changed. Reloading VM" );
+
 		using var testScriptStream = File.OpenRead( testScriptPath );
 		VM = new RideVM( testScriptStream );
 	}
