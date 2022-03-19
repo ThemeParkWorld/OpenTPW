@@ -1,0 +1,11 @@
+#setlimbo 10	; limbo size
+#setwalk  10	; number of people that can walk around at any given time.
+
+; All variables are initialised to zero by default
+variable VAR_TEST               ; 0
+
+; ************* Initialise ***************
+.init	NAME		"Test script"
+        NOP
+        CRIT_LOCK
+        COPY            VAR_TEST        69

@@ -12,7 +12,10 @@ public class Ride : Entity
 		var rideName = Path.GetFileNameWithoutExtension( rideArchive );
 
 		Log.Trace( $"Loading ride {rideName}" );
-		VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
+		// VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
+
+		using var testScriptStream = File.OpenRead( "content/testscripts/test.rse" );
+		VM = new RideVM( testScriptStream );
 	}
 
 	public override void Render()
