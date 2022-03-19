@@ -63,7 +63,7 @@ public class RideVM
 		return handlerAttribute.FirstOrDefault();
 	}
 
-	public void CallOpcodeHandler( Opcode opcodeId )
+	public void CallOpcodeHandler( Opcode opcodeId, params Operand[] operands )
 	{
 		var handlerAttribute = FindOpcodeHandler( opcodeId );
 
@@ -73,7 +73,10 @@ public class RideVM
 			return;
 		}
 
-		handlerAttribute?.Invoke( null, null );
+		var parameters = new object[] { this };
+		parameters = Enumerable.Concat( parameters, operands ).ToArray();
+
+		handlerAttribute?.Invoke( null, parameters );
 	}
 
 	public void BranchTo( int value )
