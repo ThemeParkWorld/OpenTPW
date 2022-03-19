@@ -5,7 +5,6 @@
 variable VAR_TEST               ; 0
 
 ; ************* Initialise ***************
-.init	NAME		"Test script"
+.init	NAME		"Test Script"
         NOP
         CRIT_LOCK
-        COPY            VAR_TEST        69
