@@ -5,6 +5,70 @@
 variable VAR_TEST               ; 0
 
 ; ************* Initialise ***************
-.init	NAME		"Test Script"
+.init	NAME		"Test Script 1"
         NOP
         CRIT_LOCK
+        COPY            VAR_TEST        69
+        COPY            VAR_TEST        420
+        COPY            VAR_TEST        32767
+        COPY            VAR_TEST        69
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
