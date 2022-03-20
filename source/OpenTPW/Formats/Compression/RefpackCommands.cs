@@ -1,8 +1,8 @@
 ﻿namespace OpenTPW;
 
-public static class Refpack
+partial class Refpack
 {
-	public interface IRefpackCommand
+	internal interface IRefpackCommand
 	{
 		bool StopAfterFound => false;
 		int Length { get; }

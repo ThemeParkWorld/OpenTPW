@@ -2,9 +2,9 @@
 
 namespace OpenTPW;
 
-internal class WadStream : MemoryStream
+public class WadStream : MemoryStream
 {
-	internal WadStream( byte[] buffer ) : base( buffer ) { }
+	public WadStream( byte[] buffer ) : base( buffer ) { }
 
 	public byte[] ReadBytes( int length, bool bigEndian = false )
 	{
