@@ -8,22 +8,6 @@ internal class RidesTab : BaseTab
 {
 	private int selectedRide = 0;
 
-	struct Colors
-	{
-		public System.Numerics.Vector4 Background => MathExtensions.GetColor( "#282C34" );
-		public System.Numerics.Vector4 Variable => MathExtensions.GetColor( "#E06C75" );
-		public System.Numerics.Vector4 String => MathExtensions.GetColor( "#98C379" );
-		public System.Numerics.Vector4 Literal => MathExtensions.GetColor( "#E5C07B" );
-		public System.Numerics.Vector4 Label => MathExtensions.GetColor( "#61AFEF" );
-		public System.Numerics.Vector4 Instruction => MathExtensions.GetColor( "#C678DD" );
-		public System.Numerics.Vector4 Comment => MathExtensions.GetColor( "#56B6C2" );
-		public System.Numerics.Vector4 Generic => MathExtensions.GetColor( "#ABB2BF" );
-		public System.Numerics.Vector4 Step => MathExtensions.GetColor( "#C8CC76" );
-		public System.Numerics.Vector4 Black => MathExtensions.GetColor( "#000000" );
-	}
-
-	private static Colors colors = new();
-
 	private string Align( string str ) => str.PadRight( 16, ' ' );
 
 	private void DrawColoredText( string str, System.Numerics.Vector4 col, bool align = true )
@@ -35,6 +19,12 @@ internal class RidesTab : BaseTab
 		ImGui.Text( str );
 
 		ImGui.PopStyleColor();
+	}
+
+	private void ApplyPadding()
+	{
+		var padding = new System.Numerics.Vector2( 4, 2 );
+		ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
 	}
 
 	private Dictionary<int, float> labelPositions = new(); // TODO: Refresh this on script change
@@ -75,13 +65,15 @@ internal class RidesTab : BaseTab
 		//
 		// Disassembly view
 		//
-		ImGui.PushStyleColor( ImGuiCol.ChildBg, colors.Background );
+		ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
 		ImGui.BeginChild( "ride_disassembly" );
 		ImGui.PushFont( Editor.MonospaceFont );
 
 		{
 			int labelOffset = -1;
-			var padding = new System.Numerics.Vector2( 4, 4 );
+
+			ApplyPadding();
+			DrawColoredText( $"; ************* Initialise ***************", OneDark.Comment );
 
 			for ( int i = 0; i < vm.Instructions.Count; i++ )
 			{
@@ -93,23 +85,24 @@ internal class RidesTab : BaseTab
 				if ( vm.Branches.Any( b => b.CompiledOffset == labelOffset ) )
 				{
 					ImGui.NewLine();
+					ApplyPadding();
 
-					DrawColoredText( $".label_{labelOffset}", colors.Label );
+					DrawColoredText( $".label_{labelOffset}:", OneDark.Label );
 
 					if ( !labelPositions.ContainsKey( labelOffset ) )
 						labelPositions.Add( labelOffset, ImGui.GetCursorPosY() );
 				}
 
-				ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
+				ApplyPadding();
 
 				// Draw file offset
 				{
-					var col = (i == vm.CurrentPos) ? colors.Step : colors.Generic;
+					var col = (i == vm.CurrentPos) ? OneDark.Step : OneDark.Generic;
 					DrawColoredText( $"0x{instruction.offset:X4}: ", col );
 				}
 
 				ImGui.SameLine();
-				DrawColoredText( $"{instruction.opcode}", colors.Instruction );
+				DrawColoredText( $"{instruction.opcode}", OneDark.Instruction );
 
 				// Opcode info tooltip
 				if ( ImGui.IsItemHovered() )
@@ -137,11 +130,11 @@ internal class RidesTab : BaseTab
 
 					var color = operand.type switch
 					{
-						Operand.Type.Variable => colors.Variable,
-						Operand.Type.Literal => colors.Literal,
-						Operand.Type.String => colors.String,
-						Operand.Type.Location => colors.Label,
-						_ => colors.Generic
+						Operand.Type.Variable => OneDark.Variable,
+						Operand.Type.Literal => OneDark.Literal,
+						Operand.Type.String => OneDark.String,
+						Operand.Type.Location => OneDark.Label,
+						_ => OneDark.Generic
 					};
 
 					DrawColoredText( $"{operand}", color );
@@ -165,7 +158,7 @@ internal class RidesTab : BaseTab
 							if ( labelPositions.TryGetValue( operand.Value, out var position ) )
 							{
 								Log.Trace( "Jumped to " + operand.Value );
-								ImGui.SetScrollY( position - 32f );
+								ImGui.SetScrollY( position + 32.0f );
 							}
 							else
 							{

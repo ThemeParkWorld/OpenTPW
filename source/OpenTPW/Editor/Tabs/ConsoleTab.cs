@@ -25,23 +25,14 @@ internal class ConsoleTab : BaseTab
 	{
 		Logger.OnLog += ( severity, str ) =>
 		{
-			var color = Vector4.One;
-
-			switch ( severity )
+			var color = severity switch
 			{
-				case Logger.Level.Trace:
-					color = MathExtensions.GetColor( "#dfe5ed" );
-					break;
-				case Logger.Level.Info:
-					color = MathExtensions.GetColor( "#faf9f6" );
-					break;
-				case Logger.Level.Warning:
-					color = MathExtensions.GetColor( "#d3b683" );
-					break;
-				case Logger.Level.Error:
-					color = MathExtensions.GetColor( "#bf636d" );
-					break;
-			}
+				Logger.Level.Trace => OneDark.Trace,
+				Logger.Level.Info => OneDark.Info,
+				Logger.Level.Warning => OneDark.Warning,
+				Logger.Level.Error => OneDark.Error,
+				_ => OneDark.Info,
+			};
 
 			items.Add( new ConsoleItem( color, str ) );
 		};
@@ -51,7 +42,7 @@ internal class ConsoleTab : BaseTab
 	{
 		ImGui.Begin( "Console", ref visible );
 
-		ImGui.PushStyleColor( ImGuiCol.ChildBg, MathExtensions.GetColor( "#131313" ) );
+		ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
 		ImGui.BeginChild( "logs", new System.Numerics.Vector2( 0, -32 ) );
 		for ( int i = 0; i < items.Count; i++ )
 		{
