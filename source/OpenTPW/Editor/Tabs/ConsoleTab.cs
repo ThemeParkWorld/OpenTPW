@@ -3,6 +3,7 @@ using System.Numerics;
 
 namespace OpenTPW;
 
+[EditorMenu( "Debug/Console" )]
 internal class ConsoleTab : BaseTab
 {
 	List<ConsoleItem> items = new();

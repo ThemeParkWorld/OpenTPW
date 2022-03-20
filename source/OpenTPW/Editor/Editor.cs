@@ -60,9 +60,23 @@ internal partial class Editor
 		foreach ( var tab in tabs )
 		{
 			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
-			if ( editorMenuAttribute != null && ImGui.MenuItem( editorMenuAttribute.Path ) )
+			if ( editorMenuAttribute == null )
+				continue;
+
+			var splitPath = editorMenuAttribute.Path.Split( '/' );
+
+			if ( ImGui.BeginMenu( splitPath[0] ) )
 			{
-				tab.visible = !tab.visible;
+				for ( int i = 1; i < splitPath.Length; i++ )
+				{
+					string? item = splitPath[i];
+					bool active = ImGui.MenuItem( item );
+
+					if ( i == splitPath.Length - 1 && active )
+						tab.visible = !tab.visible;
+				}
+
+				ImGui.EndMenu();
 			}
 		}
 

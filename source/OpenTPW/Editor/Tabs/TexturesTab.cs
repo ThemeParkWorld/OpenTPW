@@ -2,6 +2,7 @@
 
 namespace OpenTPW;
 
+[EditorMenu( "Debug/Textures" )]
 internal class TexturesTab : BaseTab
 {
 	public TexturesTab()

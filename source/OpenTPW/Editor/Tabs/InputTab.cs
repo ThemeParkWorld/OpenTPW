@@ -1,6 +1,8 @@
 ﻿using ImGuiNET;
 
 namespace OpenTPW;
+
+[EditorMenu( "Debug/Input" )]
 internal class InputTab : BaseTab
 {
 	public override void Draw()
