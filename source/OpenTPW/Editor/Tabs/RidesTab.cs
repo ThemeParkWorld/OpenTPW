@@ -118,7 +118,7 @@ internal class RidesTab : BaseTab
 						ImGui.Text( $"{opcodeHandler.Description}" );
 						ImGui.PopFont();
 					}
-					ImGui.End();
+					ImGui.EndTooltip();
 				}
 
 				//
@@ -151,6 +151,12 @@ internal class RidesTab : BaseTab
 						var drawList = ImGui.GetWindowDrawList();
 						var underlineCol = ImGui.GetColorU32( color );
 						drawList.AddLine( itemP1, itemP2, underlineCol );
+
+						ImGui.BeginTooltip();
+						ImGui.PushFont( Editor.SansSerifFont );
+						ImGui.Text( $"Click to go to label_{operand.Value}" );
+						ImGui.PopFont();
+						ImGui.EndTooltip();
 
 						if ( ImGui.IsItemClicked() )
 						{
