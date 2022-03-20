@@ -69,7 +69,7 @@ public class RideVM
 
 		if ( handlerAttribute == null )
 		{
-			Log.Error( $"No handler for {opcodeId}, treating as no-op" );
+			Log.Warning( $"No handler for {opcodeId}, treating as no-op" );
 			return;
 		}
 
