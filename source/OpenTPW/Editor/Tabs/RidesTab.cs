@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
-using System.Numerics;
 using System.Reflection;
 
 namespace OpenTPW;
+
+[EditorMenu( "Ride/Disassembly" )]
 internal class RidesTab : BaseTab
 {
 	private int selectedRide = 0;
@@ -40,7 +41,7 @@ internal class RidesTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Ride VM disassembly view" );
+		ImGui.Begin( "Ride VM disassembly view", ref visible );
 
 		var rides = Entity.All.OfType<Ride>().ToList();
 

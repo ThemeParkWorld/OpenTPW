@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Silk.NET.OpenGL.Extensions.ImGui;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace OpenTPW;
@@ -52,6 +53,22 @@ internal partial class Editor
 		io.Fonts.ClearTexData();
 	}
 
+	private void DrawMenuBar()
+	{
+		ImGui.BeginMainMenuBar();
+
+		foreach ( var tab in tabs )
+		{
+			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
+			if ( editorMenuAttribute != null && ImGui.MenuItem( editorMenuAttribute.Path ) )
+			{
+				tab.visible = !tab.visible;
+			}
+		}
+
+		ImGui.EndMainMenuBar();
+	}
+
 	public void Update()
 	{
 		ImGuiController.Update( Time.Delta );
@@ -62,10 +79,15 @@ internal partial class Editor
 		if ( !shouldRender )
 			return;
 
-		ImGui.DockSpaceOverViewport( ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode );
-		ImGui.ShowDemoWindow();
+		DrawMenuBar();
 
-		tabs.ForEach( tab => tab.Draw() );
+		ImGui.DockSpaceOverViewport( ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode );
+
+		tabs.ForEach( tab =>
+		{
+			if ( tab.visible )
+				tab.Draw();
+		} );
 	}
 }
 

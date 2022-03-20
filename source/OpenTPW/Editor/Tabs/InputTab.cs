@@ -5,7 +5,7 @@ internal class InputTab : BaseTab
 {
 	public override void Draw()
 	{
-		ImGui.Begin( "Input" );
+		ImGui.Begin( "Input", ref visible );
 
 		ImGui.Text( $"Time: {Time.Now}" );
 

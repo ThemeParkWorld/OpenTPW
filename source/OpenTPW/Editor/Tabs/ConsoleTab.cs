@@ -48,7 +48,7 @@ internal class ConsoleTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Console" );
+		ImGui.Begin( "Console", ref visible );
 
 		ImGui.PushStyleColor( ImGuiCol.ChildBg, MathExtensions.GetColor( "#131313" ) );
 		ImGui.BeginChild( "logs", new System.Numerics.Vector2( 0, -32 ) );

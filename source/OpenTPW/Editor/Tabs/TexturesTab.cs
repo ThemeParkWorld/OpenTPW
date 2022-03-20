@@ -13,7 +13,7 @@ internal class TexturesTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Textures" );
+		ImGui.Begin( "Textures", ref visible );
 
 		var textureList = Asset.All.OfType<Texture>().ToList();
 		var texturePaths = textureList.Select( texture => $"{texture.Id}:\t{texture.Path}" ).ToList();
