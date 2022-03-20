@@ -66,65 +66,8 @@ internal class RidesTab : BaseTab
 		// Disassembly view
 		//
 		ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
-		ImGui.PushStyleColor( ImGuiCol.FrameBg, OneDark.Background );
+		ImGui.BeginChild( "ride_disassembly" );
 		ImGui.PushFont( Editor.MonospaceFont );
-		ImGui.BeginChild( "ride_disassembly", new System.Numerics.Vector2( 0, 0 ), false, ImGuiWindowFlags.NoScrollbar );
-
-		//
-		// Code map
-		//
-		{
-			var drawList = ImGui.GetWindowDrawList();
-			int labelOffset = -1;
-
-			var childRectMax = ImGui.GetItemRectMax();
-			var height = ImGui.GetWindowHeight();
-			int width = 64;
-			drawList.AddRectFilled( new System.Numerics.Vector2( childRectMax.X - width, 0 ), new System.Numerics.Vector2( childRectMax.X, height ), ImGui.GetColorU32( OneDark.Background ) );
-
-			var offset = new System.Numerics.Vector2( 4, 124 );
-
-			for ( int i = 0; i < vm.Instructions.Count; i++ )
-			{
-				Instruction instruction = vm.Instructions[i];
-
-				float x = (childRectMax.X - width) + offset.X;
-				float y = ((height / (float)vm.Instructions.Count) * (float)i) + offset.Y;
-
-				if ( vm.Branches.Any( b => b.CompiledOffset == labelOffset ) )
-				{
-					drawList.AddRectFilled( new System.Numerics.Vector2( x, y - 2 ), new System.Numerics.Vector2( x + 8, y ), ImGui.GetColorU32( OneDark.Label ) );
-				}
-
-				drawList.AddRectFilled( new System.Numerics.Vector2( x + 8, y ), new System.Numerics.Vector2( x + 16, y + 2 ), ImGui.GetColorU32( OneDark.Instruction ) );
-
-				//
-				// Draw operands
-				//
-				for ( int j = 0; j < instruction.operands.Length; j++ )
-				{
-					Operand? operand = instruction.operands[j];
-					ImGui.SameLine();
-
-					var color = operand.type switch
-					{
-						Operand.Type.Variable => OneDark.Variable,
-						Operand.Type.Literal => OneDark.Literal,
-						Operand.Type.String => OneDark.String,
-						Operand.Type.Location => OneDark.Label,
-						_ => OneDark.Generic
-					};
-
-					float x1 = x + 20 + (j * 8);
-					drawList.AddRectFilled( new System.Numerics.Vector2( x1, y ), new System.Numerics.Vector2( x1 + 4, y + 2 ), ImGui.GetColorU32( color ) );
-				}
-
-				labelOffset += instruction.GetCount();
-			}
-
-			var scroll = (ImGui.GetScrollY() / ImGui.GetScrollMaxY()) * (height - 100f);
-			drawList.AddRectFilled( new System.Numerics.Vector2( (childRectMax.X - width) + offset.X, offset.Y + scroll ), new System.Numerics.Vector2( childRectMax.X, offset.Y + scroll + 100 ), ImGui.GetColorU32( new System.Numerics.Vector4( 1, 1, 1, 0.1f ) ) );
-		}
 
 		{
 			int labelOffset = -1;
@@ -230,7 +173,7 @@ internal class RidesTab : BaseTab
 		}
 
 		ImGui.EndChild();
-		ImGui.PopStyleColor( 2 );
+		ImGui.PopStyleColor();
 		ImGui.PopFont();
 
 		ImGui.End();
