@@ -2,7 +2,7 @@
 
 public class RsseqFile
 {
-	private RideVM vmInstance;
+	private RideVM vm;
 	private List<string> variables = new List<string>();
 	private int expectedInstructions;
 	private long instructionOffset;
@@ -10,15 +10,19 @@ public class RsseqFile
 	public string Disassembly { get; private set; } = "";
 	public int VariableCount => variables.Count;
 
-	public RsseqFile( RideVM vmInstance )
+	public RsseqFile( RideVM vm )
 	{
-		this.vmInstance = vmInstance;
+		this.vm = vm;
 	}
 
 	public void ReadFile( Stream stream )
 	{
 		using var binaryReader = new BinaryReader( stream );
 		ReadFileContents( binaryReader );
+
+		stream.Seek( 0, SeekOrigin.Begin );
+		vm.FileData = new byte[(int)stream.Length];
+		stream.Read( vm.FileData, 0, (int)stream.Length );
 	}
 
 	private void ReadFileContents( BinaryReader binaryReader )
@@ -52,8 +56,8 @@ public class RsseqFile
 		// Variable count
 		var variableCount = binaryReader.ReadInt32();
 
-		vmInstance.Variables = new List<int>( variableCount );
-		vmInstance.Config = new()
+		vm.Variables = new List<int>( variableCount );
+		vm.Config = new()
 		{
 			StackSize = binaryReader.ReadInt32(),
 			TimeSlice = binaryReader.ReadInt32(),
@@ -84,7 +88,7 @@ public class RsseqFile
 			if ( (binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions + 1 )
 			{
 				Log.Warning( $"Hit max instruction count" );
-				vmInstance.Instructions.Add( new Instruction( vmInstance, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
+				vm.Instructions.Add( new Instruction( vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 				break;
 			}
 
@@ -92,26 +96,26 @@ public class RsseqFile
 			{
 				case 0x80:
 					// Opcode
-					vmInstance.Instructions.Add( new Instruction( vmInstance, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
+					vm.Instructions.Add( new Instruction( vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 					currentOpcode = (short)currentValue;
 					currentOperands = new List<Operand>();
 					break;
 				case 0x10:
 					// String
-					currentOperands.Add( new Operand( vmInstance, Operand.Type.String, truncValue, truncValue ) );
+					currentOperands.Add( new Operand( vm, Operand.Type.String, truncValue, truncValue ) );
 					break;
 				case 0x20:
 					// Branch
-					currentOperands.Add( new Operand( vmInstance, Operand.Type.Location, truncValue ) );
-					vmInstance.Branches.Add( new Branch( vmInstance.Instructions.Count - 2 /* ignore NOP and array starts at 0 */, truncValue ) );
+					currentOperands.Add( new Operand( vm, Operand.Type.Location, truncValue ) );
+					vm.Branches.Add( new Branch( vm.Instructions.Count - 2 /* ignore NOP and array starts at 0 */, truncValue ) );
 					break;
 				case 0x40:
 					// Variable
-					currentOperands.Add( new Operand( vmInstance, Operand.Type.Variable, truncValue, truncValue ) );
+					currentOperands.Add( new Operand( vm, Operand.Type.Variable, truncValue, truncValue ) );
 					break;
 				case 0x00:
 					// Literal
-					currentOperands.Add( new Operand( vmInstance, Operand.Type.Literal, truncValue ) );
+					currentOperands.Add( new Operand( vm, Operand.Type.Literal, truncValue ) );
 					break;
 			}
 		}
@@ -130,7 +134,7 @@ public class RsseqFile
 			var currentChar = binaryReader.ReadChar();
 			if ( currentChar == '\0' )
 			{
-				vmInstance.Strings.Add( stringOffsetPos, currentString );
+				vm.Strings.Add( stringOffsetPos, currentString );
 				currentString = "";
 				stringOffsetPos = binaryReader.BaseStream.Position - stringEntryPos;
 			}
@@ -146,8 +150,8 @@ public class RsseqFile
 			var variableNameLength = binaryReader.ReadInt32();
 			var stringChars = binaryReader.ReadChars( variableNameLength );
 
-			vmInstance.VariableNames.Add( new string( stringChars ).Replace( "\0", "" ) );
-			vmInstance.Variables.Add( 0 );
+			vm.VariableNames.Add( new string( stringChars ).Replace( "\0", "" ) );
+			vm.Variables.Add( 0 );
 		}
 	}
 
@@ -155,14 +159,14 @@ public class RsseqFile
 	{
 		var currentCount = 1;
 
-		for ( var i = 0; i < vmInstance.Instructions.Count; ++i )
+		for ( var i = 0; i < vm.Instructions.Count; ++i )
 		{
-			if ( vmInstance.Branches.Any( b => b.CompiledOffset == currentCount - 1 ) )
+			if ( vm.Branches.Any( b => b.CompiledOffset == currentCount - 1 ) )
 			{
 				Disassembly += $".branch_{currentCount - 1}\n";
 			}
-			Disassembly += $"\t{vmInstance.Instructions[i]}\n";
-			currentCount += vmInstance.Instructions[i].GetCount();
+			Disassembly += $"\t{vm.Instructions[i]}\n";
+			currentCount += vm.Instructions[i].GetCount();
 		}
 	}
 }

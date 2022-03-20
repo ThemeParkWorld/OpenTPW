@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using System.Reflection;
+using System.Security.Permissions;
 
 namespace OpenTPW;
 
@@ -62,6 +63,8 @@ internal class RidesTab : BaseTab
 
 		ImGui.Separator();
 
+		ImGui.Columns( 2 );
+
 		//
 		// Disassembly view
 		//
@@ -118,6 +121,7 @@ internal class RidesTab : BaseTab
 						ImGui.Text( $"{opcodeHandler.Description}" );
 						ImGui.PopFont();
 					}
+
 					ImGui.EndTooltip();
 				}
 
@@ -182,6 +186,92 @@ internal class RidesTab : BaseTab
 		ImGui.PopStyleColor();
 		ImGui.PopFont();
 
+		//
+		// Memory view
+		//
+		ImGui.NextColumn();
+		ImGui.BeginChild( "ride_memory" );
+
+		{
+			ImGui.BeginTabBar( "ride_memory_tabs" );
+
+			if ( ImGui.BeginTabItem( "Variables" ) )
+			{
+				ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
+				ImGui.BeginChild( "ride_variables" );
+				ImGui.PushFont( Editor.MonospaceFont );
+
+				for ( int i = 0; i < vm.Variables.Count; i++ )
+				{
+					var variableValue = vm.Variables[i];
+					var variableName = vm.VariableNames[i];
+					DrawColoredText( $"{variableName}", OneDark.Generic );
+					ImGui.SameLine();
+					DrawColoredText( $"{variableValue}", OneDark.Generic );
+				}
+
+				ImGui.PopFont();
+				ImGui.EndChild();
+				ImGui.EndTabItem();
+				ImGui.PopStyleColor();
+			}
+
+			if ( ImGui.BeginTabItem( "Hex" ) )
+			{
+				ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
+				ImGui.BeginChild( "ride_hex" );
+				ImGui.PushFont( Editor.MonospaceFont );
+				ImGui.Columns( 2, "ride_hex_columns", false );
+
+				for ( int i = 0; i < vm.FileData.Length; ++i )
+				{
+					if ( i % 16 == 0 )
+					{
+						DrawColoredText( $"0x{i:X4}:", OneDark.Generic );
+					}
+
+					ImGui.SameLine();
+
+					var b = vm.FileData[i];
+					var color = OneDark.Generic;
+					if ( b == 0 )
+						color = OneDark.DullGeneric;
+
+					DrawColoredText( $"{b:X2}", color, align: false );
+				}
+
+				ImGui.NextColumn();
+
+				for ( int i = 0; i < vm.FileData.Length; ++i )
+				{
+					if ( i % 16 == 0 )
+					{
+						ImGui.NewLine();
+					}
+
+					ImGui.SameLine();
+
+					var b = vm.FileData[i];
+					char c = (char)b;
+
+					if ( b < 32 )
+						c = '.';
+
+					DrawColoredText( $"{c:X1}", OneDark.Generic, align: false );
+				}
+
+				ImGui.SetColumnWidth( 0, 400 );
+				ImGui.Columns( 1 );
+				ImGui.PopFont();
+				ImGui.EndChild();
+				ImGui.EndTabItem();
+				ImGui.PopStyleColor();
+			}
+		}
+
+		ImGui.EndChild();
+
+		ImGui.Columns( 1 );
 		ImGui.End();
 	}
 }

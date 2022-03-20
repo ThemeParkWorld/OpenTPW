@@ -16,4 +16,6 @@ static class OneDark
 	public static System.Numerics.Vector4 Trace => MathExtensions.GetColor( "#ABB2BF" );
 	public static System.Numerics.Vector4 Warning => MathExtensions.GetColor( "#E5C07B" );
 	public static System.Numerics.Vector4 Info => MathExtensions.GetColor( "#62AEEF" );
+
+	public static System.Numerics.Vector4 DullGeneric => MathExtensions.GetColor( "#4f5259" );
 }

@@ -38,6 +38,7 @@ public class RideVM
 	public VMFlags Flags { get; private set; } = new VMFlags();
 	public VMConfig Config { get; set; } = new VMConfig();
 	public List<Branch> Branches { get; set; } = new List<Branch>();
+	public byte[] FileData { get; set; }
 
 	public RideVM( Stream stream )
 	{
