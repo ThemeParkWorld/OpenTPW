@@ -11,10 +11,9 @@ public class SettingsFile
 
 	public List<SettingsPair> Entries { get; set; } = new();
 
-	public SettingsFile( string path )
+	public SettingsFile( Stream stream )
 	{
-		using var memoryStream = new MemoryStream( File.ReadAllBytes( path ) );
-		using var binaryReader = new BinaryReader( memoryStream );
+		using var binaryReader = new BinaryReader( stream );
 
 		var inComment = false;
 		var inString = false;
