@@ -5,6 +5,32 @@ namespace OpenTPW;
 
 public static class Input
 {
+	public enum CursorTypes
+	{
+		Cash,
+		Busy,
+		Camcorder,
+		Carry,
+		Crosshair,
+		End,
+		Erase,
+		Height,
+		Line,
+		Move,
+		NoGo,
+		Normal,
+		Path,
+		Pick,
+		Pivot,
+		Place,
+		Pylon,
+		Queue,
+		Rotate,
+		Sdn,
+		Sup,
+		Track
+	}
+
 	public struct MouseInfo
 	{
 		public Vector2 Delta;

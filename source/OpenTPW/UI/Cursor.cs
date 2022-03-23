@@ -1,38 +1,13 @@
 ﻿namespace OpenTPW.UI;
 
-public enum CursorTypes
-{
-	Cash,
-	Busy,
-	Camcorder,
-	Carry,
-	Crosshair,
-	End,
-	Erase,
-	Height,
-	Line,
-	Move,
-	NoGo,
-	Normal,
-	Path,
-	Pick,
-	Pivot,
-	Place,
-	Pylon,
-	Queue,
-	Rotate,
-	Sdn,
-	Sup,
-	Track
-}
-
 public class Cursor : Panel
 {
 	public static Cursor Current { get; set; }
 
-	private string GetImageName( CursorTypes cursorType )
+	private string GetImageName( Input.CursorTypes cursorType )
 	{
-		if ( cursorType == CursorTypes.Cash )
+		// bullfrog PLEASE...
+		if ( cursorType == Input.CursorTypes.Cash )
 			return "Cash";
 
 		return "C" + (cursorType.ToString().Substring( 0, 3 ).ToLower());
@@ -42,8 +17,8 @@ public class Cursor : Panel
 	private Texture texture;
 	private Primitives.Plane plane;
 
-	private CursorTypes cursorType;
-	public CursorTypes CursorType
+	private Input.CursorTypes cursorType;
+	public Input.CursorTypes CursorType
 	{
 		get => cursorType;
 		set
@@ -64,38 +39,31 @@ public class Cursor : Panel
 		plane = new();
 		Current = this;
 
-		CursorType = CursorTypes.Cash;
+		CursorType = Input.CursorTypes.Normal;
 	}
 
 	private void LoadTexture()
 	{
-		texture = TextureBuilder.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).Build();
+		texture = TextureBuilder.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).UsePointFiltering().Build();
 	}
 
 	public override void Update()
 	{
 		base.Update();
 
-		position = PixelsToNDC( Input.Mouse.Position + new Vector2( 16, 16 ) );
-		position -= new Vector2( 0.5f, 0.5f );
-		position.Y = -position.Y;
-		position *= 2.0f;
+		size = new Vector2( 32, 32 );
 
-		size = PixelsToNDC( new Vector2( 32, 32 ) );
-	}
-
-	private Vector2 PixelsToNDC( Vector2 pixels )
-	{
-		return pixels / (Vector2)Screen.Size;
+		var center = size / 2;
+		position = Input.Mouse.Position + center;
+		position.Y = Screen.Size.Y - position.Y;
 	}
 
 	public override void Draw()
 	{
+		base.Draw();
+
 		if ( this.texture == null )
 			return;
-
-		modelMatrix = Silk.NET.Maths.Matrix4X4.CreateScale( size.X, size.Y, 1 ) *
-			Silk.NET.Maths.Matrix4X4.CreateTranslation( position.X, position.Y, 1 );
 
 		shader.SetMatrix( "g_mModel", modelMatrix );
 		shader.SetInt( "g_iFrame", ((Time.Now * 3).CeilToInt()) % 4 );

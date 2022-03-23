@@ -16,10 +16,18 @@ public class Image : Panel
 		plane = new();
 	}
 
+	public override void Update()
+	{
+		base.Update();
+
+		var aspect = 4f / 3f;
+		position = new Vector2( Screen.Size.X / 2, Screen.Size.Y / 2 );
+		size = new Vector2( Screen.Size.Y * aspect, Screen.Size.Y );
+	}
+
 	public override void Draw()
 	{
-		modelMatrix = Silk.NET.Maths.Matrix4X4.CreateScale( size.X, size.Y, 1 ) *
-			Silk.NET.Maths.Matrix4X4.CreateTranslation( position.X, position.Y, 1 );
+		base.Draw();
 
 		shader.SetMatrix( "g_mModel", modelMatrix );
 		plane.Draw( shader, texture );

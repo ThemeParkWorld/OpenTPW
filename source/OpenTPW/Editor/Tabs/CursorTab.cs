@@ -10,14 +10,14 @@ internal class CursorTab : BaseTab
 	{
 		ImGui.Begin( "Cursor", ref visible );
 
-		var cursorTypes = (CursorTypes[])Enum.GetValues( typeof( CursorTypes ) );
+		var cursorTypes = Enum.GetValues( typeof( Input.CursorTypes ) ) as Input.CursorTypes[];
 		var comboBoxItems = cursorTypes.Select( x => x.ToString() ).ToArray();
 		var currentCursorType = (int)Cursor.Current.CursorType;
 
 		ImGui.Combo( "Cursor type", ref currentCursorType, comboBoxItems, comboBoxItems.Length );
 
 		if ( currentCursorType != (int)Cursor.Current.CursorType )
-			Cursor.Current.CursorType = (CursorTypes)currentCursorType;
+			Cursor.Current.CursorType = (Input.CursorTypes)currentCursorType;
 
 		var texture = Cursor.Current.Texture;
 
