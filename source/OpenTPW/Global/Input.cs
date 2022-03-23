@@ -52,11 +52,18 @@ public static class Input
 	public static void UpdateFrom( IInputContext inputContext )
 	{
 		var io = ImGui.GetIO();
-		if ( !io.WantCaptureMouse )
-		{
-			var mouse = inputContext.Mice.First();
-			var mousePos = new Vector2( mouse.Position.X, mouse.Position.Y );
+		var mouse = inputContext.Mice.First();
 
+		if ( io.WantCaptureMouse )
+		{
+			mouse.Cursor.CursorMode = CursorMode.Normal;
+			Mouse = new MouseInfo();
+		}
+		else
+		{
+			mouse.Cursor.CursorMode = CursorMode.Hidden;
+
+			var mousePos = new Vector2( mouse.Position.X, mouse.Position.Y );
 			var mouseInfo = new MouseInfo
 			{
 				Delta = Mouse.Position - mousePos,
@@ -65,6 +72,7 @@ public static class Input
 				Right = mouse.IsButtonPressed( MouseButton.Right ),
 				Wheel = mouse.ScrollWheels.First().Y
 			};
+
 			Mouse = mouseInfo;
 
 			var keyboard = inputContext.Keyboards.First();
@@ -83,12 +91,9 @@ public static class Input
 
 			LastKeysDown = KeysDown.ToList();
 			KeysDown.Clear();
+
 			if ( keyboard.IsKeyPressed( Key.F1 ) )
 				KeysDown.Add( InputButton.ConsoleToggle );
-		}
-		else
-		{
-			Mouse = new MouseInfo();
 		}
 	}
 }
