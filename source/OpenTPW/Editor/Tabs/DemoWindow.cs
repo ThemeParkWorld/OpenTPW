@@ -7,6 +7,6 @@ internal class DemoWindow : BaseTab
 {
 	public override void Draw()
 	{
-		ImGui.ShowDemoWindow();
+		ImGui.ShowDemoWindow( ref visible );
 	}
 }

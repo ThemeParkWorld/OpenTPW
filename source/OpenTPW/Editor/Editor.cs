@@ -60,7 +60,7 @@ internal partial class Editor
 	{
 		ImGui.BeginMainMenuBar();
 
-		ImGui.Text( "OpenTPW | " );
+		ImGui.Text( "OpenTPW |" );
 
 		foreach ( var tab in tabs )
 		{
