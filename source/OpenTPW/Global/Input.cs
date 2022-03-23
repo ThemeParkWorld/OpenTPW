@@ -80,6 +80,10 @@ public static class Input
 		var io = ImGui.GetIO();
 		var mouse = inputContext.Mice.First();
 
+		if ( mouse.Position.X < 0 || mouse.Position.X > Screen.Size.X
+			|| mouse.Position.Y < 0 || mouse.Position.Y > Screen.Size.Y )
+			return;
+
 		if ( io.WantCaptureMouse )
 		{
 			mouse.Cursor.CursorMode = CursorMode.Normal;
