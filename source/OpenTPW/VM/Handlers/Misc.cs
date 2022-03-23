@@ -19,9 +19,9 @@ public partial class OpcodeHandlers
 		[OpcodeHandler( Opcode.COPY, "Copy a value" )]
 		public static void Copy( ref RideVM vm, Operand a, Operand b )
 		{
-			Log.Trace( $"{a.Value}" );
+			Log.Trace( $"{a.Value} -> {b.Value}" );
 			a.Value = b.Value;
-			Log.Trace( $"{a.Value}" );
+			Log.Trace( $"res: {a.Value}" );
 		}
 
 		[OpcodeHandler( Opcode.NAME, "Set ride name" )]

@@ -10,12 +10,13 @@ public class Ride : Entity
 
 	public Ride( string rideArchive )
 	{
-		fileSystem = new WadFileSystem( rideArchive );
 		var rideName = Path.GetFileNameWithoutExtension( rideArchive );
 
-		Log.Trace( $"Loading ride {rideName}" );
-
+		fileSystem = new WadFileSystem( rideArchive );
 		VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
+		var settingsFile = new SettingsFile( fileSystem.OpenRead( rideName + ".sam" ) );
+
+		Log.Trace( $"Loaded ride {settingsFile.Entries.First( x => x.Item1 == "Info.Name" ).Item2}" );
 	}
 
 	public void LoadDebugScript()
