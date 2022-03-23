@@ -29,7 +29,8 @@ internal partial class Editor
 			new InputTab(),
 			new RidesTab(),
 			new FileBrowserTab(),
-			new DemoWindow()
+			new DemoWindow(),
+			new CursorTab()
 		} );
 	}
 

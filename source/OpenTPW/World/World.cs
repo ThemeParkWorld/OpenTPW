@@ -13,6 +13,8 @@ public class World
 
 		var ride = new Ride( GameDir.GetPath( "data/levels/jungle/rides/monkey.wad" ) );
 
+		Hud.AddChild( new Cursor() );
+
 		Event.Register( this );
 		Event.Run( Event.Game.LoadAttribute.Name );
 	}
