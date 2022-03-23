@@ -27,7 +27,9 @@ internal partial class Editor
 			new TexturesTab(),
 			new ConsoleTab(),
 			new InputTab(),
-			new RidesTab()
+			new RidesTab(),
+			new FileBrowserTab(),
+			new DemoWindow()
 		} );
 	}
 
@@ -40,7 +42,7 @@ internal partial class Editor
 		io.Fonts.Clear();
 
 		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
-		MonospaceFont = io.Fonts.AddFontFromFileTTF( @"C:\Windows\Fonts\CascadiaCode.ttf", 12.5f );
+		MonospaceFont = io.Fonts.AddFontDefault();
 
 		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
 
@@ -56,6 +58,8 @@ internal partial class Editor
 	private void DrawMenuBar()
 	{
 		ImGui.BeginMainMenuBar();
+
+		ImGui.Text( "OpenTPW | " );
 
 		foreach ( var tab in tabs )
 		{

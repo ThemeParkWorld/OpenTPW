@@ -9,25 +9,6 @@ internal class RidesTab : BaseTab
 {
 	private int selectedRide = 0;
 
-	private string Align( string str ) => str.PadRight( 16, ' ' );
-
-	private void DrawColoredText( string str, System.Numerics.Vector4 col, bool align = true )
-	{
-		ImGui.PushStyleColor( ImGuiCol.Text, col );
-
-		if ( align )
-			str = Align( str );
-		ImGui.Text( str );
-
-		ImGui.PopStyleColor();
-	}
-
-	private void ApplyPadding()
-	{
-		var padding = new System.Numerics.Vector2( 4, 2 );
-		ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
-	}
-
 	private Dictionary<int, float> labelPositions = new(); // TODO: Refresh this on script change
 
 	public override void Draw()
@@ -75,8 +56,8 @@ internal class RidesTab : BaseTab
 		{
 			int labelOffset = -1;
 
-			ApplyPadding();
-			DrawColoredText( $"; ************* Initialise ***************", OneDark.Comment );
+			EditorHelpers.ApplyPadding();
+			EditorHelpers.DrawColoredText( $"; ************* Initialise ***************", OneDark.Comment );
 
 			for ( int i = 0; i < vm.Instructions.Count; i++ )
 			{
@@ -88,24 +69,24 @@ internal class RidesTab : BaseTab
 				if ( vm.Branches.Any( b => b.CompiledOffset == labelOffset ) )
 				{
 					ImGui.NewLine();
-					ApplyPadding();
+					EditorHelpers.ApplyPadding();
 
-					DrawColoredText( $".label_{labelOffset}:", OneDark.Label );
+					EditorHelpers.DrawColoredText( $".label_{labelOffset}:", OneDark.Label );
 
 					if ( !labelPositions.ContainsKey( labelOffset ) )
 						labelPositions.Add( labelOffset, ImGui.GetCursorPosY() );
 				}
 
-				ApplyPadding();
+				EditorHelpers.ApplyPadding();
 
 				// Draw file offset
 				{
 					var col = (i == vm.CurrentPos) ? OneDark.Step : OneDark.Generic;
-					DrawColoredText( $"0x{instruction.offset:X4}: ", col );
+					EditorHelpers.DrawColoredText( $"0x{instruction.offset:X4}: ", col );
 				}
 
 				ImGui.SameLine();
-				DrawColoredText( $"{instruction.opcode}", OneDark.Instruction );
+				EditorHelpers.DrawColoredText( $"{instruction.opcode}", OneDark.Instruction );
 
 				// Opcode info tooltip
 				if ( ImGui.IsItemHovered() )
@@ -141,7 +122,7 @@ internal class RidesTab : BaseTab
 						_ => OneDark.Generic
 					};
 
-					DrawColoredText( $"{operand}", color );
+					EditorHelpers.DrawColoredText( $"{operand}", color );
 
 					// Link hover, jump to on click
 					if ( ImGui.IsItemHovered() && operand.type == Operand.Type.Location )
@@ -205,9 +186,9 @@ internal class RidesTab : BaseTab
 				{
 					var variableValue = vm.Variables[i];
 					var variableName = vm.VariableNames[i];
-					DrawColoredText( $"{variableName}", OneDark.Generic );
+					EditorHelpers.DrawColoredText( $"{variableName}", OneDark.Generic );
 					ImGui.SameLine();
-					DrawColoredText( $"{variableValue}", OneDark.Generic );
+					EditorHelpers.DrawColoredText( $"{variableValue}", OneDark.Generic );
 				}
 
 				ImGui.PopFont();
@@ -221,13 +202,12 @@ internal class RidesTab : BaseTab
 				ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
 				ImGui.BeginChild( "ride_hex" );
 				ImGui.PushFont( Editor.MonospaceFont );
-				ImGui.Columns( 2, "ride_hex_columns", false );
 
 				for ( int i = 0; i < vm.FileData.Length; ++i )
 				{
 					if ( i % 16 == 0 )
 					{
-						DrawColoredText( $"0x{i:X4}:", OneDark.Generic );
+						EditorHelpers.DrawColoredText( $"0x{i:X4}:", OneDark.Generic );
 					}
 
 					ImGui.SameLine();
@@ -237,31 +217,9 @@ internal class RidesTab : BaseTab
 					if ( b == 0 )
 						color = OneDark.DullGeneric;
 
-					DrawColoredText( $"{b:X2}", color, align: false );
+					EditorHelpers.DrawColoredText( $"{b:X2}", color, align: false );
 				}
 
-				ImGui.NextColumn();
-
-				for ( int i = 0; i < vm.FileData.Length; ++i )
-				{
-					if ( i % 16 == 0 )
-					{
-						ImGui.NewLine();
-					}
-
-					ImGui.SameLine();
-
-					var b = vm.FileData[i];
-					char c = (char)b;
-
-					if ( b < 32 )
-						c = '.';
-
-					DrawColoredText( $"{c:X1}", OneDark.Generic, align: false );
-				}
-
-				ImGui.SetColumnWidth( 0, 400 );
-				ImGui.Columns( 1 );
 				ImGui.PopFont();
 				ImGui.EndChild();
 				ImGui.EndTabItem();
