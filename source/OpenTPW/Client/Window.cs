@@ -52,7 +52,7 @@ internal class Window
 		Time.UpdateFrom( (float)deltaTime );
 		Input.UpdateFrom( inputContext );
 
-		Gl.ClearColor( 1, 0, 1, 1 );
+		Gl.ClearColor( 0, 0, 0, 1 );
 		Gl.Clear( ClearBufferMask.ColorBufferBit );
 
 		world.Update();
