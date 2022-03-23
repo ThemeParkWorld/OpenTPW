@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using System.Numerics;
 
 namespace OpenTPW;
 
@@ -23,11 +24,12 @@ internal class FileBrowserTab : BaseTab
 			void DisplayDirectory( string rootPath, string directory )
 			{
 				var relativePath = Path.GetRelativePath( rootPath, directory );
+				var dirName = Path.GetFileName( relativePath );
 
 				if ( searchBox.Length > 0 )
 					ImGui.SetNextItemOpen( true );
 
-				if ( ImGui.TreeNodeEx( relativePath, ImGuiTreeNodeFlags.SpanFullWidth ) )
+				if ( searchBox.Length > 0 || ImGui.TreeNodeEx( dirName, ImGuiTreeNodeFlags.SpanFullWidth ) )
 				{
 					foreach ( var subdir in Directory.GetDirectories( directory ) )
 					{
@@ -39,13 +41,14 @@ internal class FileBrowserTab : BaseTab
 						if ( searchBox.Length > 0 && !file.Contains( searchBox ) )
 							continue;
 
-						if ( ImGui.SmallButton( Path.GetRelativePath( rootPath, file ) ) )
-						{
+						ImGui.TreeNodeEx( Path.GetRelativePath( rootPath, file ), ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen );
+
+						if ( ImGui.IsItemClicked() )
 							selectedFileData = File.ReadAllBytes( file );
-						}
 					}
 
-					ImGui.TreePop();
+					if ( searchBox.Length == 0 )
+						ImGui.TreePop();
 				}
 			}
 
