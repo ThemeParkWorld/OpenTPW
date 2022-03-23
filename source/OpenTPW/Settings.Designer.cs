@@ -37,7 +37,7 @@ namespace OpenTPW {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1024, 768")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1600, 900")]
         public global::System.Drawing.Point GameWindowSize {
             get {
                 return ((global::System.Drawing.Point)(this["GameWindowSize"]));
