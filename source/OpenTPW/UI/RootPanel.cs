@@ -12,7 +12,11 @@ public class RootPanel : Entity
 
 	public override void Render()
 	{
+		Gl.Disable( Silk.NET.OpenGL.EnableCap.DepthTest ); // Move this to some sort of renderer class
+
 		Children.ForEach( child => child.Draw() );
+
+		Gl.Enable( Silk.NET.OpenGL.EnableCap.DepthTest ); // Move this to some sort of renderer class
 	}
 
 	public override void Update()

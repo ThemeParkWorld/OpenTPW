@@ -13,12 +13,12 @@ public class World
 	{
 		Current = this;
 
+		Camera = new Camera();
+		_ = new TestObject();
+
 		Hud = new();
 		// Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
 		Hud.AddChild( new Cursor() );
-
-		Camera = new Camera();
-		_ = new TestObject();
 
 		Event.Register( this );
 		Event.Run( Event.Game.LoadAttribute.Name );
