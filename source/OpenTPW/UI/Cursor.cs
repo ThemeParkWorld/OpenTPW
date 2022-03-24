@@ -32,13 +32,15 @@ public class Cursor : Panel
 
 	public Cursor()
 	{
+		Current ??= this;
+
 		shader = Shader.Builder.WithVertex( "content/shaders/cursor/cursor.vert" )
 							 .WithFragment( "content/shaders/cursor/cursor.frag" )
 							 .Build();
 
 		plane = new();
-		Current = this;
 
+		// TODO: Move this to Input
 		CursorType = Input.CursorTypes.Normal;
 	}
 

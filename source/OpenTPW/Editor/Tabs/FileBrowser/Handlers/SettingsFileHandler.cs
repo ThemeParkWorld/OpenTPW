@@ -2,12 +2,12 @@
 
 namespace OpenTPW;
 
-[FileManager( @"\.sam" )]
-public class SettingsFileManager : BaseFileManager
+[FileHandler( @"\.sam" )]
+public class SettingsFileHandler : BaseFileHandler
 {
 	private SettingsFile settingsFile;
 
-	public SettingsFileManager( byte[] fileData ) : base( fileData )
+	public SettingsFileHandler( byte[] fileData ) : base( fileData )
 	{
 		using var stream = new MemoryStream( fileData );
 		settingsFile = new SettingsFile( stream );

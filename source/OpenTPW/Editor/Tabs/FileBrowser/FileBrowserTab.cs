@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using System.Numerics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -12,9 +11,21 @@ internal class FileBrowserTab : BaseTab
 	private string selectedFileExtension = "";
 	private string searchBox = "";
 
-	private List<(Regex, Type)> fileHandlers = new();
+	private List<RegisteredFileHandler> fileHandlers = new();
 
-	private BaseFileManager? selectedFileHandler;
+	struct RegisteredFileHandler
+	{
+		public Regex Regex { get; set; }
+		public Type Type { get; set; }
+
+		public RegisteredFileHandler( Regex regex, Type type )
+		{
+			Regex = regex;
+			Type = type;
+		}
+	}
+
+	private BaseFileHandler? selectedFileHandler;
 
 	public FileBrowserTab()
 	{
@@ -24,24 +35,66 @@ internal class FileBrowserTab : BaseTab
 	private void RegisterFileHandlers()
 	{
 		var types = Assembly.GetExecutingAssembly().GetTypes()
-			.Where( m => m.GetCustomAttribute<FileManagerAttribute>() != null );
+			.Where( m => m.GetCustomAttribute<FileHandlerAttribute>() != null );
 
 		void AddFileHandlers( bool matchDefault )
 		{
 			foreach ( var type in types )
 			{
-				var attribute = type.GetCustomAttribute<FileManagerAttribute>();
+				var attribute = type.GetCustomAttribute<FileHandlerAttribute>();
 
 				if ( attribute.IsDefault != matchDefault )
 					continue;
 
 				var regex = new Regex( attribute.RegexPattern );
-				fileHandlers.Add( (regex, type) );
+				fileHandlers.Add( new( regex, type ) );
 			}
 		}
 
 		AddFileHandlers( false );
+
+		// Defer default handlers to ensure we don't match their regex too early
 		AddFileHandlers( true );
+	}
+
+	private void DisplayDirectory( string rootPath, string directory )
+	{
+		var relativePath = Path.GetRelativePath( rootPath, directory );
+		var dirName = Path.GetFileName( relativePath );
+
+		if ( searchBox.Length > 0 )
+			ImGui.SetNextItemOpen( true );
+
+		if ( searchBox.Length == 0 && !ImGui.TreeNodeEx( dirName, ImGuiTreeNodeFlags.SpanFullWidth ) )
+			return;
+
+		foreach ( var subdir in Directory.GetDirectories( directory ) )
+		{
+			DisplayDirectory( rootPath, subdir );
+		}
+
+		foreach ( var file in Directory.GetFiles( directory ) )
+		{
+			if ( searchBox.Length > 0 && !file.Contains( searchBox ) )
+				continue;
+
+			ImGui.TreeNodeEx( Path.GetRelativePath( rootPath, file ),
+				ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen );
+
+			if ( ImGui.IsItemClicked() )
+			{
+				selectedFileData = File.ReadAllBytes( file );
+				selectedFileExtension = Path.GetExtension( file );
+
+				var fileHandler = fileHandlers.FirstOrDefault( h => h.Regex.Match( selectedFileExtension ).Success );
+
+				var args = new object[] { selectedFileData };
+				selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;
+			}
+		}
+
+		if ( searchBox.Length == 0 )
+			ImGui.TreePop();
 	}
 
 	public override void Draw()
@@ -55,53 +108,16 @@ internal class FileBrowserTab : BaseTab
 
 		ImGui.BeginChild( "files" );
 
-		{
-			void DisplayDirectory( string rootPath, string directory )
-			{
-				var relativePath = Path.GetRelativePath( rootPath, directory );
-				var dirName = Path.GetFileName( relativePath );
-
-				if ( searchBox.Length > 0 )
-					ImGui.SetNextItemOpen( true );
-
-				if ( searchBox.Length > 0 || ImGui.TreeNodeEx( dirName, ImGuiTreeNodeFlags.SpanFullWidth ) )
-				{
-					foreach ( var subdir in Directory.GetDirectories( directory ) )
-					{
-						DisplayDirectory( rootPath, subdir );
-					}
-
-					foreach ( var file in Directory.GetFiles( directory ) )
-					{
-						if ( searchBox.Length > 0 && !file.Contains( searchBox ) )
-							continue;
-
-						ImGui.TreeNodeEx( Path.GetRelativePath( rootPath, file ), ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen );
-
-						if ( ImGui.IsItemClicked() )
-						{
-							selectedFileData = File.ReadAllBytes( file );
-							selectedFileExtension = Path.GetExtension( file );
-
-							var fileHandler = fileHandlers.FirstOrDefault( x => x.Item1.Match( selectedFileExtension ).Success );
-							selectedFileHandler = Activator.CreateInstance( fileHandler.Item2, new object[] { selectedFileData } ) as BaseFileManager;
-						}
-					}
-
-					if ( searchBox.Length == 0 )
-						ImGui.TreePop();
-				}
-			}
-
-			var path = GameDir.GetPath( "data/" );
-
-			DisplayDirectory( path, path );
-		}
+		//
+		// Directory view
+		//
+		var path = GameDir.GetPath( "data/" );
+		DisplayDirectory( path, path );
 
 		ImGui.EndChild();
 
 		//
-		// Memory view
+		// File view
 		//
 		ImGui.NextColumn();
 		ImGui.BeginChild( "hex_view" );

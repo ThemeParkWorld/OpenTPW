@@ -3,10 +3,10 @@ using System.Text;
 
 namespace OpenTPW;
 
-[FileManager( @"\.txt" )]
-public class TextFileManager : BaseFileManager
+[FileHandler( @"\.txt" )]
+public class TextFileHandler : BaseFileHandler
 {
-	public TextFileManager( byte[] fileData ) : base( fileData )
+	public TextFileHandler( byte[] fileData ) : base( fileData )
 	{
 	}
 

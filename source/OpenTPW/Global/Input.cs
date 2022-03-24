@@ -3,55 +3,8 @@ using Silk.NET.Input;
 
 namespace OpenTPW;
 
-public static class Input
+public static partial class Input
 {
-	public enum CursorTypes
-	{
-		Cash,
-		Busy,
-		Camcorder,
-		Carry,
-		Crosshair,
-		End,
-		Erase,
-		Height,
-		Line,
-		Move,
-		NoGo,
-		Normal,
-		Path,
-		Pick,
-		Pivot,
-		Place,
-		Pylon,
-		Queue,
-		Rotate,
-		Sdn,
-		Sup,
-		Track
-	}
-
-	public struct MouseInfo
-	{
-		public Vector2 Delta;
-		public Vector2 Position;
-
-		public bool Left;
-		public bool Right;
-
-		public float Wheel;
-
-		public override string ToString()
-		{
-			var str = "";
-
-			foreach ( var field in typeof( MouseInfo ).GetFields() )
-				str += $"{field.Name}: {field.GetValue( this )}\n";
-
-			return str;
-		}
-	}
-
 	public static MouseInfo Mouse { get; internal set; }
 
 	public static float Forward { get; set; }
@@ -126,9 +79,4 @@ public static class Input
 				KeysDown.Add( InputButton.ConsoleToggle );
 		}
 	}
-}
-
-public enum InputButton
-{
-	ConsoleToggle
 }

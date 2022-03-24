@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using System.Reflection;
-using System.Security.Permissions;
 
 namespace OpenTPW;
 

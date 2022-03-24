@@ -1,10 +1,10 @@
 ﻿namespace OpenTPW;
 
-public class BaseFileManager
+public class BaseFileHandler
 {
 	protected byte[] FileData { get; set; }
 
-	public BaseFileManager( byte[] fileData )
+	public BaseFileHandler( byte[] fileData )
 	{
 		this.FileData = fileData;
 	}

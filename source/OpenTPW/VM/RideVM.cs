@@ -2,24 +2,9 @@
 
 namespace OpenTPW;
 
-public class RideVM
+public partial class RideVM
 {
-	public struct VMConfig
-	{
-		public int StackSize { get; set; }
-		public int LimboSize { get; set; }
-		public int BounceSize { get; set; }
-		public int WalkSize { get; set; }
-		public int TimeSlice { get; set; }
-	}
-	public struct VMFlags
-	{
-		public bool Sign { get; set; }
-		public bool Zero { get; set; }
-		public bool Crit { get; set; }
-	}
-
-	private readonly RsseqFile rsseqFile;
+	private readonly RideScriptFile rsseqFile;
 
 	public string ScriptName { get; set; } = "Unnamed";
 
@@ -42,7 +27,7 @@ public class RideVM
 
 	public RideVM( Stream stream )
 	{
-		rsseqFile = new RsseqFile( this );
+		rsseqFile = new RideScriptFile( this );
 		rsseqFile.ReadFile( stream );
 	}
 

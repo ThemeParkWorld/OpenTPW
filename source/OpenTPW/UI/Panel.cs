@@ -29,6 +29,7 @@ public class Panel
 
 	public virtual void Update()
 	{
+
 	}
 
 	public virtual void Draw()

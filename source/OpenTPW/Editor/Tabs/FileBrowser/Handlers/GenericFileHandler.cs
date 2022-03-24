@@ -1,10 +1,10 @@
 ﻿using ImGuiNET;
 namespace OpenTPW;
 
-[FileManager( @"\..*", IsDefault = true )]
-public class GenericFileManager : BaseFileManager
+[FileHandler( @"\..*", IsDefault = true )]
+public class GenericFileHandler : BaseFileHandler
 {
-	public GenericFileManager( byte[] fileData ) : base( fileData ) { }
+	public GenericFileHandler( byte[] fileData ) : base( fileData ) { }
 
 	public override void Draw()
 	{

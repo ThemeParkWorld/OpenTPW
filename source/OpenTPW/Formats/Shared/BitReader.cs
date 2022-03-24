@@ -1,5 +1,9 @@
 ﻿namespace OpenTPW;
 
+/// <summary>
+/// Allows reading from a byte array on a bit-by-bit basis.
+/// Mainly used for LZSS (de-)compression.
+/// </summary>
 public class BitReader
 {
 	private byte[] buffer;

@@ -26,22 +26,4 @@ public struct Instruction
 	{
 		vmInstance.CallOpcodeHandler( opcode, operands );
 	}
-
-	public override string ToString()
-	{
-		var operandString = "";
-		for ( var i = 0; i < operands.Length; ++i )
-		{
-			operandString += operands[i].Value;
-			if ( i != operands.Length - 1 )
-				operandString += " ";
-		}
-
-		var padding = " ";
-		var opcodeName = opcode.ToString();
-		if ( opcodeName.Length < 8 )
-			padding += " ";
-
-		return $"{opcode}{padding}{operandString}";
-	}
 }

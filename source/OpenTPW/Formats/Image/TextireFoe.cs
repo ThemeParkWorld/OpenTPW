@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-public class WctFile
+public class TextureFile
 {
 	public Texture? Texture { get; set; }
 
@@ -437,7 +437,7 @@ public class WctFile
 	static float ComputeDequantizationScaleCbCr( int n ) => 1.0f - ((float)n * -0.25f);
 	static float ComputeDequantizationScaleA( int n ) => (float)n + 1.0f;
 
-	public WctFile( string path )
+	public TextureFile( string path )
 	{
 		//
 		// Setup readers

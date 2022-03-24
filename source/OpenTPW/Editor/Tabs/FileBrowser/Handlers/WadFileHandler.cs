@@ -2,12 +2,12 @@
 
 namespace OpenTPW;
 
-[FileManager( @"\.wad" )]
-public class WadFileManager : BaseFileManager
+[FileHandler( @"\.wad" )]
+public class WadFileHandler : BaseFileHandler
 {
 	private WadArchive wadArchive;
 
-	public WadFileManager( byte[] fileData ) : base( fileData )
+	public WadFileHandler( byte[] fileData ) : base( fileData )
 	{
 		using var stream = new MemoryStream( fileData );
 		wadArchive = new( stream );

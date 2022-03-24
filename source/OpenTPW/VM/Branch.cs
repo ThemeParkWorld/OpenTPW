@@ -2,7 +2,6 @@
 
 namespace OpenTPW;
 
-[StructLayout( LayoutKind.Auto )]
 public struct Branch
 {
 	/// <summary>

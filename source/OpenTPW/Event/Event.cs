@@ -10,11 +10,11 @@ public static partial class Event
 		public MethodInfo Method { get; set; }
 		public object Object { get; set; }
 
-		public EventRef( string name, MethodInfo method, object @object )
+		public EventRef( string name, MethodInfo method, object obj )
 		{
 			Name = name;
 			Method = method;
-			Object = @object;
+			Object = obj;
 		}
 	}
 

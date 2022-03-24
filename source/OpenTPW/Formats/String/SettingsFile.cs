@@ -1,5 +1,6 @@
 ﻿namespace OpenTPW;
 
+// TODO: Proper struct for SettingsPair
 using SettingsPair = MutablePair<string, string>;
 
 public class SettingsFile
