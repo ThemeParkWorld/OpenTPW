@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-[System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
+[System.AttributeUsage( AttributeTargets.Class, Inherited = false, AllowMultiple = false )]
 sealed class FileManagerAttribute : Attribute
 {
 	public string RegexPattern { get; set; }

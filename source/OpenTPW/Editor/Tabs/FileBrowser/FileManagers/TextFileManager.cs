@@ -3,17 +3,23 @@ using System.Text;
 
 namespace OpenTPW;
 
-partial class FileManagers
+[FileManager( @"\.txt" )]
+public class TextFileManager : BaseFileManager
 {
-	[FileManager( @"\.(sam|txt)" )]
-	public static void DisplayTextFile( byte[] selectedFileData )
+	public TextFileManager( byte[] fileData ) : base( fileData )
 	{
+	}
+
+	public override void Draw()
+	{
+		base.Draw();
+
 		ImGui.Text( $"File type: Text" );
 		ImGui.PushStyleColor( ImGuiCol.FrameBg, OneDark.Background );
 		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
 		ImGui.PushFont( Editor.MonospaceFont );
 
-		var str = Encoding.ASCII.GetString( selectedFileData );
+		var str = Encoding.ASCII.GetString( FileData );
 
 		ImGui.InputTextMultiline(
 			"##text_file_contents",
@@ -23,6 +29,6 @@ partial class FileManagers
 			ImGuiInputTextFlags.ReadOnly );
 
 		ImGui.PopFont();
-		ImGui.PopStyleColor(2);
+		ImGui.PopStyleColor( 2 );
 	}
 }

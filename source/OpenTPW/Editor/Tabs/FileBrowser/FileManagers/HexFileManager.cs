@@ -1,11 +1,14 @@
 ﻿using ImGuiNET;
 namespace OpenTPW;
 
-public static partial class FileManagers
+[FileManager( @"\..*", IsDefault = true )]
+public class GenericFileManager : BaseFileManager
 {
-	[FileManager( @"\..*", IsDefault = true )]
-	public static void DisplayHexFile( byte[] selectedFileData )
+	public GenericFileManager( byte[] fileData ) : base( fileData ) { }
+
+	public override void Draw()
 	{
+		base.Draw();
 		ImGui.Text( $"File type: Generic (hex)" );
 
 		ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
@@ -14,7 +17,7 @@ public static partial class FileManagers
 		ImGui.Columns( 2, "ride_hex_columns", false );
 
 		int minBytes = 0;
-		int maxBytes = Math.Min( selectedFileData.Length, minBytes + 512 );
+		int maxBytes = Math.Min( FileData.Length, minBytes + 512 );
 
 		ImGuiListClipper clipperRef = new();
 		ImGuiListClipperPtr clipper;
@@ -23,7 +26,7 @@ public static partial class FileManagers
 			clipper = new ImGuiListClipperPtr( &clipperRef );
 		}
 
-		clipper.Begin( selectedFileData.Length / 16 );
+		clipper.Begin( FileData.Length / 16 );
 		clipper.ItemsHeight = 16;
 
 		while ( clipper.Step() )
@@ -37,7 +40,7 @@ public static partial class FileManagers
 
 				ImGui.SameLine();
 
-				var b = selectedFileData[i];
+				var b = FileData[i];
 				var color = OneDark.Generic;
 				if ( b == 0 )
 					color = OneDark.DullGeneric;
@@ -56,7 +59,7 @@ public static partial class FileManagers
 
 				ImGui.SameLine();
 
-				var b = selectedFileData[i];
+				var b = FileData[i];
 				char c = (char)b;
 
 				var color = OneDark.Generic;

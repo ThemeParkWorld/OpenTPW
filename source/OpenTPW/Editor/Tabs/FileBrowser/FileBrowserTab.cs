@@ -12,7 +12,9 @@ internal class FileBrowserTab : BaseTab
 	private string selectedFileExtension = "";
 	private string searchBox = "";
 
-	private List<(Regex, MethodInfo)> fileHandlers = new();
+	private List<(Regex, Type)> fileHandlers = new();
+
+	private BaseFileManager? selectedFileHandler;
 
 	public FileBrowserTab()
 	{
@@ -21,20 +23,20 @@ internal class FileBrowserTab : BaseTab
 
 	private void RegisterFileHandlers()
 	{
-		var methods = typeof( FileManagers ).GetMethods().Where( m => m.GetCustomAttribute<FileManagerAttribute>() != null );
+		var types = Assembly.GetExecutingAssembly().GetTypes()
+			.Where( m => m.GetCustomAttribute<FileManagerAttribute>() != null );
 
 		void AddFileHandlers( bool matchDefault )
 		{
-			foreach ( var method in methods )
+			foreach ( var type in types )
 			{
-				var attribute = method.GetCustomAttribute<FileManagerAttribute>();
+				var attribute = type.GetCustomAttribute<FileManagerAttribute>();
 
 				if ( attribute.IsDefault != matchDefault )
 					continue;
 
 				var regex = new Regex( attribute.RegexPattern );
-
-				fileHandlers.Add( (regex, method) );
+				fileHandlers.Add( (regex, type) );
 			}
 		}
 
@@ -80,6 +82,9 @@ internal class FileBrowserTab : BaseTab
 						{
 							selectedFileData = File.ReadAllBytes( file );
 							selectedFileExtension = Path.GetExtension( file );
+
+							var fileHandler = fileHandlers.FirstOrDefault( x => x.Item1.Match( selectedFileExtension ).Success );
+							selectedFileHandler = Activator.CreateInstance( fileHandler.Item2, new object[] { selectedFileData } ) as BaseFileManager;
 						}
 					}
 
@@ -101,18 +106,7 @@ internal class FileBrowserTab : BaseTab
 		ImGui.NextColumn();
 		ImGui.BeginChild( "hex_view" );
 
-		{
-			foreach ( var handler in fileHandlers )
-			{
-				var match = handler.Item1.Match( selectedFileExtension );
-
-				if ( match.Success )
-				{
-					handler.Item2.Invoke( null, new object[] { selectedFileData } );
-					break;
-				}
-			}
-		}
+		selectedFileHandler?.Draw();
 
 		ImGui.Columns( 1 );
 		ImGui.End();

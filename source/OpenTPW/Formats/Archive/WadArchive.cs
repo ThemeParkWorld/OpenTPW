@@ -13,7 +13,13 @@ public class WadArchive
 
 	public WadArchive( string path )
 	{
-		LoadArchive( path );
+		using var fileStream = File.OpenRead( path );
+		LoadArchive( fileStream );
+	}
+
+	public WadArchive( Stream stream )
+	{
+		LoadArchive( stream );
 	}
 
 	public void Dispose()
@@ -121,10 +127,10 @@ public class WadArchive
 		}
 	}
 
-	public void LoadArchive( string path )
+	public void LoadArchive( Stream stream )
 	{
 		// Set up read buffer
-		var tempStreamReader = new StreamReader( path );
+		var tempStreamReader = new StreamReader( stream );
 		var fileLength = (int)tempStreamReader.BaseStream.Length;
 
 		Buffer = new byte[fileLength];
