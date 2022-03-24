@@ -109,3 +109,5 @@ csharp_style_allow_embedded_statements_on_same_line_experimental = false:suggest
 
 dotnet_style_allow_multiple_blank_lines_experimental = false:suggestion
 dotnet_style_allow_statement_immediately_after_block_experimental = false:suggestion
+
+dotnet_diagnostic.IDE0100.severity = error
