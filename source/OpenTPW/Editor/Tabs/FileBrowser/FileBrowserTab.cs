@@ -1,5 +1,7 @@
 ﻿using ImGuiNET;
 using System.Numerics;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace OpenTPW;
 
@@ -7,7 +9,38 @@ namespace OpenTPW;
 internal class FileBrowserTab : BaseTab
 {
 	private byte[] selectedFileData = new byte[0];
+	private string selectedFileExtension = "";
 	private string searchBox = "";
+
+	private List<(Regex, MethodInfo)> fileHandlers = new();
+
+	public FileBrowserTab()
+	{
+		RegisterFileHandlers();
+	}
+
+	private void RegisterFileHandlers()
+	{
+		var methods = typeof( FileManagers ).GetMethods().Where( m => m.GetCustomAttribute<FileManagerAttribute>() != null );
+
+		void AddFileHandlers( bool matchDefault )
+		{
+			foreach ( var method in methods )
+			{
+				var attribute = method.GetCustomAttribute<FileManagerAttribute>();
+
+				if ( attribute.IsDefault != matchDefault )
+					continue;
+
+				var regex = new Regex( attribute.RegexPattern );
+
+				fileHandlers.Add( (regex, method) );
+			}
+		}
+
+		AddFileHandlers( false );
+		AddFileHandlers( true );
+	}
 
 	public override void Draw()
 	{
@@ -44,7 +77,10 @@ internal class FileBrowserTab : BaseTab
 						ImGui.TreeNodeEx( Path.GetRelativePath( rootPath, file ), ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen );
 
 						if ( ImGui.IsItemClicked() )
+						{
 							selectedFileData = File.ReadAllBytes( file );
+							selectedFileExtension = Path.GetExtension( file );
+						}
 					}
 
 					if ( searchBox.Length == 0 )
@@ -66,75 +102,16 @@ internal class FileBrowserTab : BaseTab
 		ImGui.BeginChild( "hex_view" );
 
 		{
-			ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
-			ImGui.BeginChild( "ride_hex" );
-			ImGui.PushFont( Editor.MonospaceFont );
-			ImGui.Columns( 2, "ride_hex_columns", false );
-
-			int minBytes = 0;
-			int maxBytes = Math.Min( selectedFileData.Length, minBytes + 512 );
-
-			ImGuiListClipper clipperRef = new();
-			ImGuiListClipperPtr clipper;
-			unsafe
+			foreach ( var handler in fileHandlers )
 			{
-				clipper = new ImGuiListClipperPtr( &clipperRef );
-			}
+				var match = handler.Item1.Match( selectedFileExtension );
 
-			clipper.Begin( selectedFileData.Length / 16 );
-			clipper.ItemsHeight = 16;
-
-			while ( clipper.Step() )
-			{
-				for ( int i = clipper.DisplayStart * 16; i < clipper.DisplayEnd * 16; i++ )
+				if ( match.Success )
 				{
-					if ( i % 16 == 0 )
-					{
-						EditorHelpers.DrawColoredText( $"0x{i:X4}:", OneDark.Generic );
-					}
-
-					ImGui.SameLine();
-
-					var b = selectedFileData[i];
-					var color = OneDark.Generic;
-					if ( b == 0 )
-						color = OneDark.DullGeneric;
-
-					EditorHelpers.DrawColoredText( $"{b:X2}", color, align: false );
+					handler.Item2.Invoke( null, new object[] { selectedFileData } );
+					break;
 				}
-
-				ImGui.NextColumn();
-
-				for ( int i = clipper.DisplayStart * 16; i < clipper.DisplayEnd * 16; i++ )
-				{
-					if ( i % 16 == 0 )
-					{
-						ImGui.NewLine();
-					}
-
-					ImGui.SameLine();
-
-					var b = selectedFileData[i];
-					char c = (char)b;
-
-					var color = OneDark.Generic;
-					if ( b < 32 )
-					{
-						c = '.';
-						color = OneDark.DullGeneric;
-					}
-
-					EditorHelpers.DrawColoredText( $"{c:X1}", color, align: false );
-				}
-
-				ImGui.NextColumn();
 			}
-
-			ImGui.SetColumnWidth( 0, 450 );
-			ImGui.Columns( 1 );
-			ImGui.PopFont();
-			ImGui.EndChild();
-			ImGui.PopStyleColor();
 		}
 
 		ImGui.Columns( 1 );
