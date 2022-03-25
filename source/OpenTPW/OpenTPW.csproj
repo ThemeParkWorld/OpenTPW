@@ -1,41 +1,46 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="icon.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="icon.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ImGui.NET" Version="1.87.2" />
-    <PackageReference Include="Silk.NET.Input" Version="2.13.0" />
-    <PackageReference Include="Silk.NET.OpenGL" Version="2.13.0" />
-    <PackageReference Include="Silk.NET.OpenGL.Extensions.ImGui" Version="2.13.0" />
-    <PackageReference Include="Silk.NET.Windowing" Version="2.13.0" />
-    <PackageReference Include="StbImageSharp" Version="2.27.8" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ImGui.NET" Version="1.87.2" />
+		<PackageReference Include="Silk.NET.Input" Version="2.13.0" />
+		<PackageReference Include="Silk.NET.OpenGL" Version="2.13.0" />
+		<PackageReference Include="Silk.NET.OpenGL.Extensions.ImGui" Version="2.13.0" />
+		<PackageReference Include="Silk.NET.Windowing" Version="2.13.0" />
+		<PackageReference Include="StbImageSharp" Version="2.27.8" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Settings.Designer.cs">
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\OpenTPW.SourceGenerator\OpenTPW.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
 
 </Project>
