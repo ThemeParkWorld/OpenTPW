@@ -1,8 +1,6 @@
 ﻿using ImGuiNET;
-using System.Numerics;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace OpenTPW;
 
@@ -10,29 +8,34 @@ namespace OpenTPW;
 internal class FileBrowserTab : BaseTab
 {
 	private byte[] selectedFileData = new byte[0];
-	private string selectedFileExtension = "";
 	private string searchBox = "";
 	private string selectedDirectory = "data/";
 
-	private List<RegisteredFileHandler> fileHandlers = new();
+	private Texture folderIcon;
 
 	struct RegisteredFileHandler
 	{
+		public Texture Icon { get; set; }
 		public Regex Regex { get; set; }
 		public Type Type { get; set; }
 
-		public RegisteredFileHandler( Regex regex, Type type )
+		public RegisteredFileHandler( Regex regex, Type type, Texture icon )
 		{
 			Regex = regex;
 			Type = type;
+			Icon = icon;
 		}
 	}
+
+	private List<RegisteredFileHandler> fileHandlers = new();
 
 	private BaseFileHandler? selectedFileHandler;
 
 	public FileBrowserTab()
 	{
 		RegisterFileHandlers();
+
+		folderIcon = TextureBuilder.FromPath( "content/icons/folder.png", flipY: false ).Build();
 	}
 
 	private void RegisterFileHandlers()
@@ -50,7 +53,10 @@ internal class FileBrowserTab : BaseTab
 					continue;
 
 				var regex = new Regex( attribute.RegexPattern );
-				fileHandlers.Add( new( regex, type ) );
+				var icon = TextureBuilder.FromPath( attribute.Icon, flipY: false ).Build();
+				var registeredFileHandler = new RegisteredFileHandler( regex, type, icon );
+
+				fileHandlers.Add( registeredFileHandler );
 			}
 		}
 
@@ -60,22 +66,26 @@ internal class FileBrowserTab : BaseTab
 		AddFileHandlers( true );
 	}
 
+	private System.Numerics.Vector2 iconPosition = new();
+	private System.Numerics.Vector2 IconSize => new( 64, 64 );
+	private System.Numerics.Vector2 IconPadding => new( 32, 32 );
+
 	private void DrawIcon( Texture icon, string text )
 	{
-		var xy = new System.Numerics.Vector2( x, y );
-		ImGui.SetCursorPos( xy - new System.Numerics.Vector2( 0, 8 ) );
+		ImGui.SetCursorPos( iconPosition - new System.Numerics.Vector2( 0, IconPadding.Y * 0.5f ) );
+		ImGui.Image( (IntPtr)icon.Id, IconSize );
 
-		ImGui.Image( (IntPtr)icon.Id, new System.Numerics.Vector2( 64, 64 ) );
-
+		//
+		// Centered text offset
+		//
 		float mid = ImGui.CalcTextSize( text ).X;
-		mid = 64 - mid;
-		mid = mid / 2f;
+		mid = (IconSize.X - mid) / 2f;
 
-		ImGui.SetCursorPos( xy + new System.Numerics.Vector2( mid, 64 - 8 ) );
+		ImGui.SetCursorPos( iconPosition + new System.Numerics.Vector2( mid, IconSize.Y - IconPadding.Y * 0.5f ) );
 		ImGui.Text( text );
 
-		ImGui.SetCursorPos( xy );
-		ImGui.InvisibleButton( $"button{text}", new System.Numerics.Vector2( 64, 64 ) );
+		ImGui.SetCursorPos( iconPosition );
+		ImGui.InvisibleButton( $"button{text}", IconSize );
 
 		var drawList = ImGui.GetForegroundDrawList();
 
@@ -85,38 +95,36 @@ internal class FileBrowserTab : BaseTab
 			var col = OneDark.Comment;
 			col.W = 0.5f;
 
-			var offset = new System.Numerics.Vector2( 16, 16 );
-			drawList.AddRect( pos - offset, pos + new System.Numerics.Vector2( 64, 64 ) + offset, ImGui.GetColorU32( col ), 8f, ImDrawFlags.None, 4f );
+			var halfPadding = IconPadding / 2f;
+			var rectOffset = new System.Numerics.Vector2( 0, -8 );
+
+			drawList.AddRect(
+				pos - halfPadding + rectOffset,
+				pos + IconSize + halfPadding + rectOffset,
+				ImGui.GetColorU32( col ),
+				8f,
+				ImDrawFlags.None,
+				4f );
 		}
 
-		x += 96;
+		iconPosition.X += IconSize.X + IconPadding.X;
 		var maxWidth = ImGui.GetWindowWidth() - 48;
-		if ( x > maxWidth )
+		if ( iconPosition.X > maxWidth )
 		{
-			x = 32;
-			y += 96;
+			iconPosition.X = IconPadding.X;
+			iconPosition.Y += IconSize.Y + IconPadding.Y;
 		}
 	}
 
-	float x = 0;
-	float y = 0;
-
 	private void DisplayDirectory( string rootPath, string directory )
 	{
-		var relativePath = Path.GetRelativePath( rootPath, directory );
-		var dirName = Path.GetFileName( relativePath );
-
-		if ( searchBox.Length > 0 )
-			ImGui.SetNextItemOpen( true );
-
-
 		foreach ( var subDir in Directory.GetDirectories( directory ) )
 		{
 			var subDirName = Path.GetFileName( subDir );
 
 			if ( searchBox.Length == 0 )
 			{
-				DrawIcon( Icons.Folder, subDirName );
+				DrawIcon( folderIcon, subDirName );
 
 				if ( ImGui.IsItemClicked() )
 				{
@@ -134,54 +142,24 @@ internal class FileBrowserTab : BaseTab
 			if ( searchBox.Length > 0 && !file.Contains( searchBox ) )
 				continue;
 
-			ImGui.SetCursorPos( new System.Numerics.Vector2( x, y ) );
-			var icon = Icons.Document;
-
-			switch ( Path.GetExtension( file ).ToLower() )
-			{
-				case ".wad":
-					icon = Icons.Archive;
-					break;
-				case ".wct":
-				case ".tga":
-				case ".png":
-				case ".jpg":
-				case ".jpeg":
-					icon = Icons.Image;
-					break;
-				case ".rse":
-				case ".rss":
-					icon = Icons.Ride;
-					break;
-				case ".sf2":
-				case ".mp2":
-				case ".sdt":
-					icon = Icons.Sound;
-					break;
-				case ".md2":
-					icon = Icons.Model;
-					break;
-				default:
-					icon = Icons.Document;
-					break;
-			}
+			var fileHandler = FindFileHandler( Path.GetExtension( file ) );
+			var icon = fileHandler.Icon;
 
 			DrawIcon( icon, Path.GetFileName( file ) );
 
 			if ( ImGui.IsItemClicked() )
 			{
 				selectedFileData = File.ReadAllBytes( file );
-				selectedFileExtension = Path.GetExtension( file );
-
-				var fileHandler = fileHandlers.FirstOrDefault( h => h.Regex.Match( selectedFileExtension ).Success );
 
 				var args = new object[] { selectedFileData };
 				selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;
 			}
 		}
+	}
 
-		// if ( searchBox.Length == 0 )
-		// ImGui.TreePop();
+	private RegisteredFileHandler FindFileHandler( string fileExtension )
+	{
+		return fileHandlers.FirstOrDefault( h => h.Regex.Match( fileExtension ).Success );
 	}
 
 	public override void Draw()
@@ -190,47 +168,60 @@ internal class FileBrowserTab : BaseTab
 
 		ImGui.Columns( 2 );
 
-		ImGui.SetNextItemWidth( -1 );
-		ImGui.InputText( "##search", ref searchBox, 256 );
-
-		string totalPath = "";
-		foreach ( var directory in selectedDirectory.Split( Path.DirectorySeparatorChar ) )
+		//
+		// Search box
+		//
 		{
-			totalPath = Path.Join( totalPath, directory );
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.InputText( "##search", ref searchBox, 256 );
+		}
 
-			if ( ImGui.Button( directory ) )
+		//
+		// Breadcrumbs
+		//
+		{
+			string totalPath = "";
+			foreach ( var directory in selectedDirectory.Split( Path.DirectorySeparatorChar ) )
 			{
-				selectedDirectory = totalPath;
-			}
+				totalPath = Path.Join( totalPath, directory );
 
-			ImGui.SameLine();
-			ImGui.Text( Path.DirectorySeparatorChar.ToString() );
-			ImGui.SameLine();
+				if ( ImGui.Button( directory ) )
+				{
+					selectedDirectory = totalPath;
+				}
+
+				ImGui.SameLine();
+				ImGui.Text( Path.DirectorySeparatorChar.ToString() );
+				ImGui.SameLine();
+			}
 		}
 
 		ImGui.NewLine();
 
-		ImGui.BeginChild( "files" );
-
 		//
 		// Directory view
 		//
-		var path = GameDir.GetPath( selectedDirectory );
-		x = 32;
-		y = 32;
-		DisplayDirectory( path, path );
+		ImGui.BeginChild( "files" );
+		{
+			iconPosition = IconPadding;
 
+			var path = GameDir.GetPath( selectedDirectory );
+			DisplayDirectory( path, path );
+		}
 		ImGui.EndChild();
 
 		//
 		// File view
 		//
 		ImGui.NextColumn();
-		ImGui.BeginChild( "hex_view" );
-
-		selectedFileHandler?.Draw();
+		ImGui.BeginChild( "file_view" );
+		{
+			selectedFileHandler?.Draw();
+		}
+		ImGui.EndChild();
 
 		ImGui.Columns( 1 );
 		ImGui.End();
+
 	}
 }

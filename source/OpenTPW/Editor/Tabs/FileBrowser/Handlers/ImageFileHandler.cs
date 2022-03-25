@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenTPW;
 
-[FileHandler( @"\.(png|tga|jpg|jpeg)" )]
+[FileHandler( @"\.(png|tga|jpg|jpeg)", icon: "content/icons/image.png" )]
 public class ImageFileHandler : BaseFileHandler
 {
 	private Texture texture;

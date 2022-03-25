@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTPW", "OpenTPW\OpenTPW.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTPW.Tests", "OpenTPW.Tests\OpenTPW.Tests.csproj", "{96BBB7AC-AC1F-4430-8039-21D03E4903AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTPW.SourceGenerator", "OpenTPW.SourceGenerator\OpenTPW.SourceGenerator.csproj", "{0C5062FE-AC88-4A90-89D2-6FA94A187045}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{96BBB7AC-AC1F-4430-8039-21D03E4903AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96BBB7AC-AC1F-4430-8039-21D03E4903AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96BBB7AC-AC1F-4430-8039-21D03E4903AD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C5062FE-AC88-4A90-89D2-6FA94A187045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C5062FE-AC88-4A90-89D2-6FA94A187045}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C5062FE-AC88-4A90-89D2-6FA94A187045}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C5062FE-AC88-4A90-89D2-6FA94A187045}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

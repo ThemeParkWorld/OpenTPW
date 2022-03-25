@@ -2,7 +2,7 @@
 
 namespace OpenTPW;
 
-[FileHandler( @"\.wad" )]
+[FileHandler( @"\.wad", icon: "content/icons/archive.png" )]
 public class WadFileHandler : BaseFileHandler
 {
 	private WadArchive wadArchive;
