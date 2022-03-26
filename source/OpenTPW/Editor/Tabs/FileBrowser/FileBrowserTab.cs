@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -9,9 +10,11 @@ internal class FileBrowserTab : BaseTab
 {
 	private byte[] selectedFileData = new byte[0];
 	private string searchBox = "";
-	private string selectedDirectory = "data/";
+	private string selectedDirectory = "data";
 
 	private Texture folderIcon;
+
+	private List<FilePreviewTab> subTabs = new List<FilePreviewTab>();
 
 	struct RegisteredFileHandler
 	{
@@ -108,12 +111,23 @@ internal class FileBrowserTab : BaseTab
 		}
 
 		iconPosition.X += IconSize.X + IconPadding.X;
-		var maxWidth = ImGui.GetWindowWidth() - 48;
+		var maxWidth = ImGui.GetWindowWidth() - IconSize.X;
+
 		if ( iconPosition.X > maxWidth )
 		{
 			iconPosition.X = IconPadding.X;
 			iconPosition.Y += IconSize.Y + IconPadding.Y;
 		}
+	}
+
+	private void StartProcess( string processName, string arguments )
+	{
+		var process = new Process();
+		process.StartInfo.FileName = processName;
+		process.StartInfo.Arguments = arguments;
+
+		Log.Trace( arguments );
+		process.Start();
 	}
 
 	private void DisplayDirectory( string rootPath, string directory )
@@ -125,6 +139,17 @@ internal class FileBrowserTab : BaseTab
 			if ( searchBox.Length == 0 )
 			{
 				DrawIcon( folderIcon, subDirName );
+
+				if ( ImGui.BeginPopupContextItem() )
+				{
+					ImGui.Text( $"Folder: {subDirName}" );
+					ImGui.Separator();
+
+					if ( ImGui.Selectable( "Show in Explorer" ) )
+						StartProcess( "explorer.exe", $"/select,\"{subDir}\"" );
+
+					ImGui.EndPopup();
+				}
 
 				if ( ImGui.IsItemClicked() )
 				{
@@ -147,12 +172,38 @@ internal class FileBrowserTab : BaseTab
 
 			DrawIcon( icon, Path.GetFileName( file ) );
 
+			if ( ImGui.BeginPopupContextItem() )
+			{
+				ImGui.Text( $"File: {Path.GetFileName( file )}" );
+				ImGui.Separator();
+
+				if ( ImGui.Selectable( "Show in Explorer" ) )
+					StartProcess( "explorer.exe", $"/select,\"{file}\"");
+
+				if ( ImGui.Selectable( "Open in Hex Editor" ) )
+				{
+					selectedFileData = File.ReadAllBytes( file );
+					subTabs.Add( new FilePreviewTab( selectedFileData, new GenericFileHandler( selectedFileData ) ) );
+				}
+
+				if ( ImGui.Selectable( "Open in HxD" ) )
+					StartProcess( @"C:\Program Files\HxD\HxD.exe", $"\"{file}\"" );
+
+				if ( ImGui.Selectable( "Open in Notepad" ) )
+					StartProcess( @"notepad.exe", $"\"{file}\"" );
+
+
+				ImGui.EndPopup();
+			}
+
 			if ( ImGui.IsItemClicked() )
 			{
 				selectedFileData = File.ReadAllBytes( file );
 
 				var args = new object[] { selectedFileData };
 				selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;
+
+				subTabs.Add( new FilePreviewTab( selectedFileData, selectedFileHandler ) );
 			}
 		}
 	}
@@ -165,8 +216,6 @@ internal class FileBrowserTab : BaseTab
 	public override void Draw()
 	{
 		ImGui.Begin( "Files", ref visible );
-
-		ImGui.Columns( 2 );
 
 		//
 		// Search box
@@ -202,26 +251,17 @@ internal class FileBrowserTab : BaseTab
 		// Directory view
 		//
 		ImGui.BeginChild( "files" );
+
 		{
 			iconPosition = IconPadding;
 
 			var path = GameDir.GetPath( selectedDirectory );
 			DisplayDirectory( path, path );
 		}
-		ImGui.EndChild();
 
-		//
-		// File view
-		//
-		ImGui.NextColumn();
-		ImGui.BeginChild( "file_view" );
-		{
-			selectedFileHandler?.Draw();
-		}
 		ImGui.EndChild();
-
-		ImGui.Columns( 1 );
 		ImGui.End();
 
+		subTabs.ForEach( x => x.Draw() );
 	}
 }
