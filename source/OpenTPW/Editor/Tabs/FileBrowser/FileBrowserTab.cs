@@ -8,13 +8,12 @@ namespace OpenTPW;
 [EditorMenu( "Debug/File Tree" )]
 internal class FileBrowserTab : BaseTab
 {
-	private byte[] selectedFileData = new byte[0];
-	private string searchBox = "";
+	private string searchBoxText = "";
 	private string selectedDirectory = "data";
 
 	private Texture folderIcon;
 
-	private List<FilePreviewTab> subTabs = new List<FilePreviewTab>();
+	private List<FilePreviewTab> subTabs = new();
 
 	struct RegisteredFileHandler
 	{
@@ -96,18 +95,17 @@ internal class FileBrowserTab : BaseTab
 		{
 			var pos = ImGui.GetItemRectMin();
 			var col = OneDark.Comment;
-			col.W = 0.5f;
+			col.W = 0.25f;
 
 			var halfPadding = IconPadding / 2f;
 			var rectOffset = new System.Numerics.Vector2( 0, -8 );
 
-			drawList.AddRect(
+			drawList.AddRectFilled(
 				pos - halfPadding + rectOffset,
 				pos + IconSize + halfPadding + rectOffset,
 				ImGui.GetColorU32( col ),
 				8f,
-				ImDrawFlags.None,
-				4f );
+				ImDrawFlags.None );
 		}
 
 		iconPosition.X += IconSize.X + IconPadding.X;
@@ -136,10 +134,13 @@ internal class FileBrowserTab : BaseTab
 		{
 			var subDirName = Path.GetFileName( subDir );
 
-			if ( searchBox.Length == 0 )
+			if ( searchBoxText.Length == 0 )
 			{
 				DrawIcon( folderIcon, subDirName );
 
+				//
+				// Context menu
+				//
 				if ( ImGui.BeginPopupContextItem() )
 				{
 					ImGui.Text( $"Folder: {subDirName}" );
@@ -164,7 +165,7 @@ internal class FileBrowserTab : BaseTab
 
 		foreach ( var file in Directory.GetFiles( directory ) )
 		{
-			if ( searchBox.Length > 0 && !file.Contains( searchBox ) )
+			if ( searchBoxText.Length > 0 && !file.Contains( searchBoxText ) )
 				continue;
 
 			var fileHandler = FindFileHandler( Path.GetExtension( file ) );
@@ -172,18 +173,21 @@ internal class FileBrowserTab : BaseTab
 
 			DrawIcon( icon, Path.GetFileName( file ) );
 
+			//
+			// Context menu
+			//
 			if ( ImGui.BeginPopupContextItem() )
 			{
 				ImGui.Text( $"File: {Path.GetFileName( file )}" );
 				ImGui.Separator();
 
 				if ( ImGui.Selectable( "Show in Explorer" ) )
-					StartProcess( "explorer.exe", $"/select,\"{file}\"");
+					StartProcess( "explorer.exe", $"/select,\"{file}\"" );
 
 				if ( ImGui.Selectable( "Open in Hex Editor" ) )
 				{
-					selectedFileData = File.ReadAllBytes( file );
-					subTabs.Add( new FilePreviewTab( selectedFileData, new GenericFileHandler( selectedFileData ) ) );
+					var fileData = File.ReadAllBytes( file );
+					subTabs.Add( new FilePreviewTab( fileData, new GenericFileHandler( fileData ) ) );
 				}
 
 				if ( ImGui.Selectable( "Open in HxD" ) )
@@ -198,12 +202,12 @@ internal class FileBrowserTab : BaseTab
 
 			if ( ImGui.IsItemClicked() )
 			{
-				selectedFileData = File.ReadAllBytes( file );
+				var fileData = File.ReadAllBytes( file );
 
-				var args = new object[] { selectedFileData };
+				var args = new object[] { fileData };
 				selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;
 
-				subTabs.Add( new FilePreviewTab( selectedFileData, selectedFileHandler ) );
+				subTabs.Add( new FilePreviewTab( fileData, selectedFileHandler ) );
 			}
 		}
 	}
@@ -222,7 +226,7 @@ internal class FileBrowserTab : BaseTab
 		//
 		{
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputText( "##search", ref searchBox, 256 );
+			ImGui.InputText( "##search", ref searchBoxText, 256 );
 		}
 
 		//
