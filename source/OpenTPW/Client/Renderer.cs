@@ -72,28 +72,28 @@ internal class Renderer
 		{
 			Elements = new[]
 			{
-					new ResourceLayoutElementDescription()
-					{
-						Kind = ResourceKind.TextureReadOnly,
-						Name = "mainTexture",
-						Options = ResourceLayoutElementOptions.None,
-						Stages = ShaderStages.Fragment
-					},
-					new ResourceLayoutElementDescription()
-					{
-						Kind = ResourceKind.Sampler,
-						Name = "mainTextureSampler",
-						Options = ResourceLayoutElementOptions.None,
-						Stages = ShaderStages.Fragment
-					},
-					new ResourceLayoutElementDescription()
-					{
-						Kind = ResourceKind.UniformBuffer,
-						Name = "ubo",
-						Options = ResourceLayoutElementOptions.None,
-						Stages = ShaderStages.Vertex
-					}
+				new ResourceLayoutElementDescription()
+				{
+					Kind = ResourceKind.TextureReadOnly,
+					Name = "g_t",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Fragment
+				},
+				new ResourceLayoutElementDescription()
+				{
+					Kind = ResourceKind.Sampler,
+					Name = "mainTextureSampler",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Fragment
+				},
+				new ResourceLayoutElementDescription()
+				{
+					Kind = ResourceKind.UniformBuffer,
+					Name = "ubo",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Vertex
 				}
+			}
 		};
 
 		rsrcLayout = graphicsDevice.ResourceFactory.CreateResourceLayout( rsrcLayoutDesc );
@@ -176,7 +176,8 @@ internal class Renderer
 		};
 
 		graphicsDevice = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow,
-													   options,
-													   GraphicsBackend.Direct3D11 );
+													   options );
+
+		Window.Current.SdlWindow.Title += graphicsDevice.BackendType.ToString();
 	}
 }
