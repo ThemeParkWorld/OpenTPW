@@ -2,5 +2,7 @@
 
 public enum InputButton
 {
-	ConsoleToggle
+	ConsoleToggle,
+	RotateLeft,
+	RotateRight
 }

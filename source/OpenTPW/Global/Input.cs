@@ -77,6 +77,10 @@ public static partial class Input
 
 			if ( keyboard.IsKeyPressed( Key.F1 ) )
 				KeysDown.Add( InputButton.ConsoleToggle );
+			if ( keyboard.IsKeyPressed( Key.Left ) )
+				KeysDown.Add( InputButton.RotateLeft );
+			if ( keyboard.IsKeyPressed( Key.Right ) )
+				KeysDown.Add( InputButton.RotateRight );
 		}
 	}
 }
