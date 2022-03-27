@@ -1,28 +1,24 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace OpenTPW;
 
 public class Shader
 {
-	public uint Id { get; set; }
-
 	public static ShaderBuilder Builder => new();
 
-	internal Shader( uint id )
+	internal Shader()
 	{
-		Id = id;
 	}
 
 	public void Use()
 	{
-		Gl.UseProgram( Id );
 	}
 
 	public void SetFloat( string name, float value )
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )
 		{
-			Gl.ProgramUniform1( Id, loc, value );
 		}
 	}
 
@@ -30,15 +26,13 @@ public class Shader
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )
 		{
-			Gl.ProgramUniform1( Id, loc, value );
 		}
 	}
 
-	public unsafe void SetMatrix( string name, Matrix4X4 value )
+	public unsafe void SetMatrix( string name, Matrix4x4 value )
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )
 		{
-			Gl.ProgramUniformMatrix4( Id, loc, 1, false, (float*)Unsafe.AsPointer( ref value ) );
 		}
 	}
 
@@ -46,7 +40,6 @@ public class Shader
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )
 		{
-			Gl.ProgramUniform2( Id, loc, value.X, value.Y );
 		}
 	}
 
@@ -54,7 +47,6 @@ public class Shader
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )
 		{
-			Gl.ProgramUniform3( Id, loc, value.X, value.Y, value.Z );
 		}
 	}
 
@@ -62,13 +54,12 @@ public class Shader
 	{
 		if ( TryGetUniformLocation( name, out int loc ) )
 		{
-			Gl.ProgramUniform1( Id, loc, value ? 1 : 0 );
 		}
 	}
 
 	private bool TryGetUniformLocation( string name, out int loc )
 	{
-		loc = Gl.GetUniformLocation( Id, name );
+		loc = -1;
 
 		if ( loc < 0 )
 		{

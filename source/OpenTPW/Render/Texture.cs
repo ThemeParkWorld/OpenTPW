@@ -1,6 +1,4 @@
-﻿using Silk.NET.OpenGL;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 public class Texture : Asset
 {
@@ -24,8 +22,8 @@ public class Texture : Asset
 		All.Add( this );
 	}
 
-	public void Bind( TextureTarget textureTarget = TextureTarget.Texture2D )
+	public void Bind()
 	{
-		Gl.BindTexture( textureTarget, Id );
+
 	}
 }

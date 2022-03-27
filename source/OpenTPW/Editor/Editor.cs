@@ -1,13 +1,12 @@
 ﻿using ImGuiNET;
-using Silk.NET.Input;
-using Silk.NET.OpenGL.Extensions.ImGui;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Veldrid;
 
 namespace OpenTPW;
 internal partial class Editor
 {
-	private ImGuiController ImGuiController;
+	private ImGuiRenderer ImGuiController;
 	private Texture defaultFontTexture;
 
 	private List<BaseTab> tabs = new();
@@ -17,7 +16,7 @@ internal partial class Editor
 	public static ImFontPtr MonospaceFont { get; private set; }
 	public static ImFontPtr SansSerifFont { get; private set; }
 
-	public Editor( ImGuiController imGuiController )
+	public Editor( ImGuiRenderer imGuiController )
 	{
 		ImGuiController = imGuiController;
 
@@ -48,7 +47,7 @@ internal partial class Editor
 		io.KeyMap[(int)ImGuiKey.Home] = (int)Key.Home;
 		io.KeyMap[(int)ImGuiKey.End] = (int)Key.End;
 		io.KeyMap[(int)ImGuiKey.Delete] = (int)Key.Delete;
-		io.KeyMap[(int)ImGuiKey.Backspace] = (int)Key.Backspace;
+		io.KeyMap[(int)ImGuiKey.Backspace] = (int)Key.BackSpace;
 		io.KeyMap[(int)ImGuiKey.Enter] = (int)Key.Enter;
 		io.KeyMap[(int)ImGuiKey.Escape] = (int)Key.Escape;
 		io.KeyMap[(int)ImGuiKey.A] = (int)Key.A;
@@ -115,9 +114,9 @@ internal partial class Editor
 		ImGui.EndMainMenuBar();
 	}
 
-	public void Update()
+	public void UpdateFrom( InputSnapshot inputSnapshot )
 	{
-		ImGuiController.Update( Time.Delta );
+		ImGuiController.Update( Time.Delta, inputSnapshot );
 
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			shouldRender = !shouldRender;

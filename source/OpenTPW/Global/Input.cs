@@ -1,5 +1,5 @@
 ﻿using ImGuiNET;
-using Silk.NET.Input;
+using Veldrid;
 
 namespace OpenTPW;
 
@@ -28,58 +28,59 @@ public static partial class Input
 		return !KeysDown.Contains( button ) && LastKeysDown.Contains( button );
 	}
 
-	public static void UpdateFrom( IInputContext inputContext )
+	public static void UpdateFrom( InputSnapshot inputSnapshot )
 	{
 		var io = ImGui.GetIO();
-		var mouse = inputContext.Mice.First();
 
-		if ( mouse.Position.X < 0 || mouse.Position.X > Screen.Size.X
-			|| mouse.Position.Y < 0 || mouse.Position.Y > Screen.Size.Y )
+		if ( inputSnapshot.MousePosition.X < 0 || inputSnapshot.MousePosition.X > Screen.Size.X
+			|| inputSnapshot.MousePosition.Y < 0 || inputSnapshot.MousePosition.Y > Screen.Size.Y )
 			return;
 
 		if ( io.WantCaptureMouse )
 		{
-			mouse.Cursor.CursorMode = CursorMode.Normal;
+			// mouse.Cursor.CursorMode = CursorMode.Normal;
 			Mouse = new MouseInfo();
 		}
 		else
 		{
-			mouse.Cursor.CursorMode = CursorMode.Hidden;
+			// mouse.Cursor.CursorMode = CursorMode.Hidden;
 
-			var mousePos = new Vector2( mouse.Position.X, mouse.Position.Y );
+			var mousePos = new Vector2( inputSnapshot.MousePosition.X, inputSnapshot.MousePosition.Y );
 			var mouseInfo = new MouseInfo
 			{
 				Delta = Mouse.Position - mousePos,
 				Position = mousePos,
-				Left = mouse.IsButtonPressed( MouseButton.Left ),
-				Right = mouse.IsButtonPressed( MouseButton.Right ),
-				Wheel = mouse.ScrollWheels.First().Y
+				Left = inputSnapshot.IsMouseDown( MouseButton.Left ),
+				Right = inputSnapshot.IsMouseDown( MouseButton.Right ),
+				Wheel = inputSnapshot.WheelDelta
 			};
 
 			Mouse = mouseInfo;
 
-			var keyboard = inputContext.Keyboards.First();
-
 			Right = 0;
 			Forward = 0;
 
-			if ( keyboard.IsKeyPressed( Key.A ) )
+			var keysDown = inputSnapshot.KeyEvents.Where( x => x.Down ).Select( x => x.Key );
+
+			bool IsKeyPressed( Key k ) => keysDown.Contains( k );
+
+			if ( IsKeyPressed( Key.A ) )
 				Right -= 1;
-			if ( keyboard.IsKeyPressed( Key.D ) )
+			if ( IsKeyPressed( Key.D ) )
 				Right += 1;
-			if ( keyboard.IsKeyPressed( Key.W ) )
+			if ( IsKeyPressed( Key.W ) )
 				Forward += 1;
-			if ( keyboard.IsKeyPressed( Key.S ) )
+			if ( IsKeyPressed( Key.S ) )
 				Forward -= 1;
 
 			LastKeysDown = KeysDown.ToList();
 			KeysDown.Clear();
 
-			if ( keyboard.IsKeyPressed( Key.F1 ) )
+			if ( IsKeyPressed( Key.F1 ) )
 				KeysDown.Add( InputButton.ConsoleToggle );
-			if ( keyboard.IsKeyPressed( Key.Left ) )
+			if ( IsKeyPressed( Key.Left ) )
 				KeysDown.Add( InputButton.RotateLeft );
-			if ( keyboard.IsKeyPressed( Key.Right ) )
+			if ( IsKeyPressed( Key.Right ) )
 				KeysDown.Add( InputButton.RotateRight );
 		}
 	}

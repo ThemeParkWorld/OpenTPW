@@ -1,13 +1,15 @@
-﻿namespace OpenTPW;
+﻿using System.Numerics;
+
+namespace OpenTPW;
 
 public class Camera : Entity
 {
-	public Matrix4X4 ViewMatrix { get; set; }
-	public Matrix4X4 ProjMatrix { get; set; }
+	public Matrix4x4 ViewMatrix { get; set; }
+	public Matrix4x4 ProjMatrix { get; set; }
 
-	public Vector3 Forward => -new Vector3( ViewMatrix.Column3.X, ViewMatrix.Column3.Y, ViewMatrix.Column3.Z );
-	public Vector3 Right => new Vector3( ViewMatrix.Column1.X, ViewMatrix.Column1.Y, ViewMatrix.Column1.Z );
-	public Vector3 Up => new Vector3( ViewMatrix.Column2.X, ViewMatrix.Column2.Y, ViewMatrix.Column2.Z );
+	public Vector3 Forward => Vector3.Zero;
+	public Vector3 Right => Vector3.Zero;
+	public Vector3 Up => Vector3.Zero;
 
 	private Vector3 velocity = new();
 	private Vector3 wishVelocity = new();
@@ -29,8 +31,8 @@ public class Camera : Entity
 
 		var cameraUp = new Vector3( 0, 0, 1 );
 
-		ViewMatrix = Silk.NET.Maths.Matrix4X4.CreateLookAt<float>( cameraPos, lookAt, cameraUp );
-		ProjMatrix = Silk.NET.Maths.Matrix4X4.CreatePerspectiveFieldOfView<float>(
+		ViewMatrix = Matrix4x4.CreateLookAt( cameraPos, lookAt, cameraUp );
+		ProjMatrix = Matrix4x4.CreatePerspectiveFieldOfView(
 			90.0f.DegreesToRadians(),
 			Screen.Aspect,
 			0.1f,

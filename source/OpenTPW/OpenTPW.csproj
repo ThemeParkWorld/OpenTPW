@@ -16,12 +16,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="ImGui.NET" Version="1.87.2" />
-		<PackageReference Include="Silk.NET.Input" Version="2.13.0" />
-		<PackageReference Include="Silk.NET.OpenGL" Version="2.13.0" />
-		<PackageReference Include="Silk.NET.OpenGL.Extensions.ImGui" Version="2.13.0" />
-		<PackageReference Include="Silk.NET.Windowing" Version="2.13.0" />
 		<PackageReference Include="StbImageSharp" Version="2.27.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+		<PackageReference Include="Veldrid" Version="4.8.0" />
+		<PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
+		<PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
+		<PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
+		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>

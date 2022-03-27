@@ -1,7 +1,5 @@
-﻿using Silk.NET.Input;
-using Silk.NET.OpenGL;
-using Silk.NET.OpenGL.Extensions.ImGui;
-using Silk.NET.Windowing;
+﻿using Veldrid.StartupUtilities;
+using Veldrid.Sdl2;
 
 namespace OpenTPW;
 
@@ -11,75 +9,34 @@ namespace OpenTPW;
 /// </summary>
 internal class Window
 {
-	private IWindow window;
+	public static Window Current { get; set; }
 
-	private Editor? editor;
+	public Sdl2Window SdlWindow { get; private set; }
 
-	private ImGuiController? imgui;
-	private IInputContext inputContext;
-
-	private World world;
+	public Point2 Size => new Point2( SdlWindow.Width, SdlWindow.Height );
 
 	public Window()
 	{
-		var windowOptions = WindowOptions.Default;
-		windowOptions.Position = new Point2( 32, 32 );
+		Current ??= this;
 
-		window = Silk.NET.Windowing.Window.Create( windowOptions );
-		window.Size = new Point2( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y );
-		window.Title = "OpenTPW";
+		var windowCreateInfo = new WindowCreateInfo()
+		{
+			WindowWidth = Settings.Default.GameWindowSize.X,
+			WindowHeight = Settings.Default.GameWindowSize.Y,
+			WindowTitle = "OpenTPW",
+			X = 32,
+			Y = 32
+		};
 
-		Screen.UpdateFrom( window.Size );
+		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
 
-		window.Load += Window_Load;
-		window.Render += Window_Render;
-		window.Closing += Window_Closing;
-		window.Resize += Window_Resize;
+		Screen.UpdateFrom( Size );
 
-		window.Run();
+		SdlWindow.Resized += SdlWindow_Resized;
 	}
 
-	private void Window_Resize( Point2 newSize )
+	private void SdlWindow_Resized()
 	{
-		Gl.Viewport( newSize );
-
-		Screen.UpdateFrom( newSize );
-	}
-
-	private void Window_Closing()
-	{
-		window.Dispose();
-	}
-
-	private void Window_Render( double deltaTime )
-	{
-		Time.UpdateFrom( (float)deltaTime );
-		Input.UpdateFrom( inputContext );
-
-		Gl.ClearColor( 0, 0, 0, 1 );
-		Gl.Clear( ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit );
-
-		world.Update();
-		world.Render();
-
-		editor?.Update();
-		imgui?.Render();
-	}
-
-	private void Window_Load()
-	{
-		window.SetWindowIcon( IconLoader.LoadIcon( "content/icon-sm.tga" ) );
-
-		Global.Gl = window.CreateOpenGL();
-		inputContext = window.CreateInput();
-		imgui = new( Global.Gl, window, inputContext );
-
-		world = new();
-
-		editor = new Editor( imgui );
-
-		Gl.Enable( EnableCap.Blend );
-		Gl.Enable( EnableCap.DepthTest );
-		Gl.BlendFunc( BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha );
+		Screen.UpdateFrom( Size );
 	}
 }

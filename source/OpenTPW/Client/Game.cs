@@ -6,11 +6,11 @@
 /// </summary>
 internal class Game
 {
-    Window window;
+	Renderer renderer;
 
-    public Game()
-    {
-        Log.Trace( "Initializing game" );
-        window = new Window();
-    }
+	public Game()
+	{
+		Log.Trace( "Initializing game" );
+		renderer = new();
+	}
 }

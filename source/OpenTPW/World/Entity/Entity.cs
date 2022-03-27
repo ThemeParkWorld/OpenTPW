@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Reflection;
 
 namespace OpenTPW;
@@ -25,13 +26,13 @@ public class Entity
 
 	public string Name { get; set; }
 
-	public Matrix4X4 ModelMatrix
+	public Matrix4x4 ModelMatrix
 	{
 		get
 		{
-			var matrix = Silk.NET.Maths.Matrix4X4.CreateScale( scale );
-			matrix *= Silk.NET.Maths.Matrix4X4.CreateTranslation( position );
-			matrix *= Silk.NET.Maths.Matrix4X4.CreateFromYawPitchRoll(
+			var matrix = Matrix4x4.CreateScale( scale );
+			matrix *= Matrix4x4.CreateTranslation( position );
+			matrix *= Matrix4x4.CreateFromYawPitchRoll(
 				rotation.Y.DegreesToRadians(),
 				rotation.X.DegreesToRadians(),
 				rotation.Z.DegreesToRadians() );
