@@ -9,10 +9,17 @@ uniform mat4 g_mProj;
 uniform mat4 g_mView;
 
 out struct VS_OUT {
-    vec2 texCoords;
+    vec2 vTexCoords;
+    vec3 vNormal;
+    vec3 vPosition;
 } vs_out;
 
 void main() {
-    vs_out.texCoords = texCoords;
-    gl_Position = g_mProj * g_mView * g_mModel * vec4( position, 1.0 );
+    vs_out.vTexCoords = texCoords;
+    vs_out.vNormal = normal;
+
+    vec4 pos = g_mModel * vec4( position, 1.0 );
+    vs_out.vPosition = pos.xyz;
+
+    gl_Position = g_mProj * g_mView * pos;
 }

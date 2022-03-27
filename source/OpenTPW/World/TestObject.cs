@@ -23,6 +23,13 @@ public class TestObject : Entity
 		shader.SetMatrix( "g_mModel", ModelMatrix );
 		shader.SetMatrix( "g_mView", World.Current.Camera.ViewMatrix );
 		shader.SetMatrix( "g_mProj", World.Current.Camera.ProjMatrix );
+
+		shader.SetVector3( "g_vLightPos", World.Current.Sun.position );
+		shader.SetVector3( "g_vLightColor", World.Current.Sun.Color );
+
+		shader.SetVector3( "g_vCameraPos", World.Current.Camera.position );
+		shader.SetBool( "g_bHighlighted", Time.Now.CeilToInt() % 2 == 0 );
+
 		cube.Draw( shader, texture );
 	}
 }
