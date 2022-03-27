@@ -13,7 +13,7 @@ public class Entity
 	//
 
 	/// <summary>
-	/// Right, Up, Forward (RUF)
+	/// Right, Up, Forward (FLU)
 	/// </summary>
 	public Vector3 position;
 
