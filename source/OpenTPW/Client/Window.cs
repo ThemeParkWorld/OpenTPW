@@ -1,4 +1,5 @@
-﻿using Veldrid.StartupUtilities;
+﻿using Veldrid;
+using Veldrid.StartupUtilities;
 using Veldrid.Sdl2;
 
 namespace OpenTPW;
@@ -38,5 +39,6 @@ internal class Window
 	private void SdlWindow_Resized()
 	{
 		Screen.UpdateFrom( Size );
+		Event.Run( Event.Window.ResizedAttribute.Name, Size );
 	}
 }

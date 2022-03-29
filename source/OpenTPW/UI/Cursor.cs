@@ -1,4 +1,6 @@
-﻿namespace OpenTPW.UI;
+﻿using Veldrid;
+
+namespace OpenTPW.UI;
 
 public class Cursor : Panel
 {
@@ -60,9 +62,9 @@ public class Cursor : Panel
 		position.Y = Screen.Size.Y - position.Y;
 	}
 
-	public override void Draw()
+	public override void Draw( CommandList commandList )
 	{
-		base.Draw();
+		base.Draw( commandList );
 
 		if ( this.texture == null )
 			return;

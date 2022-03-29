@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace OpenTPW;
 
@@ -7,8 +6,11 @@ public class Shader
 {
 	public static ShaderBuilder Builder => new();
 
-	internal Shader()
+	public Veldrid.Shader[] ShaderProgram { get; }
+
+	internal Shader( Veldrid.Shader[] shaderProgram )
 	{
+		ShaderProgram = shaderProgram;
 	}
 
 	public void Use()

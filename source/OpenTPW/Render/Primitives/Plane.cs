@@ -1,4 +1,7 @@
-﻿namespace OpenTPW;
+﻿using System.Runtime.InteropServices;
+using Veldrid;
+
+namespace OpenTPW;
 
 partial class Primitives
 {
@@ -38,15 +41,29 @@ partial class Primitives
 			3, 2, 0
 		};
 
-		private uint vao, vbo, ebo;
-
 		public Plane()
 		{
 			SetupMesh();
 		}
 
+		public DeviceBuffer VertexBuffer { get; private set; }
+		public DeviceBuffer IndexBuffer { get; private set; }
+
 		public void SetupMesh()
 		{
+			var factory = Device.ResourceFactory;
+
+			var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
+
+			VertexBuffer = factory.CreateBuffer(
+				new Veldrid.BufferDescription( (uint)Vertices.Length * vertexStructSize, Veldrid.BufferUsage.VertexBuffer )
+			);
+			IndexBuffer = factory.CreateBuffer(
+				new Veldrid.BufferDescription( (uint)Indices.Length * sizeof( uint ), Veldrid.BufferUsage.IndexBuffer )
+			);
+
+			Device.UpdateBuffer( VertexBuffer, 0, Vertices );
+			Device.UpdateBuffer( IndexBuffer, 0, Indices );
 		}
 
 		public void Draw( Shader shader, Texture diffuseTexture )
@@ -54,7 +71,7 @@ partial class Primitives
 			shader.Use();
 
 			diffuseTexture.Bind();
-			shader.SetInt( "g_tDiffuse", 0 );
+			// shader.SetInt( "g_tDiffuse", 0 );
 
 			InternalDraw();
 		}

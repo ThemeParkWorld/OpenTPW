@@ -1,4 +1,5 @@
-﻿using Veldrid;
+﻿using ImGuiNET;
+using Veldrid;
 using Veldrid.StartupUtilities;
 
 namespace OpenTPW;
@@ -9,112 +10,37 @@ internal class Renderer
 
 	private Editor? editor;
 
-	private ImGuiRenderer imgui;
+	private ImGuiRenderer imguiRenderer;
 	private World world;
 	private DateTime lastFrame;
 
-	private GraphicsDevice graphicsDevice;
 	private CommandList commandList;
-	private Pipeline pipeline;
-
-	private ResourceLayout rsrcLayout;
-	private Texture missingTexture;
-
-	private ImGuiRenderer imguiRenderer;
 
 	public Renderer()
 	{
-		window = new();
+		Event.Register( this );
 
-		lastFrame = DateTime.Now;
 		Init();
 
+		lastFrame = DateTime.Now;
 		MainLoop();
 	}
 
 	private void Init()
 	{
-		CreateGraphicsDevice();
-		CreateResources();
+		window = new();
 
-		imgui = new( graphicsDevice,
-			  graphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
+		CreateGraphicsDevice();
+
+		commandList = Device.ResourceFactory.CreateCommandList();
+
+		imguiRenderer = new( Device,
+			  Device.SwapchainFramebuffer.OutputDescription,
 			  window.SdlWindow.Width,
 			  window.SdlWindow.Height );
-		editor = new Editor( imgui );
 
+		editor = new Editor( imguiRenderer );
 		world = new();
-	}
-
-	public void CreateResources()
-	{
-		var factory = graphicsDevice.ResourceFactory;
-
-		//var layout = new VertexLayoutDescription(
-		//	new VertexElementDescription( "Position", VertexElementSemantic.TextureCoordinate,
-		//		VertexElementFormat.Float3 ),
-		//	new VertexElementDescription( "TexCoords", VertexElementSemantic.TextureCoordinate,
-		//		VertexElementFormat.Float2 ) );
-
-		// CreateShaders( factory );
-
-		// var pipelineDescription = CreatePipelineDescription();
-
-		// pipelineDescription.ShaderSet = new ShaderSetDescription( new[] { layout }, shaders );
-
-		// pipeline = factory.CreateGraphicsPipeline( pipelineDescription );
-		commandList = factory.CreateCommandList();
-	}
-
-	private GraphicsPipelineDescription CreatePipelineDescription()
-	{
-		var rsrcLayoutDesc = new ResourceLayoutDescription()
-		{
-			Elements = new[]
-			{
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_t",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.Sampler,
-					Name = "mainTextureSampler",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.UniformBuffer,
-					Name = "ubo",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Vertex
-				}
-			}
-		};
-
-		rsrcLayout = graphicsDevice.ResourceFactory.CreateResourceLayout( rsrcLayoutDesc );
-
-		var pipelineDescription = new GraphicsPipelineDescription();
-
-		pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
-
-		pipelineDescription.DepthStencilState =
-			new DepthStencilStateDescription( true, true, ComparisonKind.Greater );
-
-		pipelineDescription.RasterizerState = new RasterizerStateDescription( FaceCullMode.Back,
-			PolygonFillMode.Solid, FrontFace.CounterClockwise, true, false );
-
-		pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleList;
-
-		pipelineDescription.ResourceLayouts = new[] { rsrcLayout };
-
-		pipelineDescription.Outputs = graphicsDevice.SwapchainFramebuffer.OutputDescription;
-
-		return pipelineDescription;
 	}
 
 	private void MainLoop()
@@ -133,30 +59,27 @@ internal class Renderer
 
 	private void PreRender()
 	{
-		List<ResourceSet> disposableResourceSets = new List<ResourceSet>();
-
 		commandList.Begin();
-		commandList.SetFramebuffer( graphicsDevice.SwapchainFramebuffer );
+		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
 		commandList.ClearColorTarget( 0, RgbaFloat.CornflowerBlue );
-		commandList.ClearDepthStencil( 0 );
 	}
 
 	private void PostRender()
 	{
 		commandList.End();
-		graphicsDevice.SubmitCommands( commandList );
-		graphicsDevice.SwapBuffers();
+		Device.SubmitCommands( commandList );
+		Device.SwapBuffers();
 	}
 
 	private void Render()
 	{
-		world.Render();
-		imgui?.Render( graphicsDevice, commandList );
+		world.Render( commandList );
+		imguiRenderer?.Render( Device, commandList );
 	}
 
 	private void Update()
 	{
-		float deltaTime = (float)((DateTime.Now - lastFrame).TotalSeconds);
+		float deltaTime = (float)(DateTime.Now - lastFrame).TotalSeconds;
 		InputSnapshot inputSnapshot = window.SdlWindow.PumpEvents();
 
 		Time.UpdateFrom( deltaTime );
@@ -168,16 +91,14 @@ internal class Renderer
 
 	private void CreateGraphicsDevice()
 	{
-		var options = new GraphicsDeviceOptions()
-		{
-			PreferStandardClipSpaceYDirection = true,
-			PreferDepthRangeZeroToOne = true,
-			SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt
-		};
+		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, GraphicsBackend.Vulkan );
+		Window.Current.SdlWindow.Title += Device.BackendType.ToString();
+	}
 
-		graphicsDevice = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow,
-													   options );
-
-		Window.Current.SdlWindow.Title += graphicsDevice.BackendType.ToString();
+	[Event.Window.Resized]
+	public void OnWindowResized( Point2 newSize )
+	{
+		imguiRenderer.WindowResized( newSize.X, newSize.Y );
+		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
 	}
 }

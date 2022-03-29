@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Veldrid;
 
 namespace OpenTPW.UI;
 
@@ -34,7 +35,7 @@ public class Panel
 
 	}
 
-	public virtual void Draw()
+	public virtual void Draw( CommandList commandList )
 	{
 		var positionNDC = PositionToNDC( position );
 		var sizeNDC = SizeToNDC( size );

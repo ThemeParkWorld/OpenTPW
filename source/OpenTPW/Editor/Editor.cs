@@ -6,7 +6,7 @@ using Veldrid;
 namespace OpenTPW;
 internal partial class Editor
 {
-	private ImGuiRenderer ImGuiController;
+	private ImGuiRenderer ImGuiRenderer;
 	private Texture defaultFontTexture;
 
 	private List<BaseTab> tabs = new();
@@ -18,9 +18,9 @@ internal partial class Editor
 
 	public Editor( ImGuiRenderer imGuiController )
 	{
-		ImGuiController = imGuiController;
+		ImGuiRenderer = imGuiController;
 
-		InitIO();
+		// InitIO();
 		SetTheme();
 
 		tabs.AddRange( new BaseTab[] {
@@ -116,7 +116,7 @@ internal partial class Editor
 
 	public void UpdateFrom( InputSnapshot inputSnapshot )
 	{
-		ImGuiController.Update( Time.Delta, inputSnapshot );
+		ImGuiRenderer.Update( Time.Delta, inputSnapshot );
 
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			shouldRender = !shouldRender;

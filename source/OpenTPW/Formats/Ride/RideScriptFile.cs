@@ -10,24 +10,24 @@ public class RideScriptFile
 	public string Disassembly { get; private set; } = "";
 	public int VariableCount => variables.Count;
 
-	public RideScriptFile(RideVM vm)
+	public RideScriptFile( RideVM vm )
 	{
 		this.vm = vm;
 	}
 
-	public void ReadFile(Stream stream)
+	public void ReadFile( Stream stream )
 	{
-		using var binaryReader = new BinaryReader(stream);
-		ReadFileContents(binaryReader);
+		using var binaryReader = new BinaryReader( stream );
+		ReadFileContents( binaryReader );
 
-		stream.Seek(0, SeekOrigin.Begin);
+		stream.Seek( 0, SeekOrigin.Begin );
 		vm.FileData = new byte[(int)stream.Length];
-		stream.Read(vm.FileData, 0, (int)stream.Length);
+		stream.Read( vm.FileData, 0, (int)stream.Length );
 	}
 
-	private void ReadFileContents(BinaryReader binaryReader)
+	private void ReadFileContents( BinaryReader binaryReader )
 	{
-		ReadFileHeader(binaryReader);
+		ReadFileHeader( binaryReader );
 
 		// First 4 bytes are # of expected opcodes & operands
 		expectedInstructions = binaryReader.ReadInt32();
@@ -36,27 +36,27 @@ public class RideScriptFile
 		instructionOffset = binaryReader.BaseStream.Position;
 
 		// Forward to string table
-		binaryReader.BaseStream.Seek((expectedInstructions) * 4, SeekOrigin.Current);
+		binaryReader.BaseStream.Seek( (expectedInstructions) * 4, SeekOrigin.Current );
 
-		ReadStringTable(binaryReader);
+		ReadStringTable( binaryReader );
 
 		// Go back to instructions
-		binaryReader.BaseStream.Seek(instructionOffset, SeekOrigin.Begin);
+		binaryReader.BaseStream.Seek( instructionOffset, SeekOrigin.Begin );
 
-		ReadFileBody(binaryReader);
+		ReadFileBody( binaryReader );
 		WriteDisassembly();
 	}
 
-	private void ReadFileHeader(BinaryReader binaryReader)
+	private void ReadFileHeader( BinaryReader binaryReader )
 	{
-		var magicNumber = binaryReader.ReadChars(8);
-		if (!Enumerable.SequenceEqual(magicNumber, new[] { 'R', 'S', 'S', 'E', 'Q', (char)0x0F, (char)0x01, (char)0x00 }))
-			Log.Error("Magic number was not 'RSSEQ'");
+		var magicNumber = binaryReader.ReadChars( 8 );
+		if ( !Enumerable.SequenceEqual( magicNumber, new[] { 'R', 'S', 'S', 'E', 'Q', (char)0x0F, (char)0x01, (char)0x00 } ) )
+			Log.Error( "Magic number was not 'RSSEQ'" );
 
 		// Variable count
 		var variableCount = binaryReader.ReadInt32();
 
-		vm.Variables = new List<int>(variableCount);
+		vm.Variables = new List<int>( variableCount );
 		vm.Config = new()
 		{
 			StackSize = binaryReader.ReadInt32(),
@@ -66,62 +66,62 @@ public class RideScriptFile
 			WalkSize = binaryReader.ReadInt32(),
 		};
 
-		for (var i = 0; i < 4; ++i)
+		for ( var i = 0; i < 4; ++i )
 		{
-			var paddingChars = binaryReader.ReadChars(4);
-			if (!Enumerable.SequenceEqual(paddingChars, new[] { 'P', 'a', 'd', ' ' }))
-				Log.Error("Invalid padding!");
+			var paddingChars = binaryReader.ReadChars( 4 );
+			if ( !Enumerable.SequenceEqual( paddingChars, new[] { 'P', 'a', 'd', ' ' } ) )
+				Log.Error( "Invalid padding!" );
 		}
 	}
 
-	private void ReadFileBody(BinaryReader binaryReader)
+	private void ReadFileBody( BinaryReader binaryReader )
 	{
 		var currentOperands = new List<Operand>();
 		var currentOpcode = 0;
 
-		while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length - 1)
+		while ( binaryReader.BaseStream.Position < binaryReader.BaseStream.Length - 1 )
 		{
 			var currentValue = binaryReader.ReadInt32();
 			var flag = (currentValue >> 24 & 0xFF);
 			int truncValue = (short)currentValue;
 
-			if ((binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions + 1)
+			if ( (binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions + 1 )
 			{
-				Log.Warning($"Hit max instruction count");
-				vm.Instructions.Add(new Instruction(vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray()));
+				Log.Warning( $"Hit max instruction count" );
+				vm.Instructions.Add( new Instruction( vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 				break;
 			}
 
-			switch (flag)
+			switch ( flag )
 			{
 				case 0x80:
 					// Opcode
-					vm.Instructions.Add(new Instruction(vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray()));
+					vm.Instructions.Add( new Instruction( vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 					currentOpcode = (short)currentValue;
 					currentOperands = new List<Operand>();
 					break;
 				case 0x10:
 					// String
-					currentOperands.Add(new Operand(vm, Operand.Type.String, truncValue, truncValue));
+					currentOperands.Add( new Operand( vm, Operand.Type.String, truncValue, truncValue ) );
 					break;
 				case 0x20:
 					// Branch
-					currentOperands.Add(new Operand(vm, Operand.Type.Location, truncValue));
-					vm.Branches.Add(new Branch(vm.Instructions.Count - 2 /* ignore NOP and array starts at 0 */, truncValue));
+					currentOperands.Add( new Operand( vm, Operand.Type.Location, truncValue ) );
+					vm.Branches.Add( new Branch( vm.Instructions.Count - 2 /* ignore NOP and array starts at 0 */, truncValue ) );
 					break;
 				case 0x40:
 					// Variable
-					currentOperands.Add(new Operand(vm, Operand.Type.Variable, truncValue, truncValue));
+					currentOperands.Add( new Operand( vm, Operand.Type.Variable, truncValue, truncValue ) );
 					break;
 				case 0x00:
 					// Literal
-					currentOperands.Add(new Operand(vm, Operand.Type.Literal, truncValue));
+					currentOperands.Add( new Operand( vm, Operand.Type.Literal, truncValue ) );
 					break;
 			}
 		}
 	}
 
-	private void ReadStringTable(BinaryReader binaryReader)
+	private void ReadStringTable( BinaryReader binaryReader )
 	{
 		// First entry will be the strings used within the application
 		var stringEntryLength = binaryReader.ReadInt32();
@@ -129,12 +129,12 @@ public class RideScriptFile
 		var currentString = "";
 		var stringOffsetPos = 0L;
 
-		while (binaryReader.BaseStream.Position - stringEntryPos < stringEntryLength)
+		while ( binaryReader.BaseStream.Position - stringEntryPos < stringEntryLength )
 		{
 			var currentChar = binaryReader.ReadChar();
-			if (currentChar == '\0')
+			if ( currentChar == '\0' )
 			{
-				vm.Strings.Add(stringOffsetPos, currentString);
+				vm.Strings.Add( stringOffsetPos, currentString );
 				currentString = "";
 				stringOffsetPos = binaryReader.BaseStream.Position - stringEntryPos;
 			}
@@ -144,14 +144,14 @@ public class RideScriptFile
 			}
 		}
 
-		while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+		while ( binaryReader.BaseStream.Position < binaryReader.BaseStream.Length )
 		{
 			// Read remaining variables
 			var variableNameLength = binaryReader.ReadInt32();
-			var stringChars = binaryReader.ReadChars(variableNameLength);
+			var stringChars = binaryReader.ReadChars( variableNameLength );
 
-			vm.VariableNames.Add(new string(stringChars).Replace("\0", ""));
-			vm.Variables.Add(0);
+			vm.VariableNames.Add( new string( stringChars ).Replace( "\0", "" ) );
+			vm.Variables.Add( 0 );
 		}
 	}
 
@@ -159,9 +159,9 @@ public class RideScriptFile
 	{
 		var currentCount = 1;
 
-		for (var i = 0; i < vm.Instructions.Count; ++i)
+		for ( var i = 0; i < vm.Instructions.Count; ++i )
 		{
-			if (vm.Branches.Any(b => b.CompiledOffset == currentCount - 1))
+			if ( vm.Branches.Any( b => b.CompiledOffset == currentCount - 1 ) )
 			{
 				Disassembly += $".branch_{currentCount - 1}\n";
 			}

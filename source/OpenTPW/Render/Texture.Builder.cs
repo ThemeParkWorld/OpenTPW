@@ -42,7 +42,6 @@ public partial class TextureBuilder
 		if ( !usePointFiltering )
 			return this;
 
-
 		return this;
 	}
 
@@ -74,7 +73,6 @@ public partial class TextureBuilder
 			return new TextureBuilder() { path = path };
 
 		var textureBuilder = new TextureBuilder();
-
 
 		return textureBuilder;
 	}

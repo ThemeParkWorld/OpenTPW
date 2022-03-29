@@ -1,4 +1,5 @@
 ﻿using OpenTPW.UI;
+using Veldrid;
 
 namespace OpenTPW;
 
@@ -24,16 +25,16 @@ public class World
 
 	private void SetupEntities()
 	{
-		Camera = new Camera();
-		Sun = new Sun() { position = new( 0, 10, 10 ) };
-		_ = new TestObject();
+		// Camera = new Camera();
+		// Sun = new Sun() { position = new( 0, 10, 10 ) };
+		// _ = new TestObject();
 	}
 
 	private void SetupHud()
 	{
 		Hud = new();
-		// Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
-		Hud.AddChild( new Cursor() );
+		Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
+		// Hud.AddChild( new Cursor() );
 	}
 
 	public void Update()
@@ -41,9 +42,9 @@ public class World
 		Entity.All.ForEach( entity => entity.Update() );
 	}
 
-	public void Render()
+	public void Render( CommandList commandList )
 	{
-		Entity.All.ForEach( entity => entity.Render() );
+		Entity.All.ForEach( entity => entity.Render( commandList ) );
 	}
 
 	[Event.Game.Load]

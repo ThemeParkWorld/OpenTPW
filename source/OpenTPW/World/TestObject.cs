@@ -1,4 +1,6 @@
-﻿namespace OpenTPW;
+﻿using Veldrid;
+
+namespace OpenTPW;
 
 public class TestObject : Entity
 {
@@ -16,9 +18,9 @@ public class TestObject : Entity
 		cube = new();
 	}
 
-	public override void Render()
+	public override void Render( CommandList commandList )
 	{
-		base.Render();
+		base.Render( commandList );
 
 		shader.SetMatrix( "g_mModel", ModelMatrix );
 		shader.SetMatrix( "g_mView", World.Current.Camera.ViewMatrix );

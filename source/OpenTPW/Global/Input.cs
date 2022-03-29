@@ -62,6 +62,8 @@ public static partial class Input
 
 			var keysDown = inputSnapshot.KeyEvents.Where( x => x.Down ).Select( x => x.Key );
 
+			Log.Trace( string.Join( ", ", keysDown.Select( x => x.ToString() ) ) );
+
 			bool IsKeyPressed( Key k ) => keysDown.Contains( k );
 
 			if ( IsKeyPressed( Key.A ) )

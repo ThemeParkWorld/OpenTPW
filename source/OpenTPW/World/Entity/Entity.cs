@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection;
+using Veldrid;
 
 namespace OpenTPW;
 
@@ -47,7 +48,7 @@ public class Entity
 		Name = $"{this.GetType().Name} {All.Count}";
 	}
 
-	public virtual void Render() { }
+	public virtual void Render( CommandList commandList ) { }
 	public virtual void Update() { }
 
 	public virtual void Delete() { }

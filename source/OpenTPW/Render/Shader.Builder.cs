@@ -1,41 +1,50 @@
-﻿namespace OpenTPW;
+﻿using Veldrid;
+using Veldrid.SPIRV;
 
-public class ShaderBuilder
+namespace OpenTPW
 {
-	public enum ShaderType
+	public class ShaderBuilder
 	{
-		Fragment,
-		Vertex
-	};
+		private ShaderDescription VertexShaderDescription;
+		private ShaderDescription FragmentShaderDescription;
 
-	private uint programId;
+		internal ShaderBuilder()
+		{
 
-	internal ShaderBuilder()
-	{
-	}
+		}
 
-	public ShaderBuilder WithFragment( string fragPath )
-	{
-		return this;
-	}
+		private ShaderDescription CreateShaderDescription( string path, ShaderStages shaderStage )
+		{
+			var shaderBytes = File.ReadAllBytes( path );
+			var shaderDescription = new ShaderDescription( shaderStage, shaderBytes, "main" );
 
-	public ShaderBuilder WithVertex( string vertPath )
-	{
-		return this;
-	}
+			return shaderDescription;
+		}
 
-	private void CompileShader( string path, ShaderType shaderType )
-	{
+		public ShaderBuilder WithFragment( string fragPath )
+		{
+			FragmentShaderDescription = CreateShaderDescription( fragPath, ShaderStages.Fragment );
+			return this;
+		}
 
-	}
+		public ShaderBuilder WithVertex( string vertPath )
+		{
+			VertexShaderDescription = CreateShaderDescription( vertPath, ShaderStages.Vertex );
+			return this;
+		}
 
-	private void CheckForErrors( uint shader )
-	{
-
-	}
-
-	public Shader Build()
-	{
-		return new Shader();
+		public Shader Build()
+		{
+			try
+			{
+				var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
+				return new Shader( shaderProgram );
+			}
+			catch ( Exception ex )
+			{
+				Log.Error( ex.ToString() );
+				return default;
+			}
+		}
 	}
 }
