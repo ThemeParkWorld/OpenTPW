@@ -26,7 +26,7 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
     vec3 g_vLightPos;
     vec3 g_vLightColor;
     vec3 g_vCameraPos;
-    bool g_bHighlighted;
+    int g_bHighlighted;
 } g_oUbo;
 
 vec3 lambert( vec3 vLightDir, vec3 vNormal ) 
@@ -47,7 +47,7 @@ vec3 specular( vec3 vLightDir, vec3 vNormal, vec3 vCameraDir, float fShininess )
 
 void main() 
 {
-    if ( g_oUbo.g_bHighlighted )
+    if ( g_oUbo.g_bHighlighted == 1 )
     {
         fragColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords ) * 1.5;
         return;

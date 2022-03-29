@@ -60,6 +60,7 @@ internal class Renderer
 		commandList.Begin();
 		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
 		commandList.ClearColorTarget( 0, RgbaFloat.CornflowerBlue );
+		// commandList.ClearDepthStencil( 1 );
 	}
 
 	private void PostRender()
@@ -93,8 +94,8 @@ internal class Renderer
 	{
 		var options = new GraphicsDeviceOptions()
 		{
-			PreferStandardClipSpaceYDirection = true,
-			PreferDepthRangeZeroToOne = true,
+			// PreferStandardClipSpaceYDirection = true,
+			// PreferDepthRangeZeroToOne = true,
 			// SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt
 		};
 

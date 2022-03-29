@@ -12,6 +12,7 @@ layout( location = 2 ) in vec2 texCoords;
 //
 layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
+    int g_iFrame;
 } g_oUbo;
 
 //

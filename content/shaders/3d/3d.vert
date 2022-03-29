@@ -17,7 +17,7 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
     vec3 g_vLightPos;
     vec3 g_vLightColor;
     vec3 g_vCameraPos;
-    bool g_bHighlighted;
+    int g_bHighlighted;
 } g_oUbo;
 
 //

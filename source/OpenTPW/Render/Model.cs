@@ -105,13 +105,19 @@ public class Model
 		var pipelineDescription = new GraphicsPipelineDescription()
 		{
 			BlendState = BlendStateDescription.SingleOverrideBlend,
-			DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
+
+			DepthStencilState = new DepthStencilStateDescription(
+				true,
+				true,
+				ComparisonKind.Always ),
+
 			RasterizerState = new RasterizerStateDescription(
 				FaceCullMode.Back,
 				PolygonFillMode.Solid,
 				FrontFace.CounterClockwise,
 				true,
 				false ),
+
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
 			ResourceLayouts = new[] { rsrcLayout },
 			ShaderSet = new ShaderSetDescription( new[] { vertexLayout }, material.Shader.ShaderProgram ),
