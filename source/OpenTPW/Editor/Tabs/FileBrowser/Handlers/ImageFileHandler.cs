@@ -27,37 +27,30 @@ public class ImageFileHandler : BaseFileHandler
 		if ( ratio is float.NaN )
 			ratio = 1f;
 
-		//var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
-		//ImGui.Text( $"Texture selected: {texture.Id}, ratio: {ratio} (w: {texture.Width}, h: {texture.Height})" );
+		EditorHelpers.Image( texture, new Vector2( windowWidth, windowWidth * ratio ) );
 
-		//ImGui.Image(
-		//	(IntPtr)texture.Id,
-		//	new System.Numerics.Vector2( windowWidth, windowWidth * ratio ),
-		//	new System.Numerics.Vector2( 0, 1 ),
-		//	new System.Numerics.Vector2( 1, 0 ) );
+		var startPos = ImGui.GetItemRectMin();
 
-		//var startPos = ImGui.GetItemRectMin();
+		var drawList = ImGui.GetWindowDrawList();
+		var col = ImGui.GetColorU32( Vector4.One );
 
-		//var drawList = ImGui.GetWindowDrawList();
-		//var col = ImGui.GetColorU32( Vector4.One );
+		if ( texture.Width > 128 || texture.Height > 128 )
+			return;
 
-		//if ( texture.Width > 128 || texture.Height > 128 )
-		//	return;
+		for ( int y = 1; y < texture.Height; y++ )
+		{
+			float lineX = 0f + startPos.X;
+			float lineY = (((windowWidth * ratio) / (float)texture.Height) * y) + startPos.Y;
 
-		//for ( int y = 1; y < texture.Height; y++ )
-		//{
-		//	float lineX = 0f + startPos.X;
-		//	float lineY = (((windowWidth * ratio) / (float)texture.Height) * y) + startPos.Y;
+			drawList.AddLine( new System.Numerics.Vector2( lineX, lineY ), new System.Numerics.Vector2( startPos.X + windowWidth, lineY + 2 ), col );
+		}
 
-		//	drawList.AddLine( new System.Numerics.Vector2( lineX, lineY ), new System.Numerics.Vector2( startPos.X + windowWidth, lineY + 2 ), col );
-		//}
+		for ( int x = 1; x < texture.Width; x++ )
+		{
+			float lineX = ((windowWidth * ratio / (float)texture.Width) * x) + startPos.X;
+			float lineY = 0f + startPos.Y;
 
-		//for ( int x = 1; x < texture.Width; x++ )
-		//{
-		//	float lineX = ((windowWidth * ratio / (float)texture.Width) * x) + startPos.X;
-		//	float lineY = 0f + startPos.Y;
-
-		//	drawList.AddLine( new System.Numerics.Vector2( lineX, lineY ), new System.Numerics.Vector2( lineX + 2, startPos.Y + (windowWidth * ratio) ), col );
-		//}
+			drawList.AddLine( new System.Numerics.Vector2( lineX, lineY ), new System.Numerics.Vector2( lineX + 2, startPos.Y + (windowWidth * ratio) ), col );
+		}
 	}
 }

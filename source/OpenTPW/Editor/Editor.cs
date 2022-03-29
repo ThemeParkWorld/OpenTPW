@@ -6,7 +6,9 @@ using Veldrid;
 namespace OpenTPW;
 internal partial class Editor
 {
-	private ImGuiRenderer ImGuiRenderer;
+	public static Editor Instance { get; private set; }
+
+	public ImGuiRenderer ImGuiRenderer { get; private set; }
 	private Texture defaultFontTexture;
 
 	private List<BaseTab> tabs = new();
@@ -18,6 +20,8 @@ internal partial class Editor
 
 	public Editor( ImGuiRenderer imGuiController )
 	{
+		Instance ??= this;
+
 		ImGuiRenderer = imGuiController;
 
 		InitIO();

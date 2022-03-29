@@ -27,14 +27,7 @@ internal class CursorTab : BaseTab
 		if ( ratio is float.NaN )
 			ratio = 1f;
 
-		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
-
-		ImGui.Text( $"Texture selected: {texPtr}, ratio: {ratio} (w: {texture.Width}, h: {texture.Height})" );
-		ImGui.Image(
-			texPtr,
-			new System.Numerics.Vector2( windowWidth, windowWidth * ratio ),
-			new System.Numerics.Vector2( 0, 1 ),
-			new System.Numerics.Vector2( 1, 0 ) );
+		EditorHelpers.Image( texture, new System.Numerics.Vector2( windowWidth, windowWidth * ratio ) );
 
 		ImGui.End();
 	}
