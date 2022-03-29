@@ -5,7 +5,8 @@ namespace OpenTPW;
 
 public static partial class Input
 {
-	public static MouseInfo Mouse { get; internal set; }
+	public static MouseInfo Mouse { get; internal set; } = new();
+	public static KeyboardInfo Keyboard { get; internal set; } = new();
 
 	public static float Forward { get; set; }
 	public static float Right { get; set; }
@@ -26,6 +27,21 @@ public static partial class Input
 	public static bool Released( InputButton button )
 	{
 		return !KeysDown.Contains( button ) && LastKeysDown.Contains( button );
+	}
+
+	public struct KeyboardInfo
+	{
+		public List<Key> KeysDown { get; set; }
+
+		public KeyboardInfo()
+		{
+			KeysDown = new();
+		}
+
+		public KeyboardInfo( List<Key> keysDown )
+		{
+			KeysDown = keysDown;
+		}
 	}
 
 	public static void UpdateFrom( InputSnapshot inputSnapshot )
@@ -60,11 +76,17 @@ public static partial class Input
 			Right = 0;
 			Forward = 0;
 
-			var keysDown = inputSnapshot.KeyEvents.Where( x => x.Down ).Select( x => x.Key );
+			var newKeysDown = inputSnapshot.KeyEvents.Where( x => x.Down ).Select( x => x.Key );
+			var newKeysUp = inputSnapshot.KeyEvents.Where( x => !x.Down ).Select( x => x.Key );
 
-			Log.Trace( string.Join( ", ", keysDown.Select( x => x.ToString() ) ) );
+			Keyboard = new KeyboardInfo(
+				Keyboard.KeysDown.Concat( newKeysDown )
+					.Distinct()
+					.Where( x => !newKeysUp.Contains( x ) )
+					.ToList()
+			);
 
-			bool IsKeyPressed( Key k ) => keysDown.Contains( k );
+			bool IsKeyPressed( Key k ) => Keyboard.KeysDown.Contains( k );
 
 			if ( IsKeyPressed( Key.A ) )
 				Right -= 1;

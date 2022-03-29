@@ -26,7 +26,7 @@ public class Panel
 	{
 		var p = position / new Vector2( Screen.Size.X, Screen.Size.Y );
 		p += new Vector2( -0.5f, -0.5f );
-		p *= new Vector2( 2.0f, -2.0f );
+		p *= 2.0f;
 		return p;
 	}
 

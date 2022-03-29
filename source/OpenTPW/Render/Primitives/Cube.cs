@@ -2,9 +2,9 @@
 
 partial class Primitives
 {
-	internal class Cube
+	internal static class Cube
 	{
-		private float[] cubeVertices = new[] {
+		private static float[] cubeVertices = new[] {
 			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
 			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
 			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
@@ -48,7 +48,7 @@ partial class Primitives
 			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f
 		};
 
-		public List<Vertex> Vertices
+		public static List<Vertex> Vertices
 		{
 			get
 			{
@@ -79,29 +79,10 @@ partial class Primitives
 			}
 		}
 
-		private uint vao, vbo;
-
-		public Cube()
+		public static Model GenerateModel( Material material )
 		{
-			SetupMesh();
-		}
-
-		public void SetupMesh()
-		{
-		}
-
-		public void Draw( Shader shader, Texture diffuseTexture )
-		{
-			shader.Use();
-
-			diffuseTexture.Bind();
-			shader.SetInt( "g_tDiffuse", 0 );
-
-			InternalDraw();
-		}
-
-		internal unsafe void InternalDraw()
-		{
+			var model = new Model( Vertices.ToArray(), material );
+			return model;
 		}
 	}
 }

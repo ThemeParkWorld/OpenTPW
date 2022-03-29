@@ -1,4 +1,5 @@
-﻿using Veldrid;
+﻿using System.Numerics;
+using Veldrid;
 
 namespace OpenTPW.UI;
 
@@ -6,13 +7,19 @@ public partial class Image : Panel
 {
 	private Model model;
 
+	struct ObjectUniformBuffer
+	{
+		public Matrix4x4 g_mModel;
+	}
+
 	public Image( Texture texture )
 	{
 		var material = new Material(
 			texture,
 			Shader.Builder.WithVertex( "content/shaders/test.vert" )
 						  .WithFragment( "content/shaders/test.frag" )
-						  .Build()
+						  .Build(),
+			typeof( ObjectUniformBuffer )
 		);
 
 		model = Primitives.Plane.GenerateModel( material );

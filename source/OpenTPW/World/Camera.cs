@@ -7,9 +7,9 @@ public class Camera : Entity
 	public Matrix4x4 ViewMatrix { get; set; }
 	public Matrix4x4 ProjMatrix { get; set; }
 
-	public Vector3 Forward => Vector3.Zero;
-	public Vector3 Right => Vector3.Zero;
-	public Vector3 Up => Vector3.Zero;
+	public Vector3 Forward => ViewMatrix.Forward();
+	public Vector3 Right => ViewMatrix.Right();
+	public Vector3 Up => ViewMatrix.Up();
 
 	private Vector3 velocity = new();
 	private Vector3 wishVelocity = new();

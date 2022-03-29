@@ -1,25 +1,37 @@
 #version 450
 
-in struct VS_OUT {
+//
+// In
+//
+layout( location = 0 ) in struct VS_OUT {
     vec2 vTexCoords;
     vec3 vNormal;
     vec3 vPosition;
 } vs_out;
 
-out vec4 fragColor;
+//
+// Out
+//
+layout( location = 0 ) out vec4 fragColor;
 
-uniform sampler2D g_tDiffuse;
-
-uniform vec3 g_vLightPos;
-uniform vec3 g_vLightColor;
-
-uniform vec3 g_vCameraPos;
-
-uniform bool g_bHighlighted;
+//
+// Uniforms
+//
+layout( set = 0, binding = 0 ) uniform texture2D g_tDiffuse;
+layout( set = 0, binding = 1 ) uniform sampler g_sDiffuse;
+layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
+    mat4 g_mModel;
+    mat4 g_mView;
+    mat4 g_mProj;
+    vec3 g_vLightPos;
+    vec3 g_vLightColor;
+    vec3 g_vCameraPos;
+    bool g_bHighlighted;
+} g_oUbo;
 
 vec3 lambert( vec3 vLightDir, vec3 vNormal ) 
 {
-    return dot( normalize( vLightDir ), normalize( vNormal ) ) * g_vLightColor;
+    return dot( normalize( vLightDir ), normalize( vNormal ) ) * g_oUbo.g_vLightColor;
 }
 
 vec3 ambient( vec3 vLightColor ) 
@@ -30,26 +42,28 @@ vec3 ambient( vec3 vLightColor )
 vec3 specular( vec3 vLightDir, vec3 vNormal, vec3 vCameraDir, float fShininess ) 
 {
     vec3 vReflection = reflect( normalize( -vLightDir ), normalize( vNormal ) );
-    return pow( max( dot( normalize( vCameraDir ), vReflection ), 0.0 ), fShininess ) * g_vLightColor;
+    return pow( max( dot( normalize( vCameraDir ), vReflection ), 0.0 ), fShininess ) * g_oUbo.g_vLightColor;
 }
 
 void main() 
 {
-    if ( g_bHighlighted )
+    if ( g_oUbo.g_bHighlighted )
     {
-        fragColor = texture( g_tDiffuse, vs_out.vTexCoords ) * 1.5;
+        fragColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords ) * 1.5;
         return;
     }
 
-    vec3 vLightDir = normalize( g_vLightPos - vs_out.vPosition );
+    vec3 vLightDir = normalize( g_oUbo.g_vLightPos - vs_out.vPosition );
 
     vec3 vLambert = lambert( vLightDir, vs_out.vNormal );
-    vec3 vAmbient = ambient( g_vLightColor );
+    vec3 vAmbient = ambient( g_oUbo.g_vLightColor );
     
-    vec3 vCameraDir = normalize( g_vCameraPos - vs_out.vPosition );
+    vec3 vCameraDir = normalize( g_oUbo.g_vCameraPos - vs_out.vPosition );
     vec3 vSpecular = specular( vLightDir, vs_out.vNormal, vCameraDir, 32.0 );
 
-    vec4 vColor = texture( g_tDiffuse, vs_out.vTexCoords );
+    vec4 vColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords );
 
     fragColor = vec4( vLambert + vAmbient + vSpecular, 1.0 ) * vColor;
+
+    fragColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords );
 }

@@ -52,8 +52,6 @@ internal class Renderer
 			PreRender();
 			Render();
 			PostRender();
-
-			lastFrame = DateTime.Now;
 		}
 	}
 
@@ -80,6 +78,8 @@ internal class Renderer
 	private void Update()
 	{
 		float deltaTime = (float)(DateTime.Now - lastFrame).TotalSeconds;
+		lastFrame = DateTime.Now;
+
 		InputSnapshot inputSnapshot = window.SdlWindow.PumpEvents();
 
 		Time.UpdateFrom( deltaTime );
@@ -91,7 +91,24 @@ internal class Renderer
 
 	private void CreateGraphicsDevice()
 	{
-		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, GraphicsBackend.Vulkan );
+		var options = new GraphicsDeviceOptions()
+		{
+			PreferStandardClipSpaceYDirection = true,
+			PreferDepthRangeZeroToOne = true,
+			// SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt
+		};
+
+		var preferredBackend = GraphicsBackend.Direct3D11;
+		var preferredBackendStr = Settings.Default.PreferredBackend;
+		if ( !string.IsNullOrEmpty( preferredBackendStr ) )
+		{
+			preferredBackend = (GraphicsBackend)Enum.Parse(
+				typeof( GraphicsBackend ),
+				preferredBackendStr,
+				true );
+		}
+
+		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
 
 		var windowTitle = $"OpenTPW | {Device.BackendType}";
 		Window.Current.SdlWindow.Title = windowTitle;

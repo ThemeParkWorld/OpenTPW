@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace OpenTPW;
 
@@ -81,6 +82,15 @@ public static class MathExtensions
 				(color.A / 255f)
 		);
 	}
+
+	public static Vector4 Column1( this Matrix4x4 matrix ) => new Vector4( matrix.M11, matrix.M21, matrix.M31, matrix.M41 );
+	public static Vector4 Column2( this Matrix4x4 matrix ) => new Vector4( matrix.M12, matrix.M22, matrix.M32, matrix.M42 );
+	public static Vector4 Column3( this Matrix4x4 matrix ) => new Vector4( matrix.M13, matrix.M23, matrix.M33, matrix.M43 );
+	public static Vector4 Column4( this Matrix4x4 matrix ) => new Vector4( matrix.M14, matrix.M24, matrix.M34, matrix.M44 );
+
+	public static Vector3 Right( this Matrix4x4 matrix ) => new Vector3( matrix.M11, matrix.M21, matrix.M31 );
+	public static Vector3 Up( this Matrix4x4 matrix ) => new Vector3( matrix.M12, matrix.M22, matrix.M32 );
+	public static Vector3 Forward( this Matrix4x4 matrix ) => -new Vector3( matrix.M13, matrix.M23, matrix.M33 );
 }
 
 public static class ListExtension

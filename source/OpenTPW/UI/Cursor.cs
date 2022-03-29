@@ -1,4 +1,5 @@
-﻿using Veldrid;
+﻿using System.Numerics;
+using Veldrid;
 
 namespace OpenTPW.UI;
 
@@ -20,6 +21,12 @@ public class Cursor : Panel
 	}
 
 	public Texture Texture => model.Material.DiffuseTexture;
+
+	struct ObjectUniformBuffer
+	{
+		public Matrix4x4 g_mModel;
+		public int g_iFrame;
+	}
 
 	public Cursor()
 	{
@@ -45,7 +52,8 @@ public class Cursor : Panel
 			TextureBuilder.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).UsePointFiltering().Build(),
 			Shader.Builder.WithVertex( "content/shaders/cursor/cursor.vert" )
 							 .WithFragment( "content/shaders/cursor/cursor.frag" )
-							 .Build()
+							 .Build(),
+			typeof( ObjectUniformBuffer )
 		);
 
 		model = Primitives.Plane.GenerateModel( material );
@@ -72,7 +80,7 @@ public class Cursor : Panel
 		var uniformBuffer = new ObjectUniformBuffer()
 		{
 			g_mModel = modelMatrix,
-			// g_iFrame = ((Time.Now * 3).CeilToInt()) % 4
+			g_iFrame = ((Time.Now * 3).CeilToInt()) % 4
 		};
 
 		model.Draw( uniformBuffer, commandList );
