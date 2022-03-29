@@ -92,7 +92,9 @@ internal class Renderer
 	private void CreateGraphicsDevice()
 	{
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, GraphicsBackend.Vulkan );
-		Window.Current.SdlWindow.Title += Device.BackendType.ToString();
+
+		var windowTitle = $"OpenTPW | {Device.BackendType}";
+		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
 	[Event.Window.Resized]

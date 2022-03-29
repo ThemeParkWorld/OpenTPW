@@ -34,7 +34,7 @@ public class World
 	{
 		Hud = new();
 		Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
-		// Hud.AddChild( new Cursor() );
+		Hud.AddChild( new Cursor() );
 	}
 
 	public void Update()

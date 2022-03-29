@@ -6,18 +6,7 @@ public class Cursor : Panel
 {
 	public static Cursor Current { get; set; }
 
-	private string GetImageName( Input.CursorTypes cursorType )
-	{
-		// bullfrog PLEASE...
-		if ( cursorType == Input.CursorTypes.Cash )
-			return "Cash";
-
-		return "C" + (cursorType.ToString().Substring( 0, 3 ).ToLower());
-	}
-
-	private Shader shader;
-	private Texture texture;
-	private Primitives.Plane plane;
+	private Model model;
 
 	private Input.CursorTypes cursorType;
 	public Input.CursorTypes CursorType
@@ -30,25 +19,36 @@ public class Cursor : Panel
 		}
 	}
 
-	public Texture Texture => texture;
+	public Texture Texture => model.Material.DiffuseTexture;
 
 	public Cursor()
 	{
 		Current ??= this;
 
-		shader = Shader.Builder.WithVertex( "content/shaders/cursor/cursor.vert" )
-							 .WithFragment( "content/shaders/cursor/cursor.frag" )
-							 .Build();
-
-		plane = new();
-
 		// TODO: Move this to Input
 		CursorType = Input.CursorTypes.Normal;
 	}
 
+	private string GetImageName( Input.CursorTypes cursorType )
+	{
+		// bullfrog PLEASE...
+		if ( cursorType == Input.CursorTypes.Cash )
+			return "Cash";
+
+		return "C" + (cursorType.ToString().Substring( 0, 3 ).ToLower());
+	}
+
 	private void LoadTexture()
 	{
-		texture = TextureBuilder.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).UsePointFiltering().Build();
+		// TODO: clean this up
+		var material = new Material(
+			TextureBuilder.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).UsePointFiltering().Build(),
+			Shader.Builder.WithVertex( "content/shaders/cursor/cursor.vert" )
+							 .WithFragment( "content/shaders/cursor/cursor.frag" )
+							 .Build()
+		);
+
+		model = Primitives.Plane.GenerateModel( material );
 	}
 
 	public override void Update()
@@ -66,11 +66,15 @@ public class Cursor : Panel
 	{
 		base.Draw( commandList );
 
-		if ( this.texture == null )
+		if ( this.model == null )
 			return;
 
-		shader.SetMatrix( "g_mModel", modelMatrix );
-		shader.SetInt( "g_iFrame", ((Time.Now * 3).CeilToInt()) % 4 );
-		plane.Draw( shader, texture );
+		var uniformBuffer = new ObjectUniformBuffer()
+		{
+			g_mModel = modelMatrix,
+			// g_iFrame = ((Time.Now * 3).CeilToInt()) % 4
+		};
+
+		model.Draw( uniformBuffer, commandList );
 	}
 }
