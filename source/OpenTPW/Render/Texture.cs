@@ -1,20 +1,23 @@
-﻿namespace OpenTPW;
+﻿using Veldrid;
+
+namespace OpenTPW;
 
 public class Texture : Asset
 {
 	public int Width { get; set; }
 	public int Height { get; set; }
-
-	internal uint Id { get; set; }
-
 	public string Type { get; set; }
+
+	public Veldrid.Texture VeldridTexture { get; }
+	public Veldrid.TextureView VeldridTextureView { get; }
 
 	public static TextureBuilder Builder => new();
 
-	internal Texture( string path, uint id, string type, int width, int height )
+	internal Texture( string path, Veldrid.Texture texture, Veldrid.TextureView textureView, string type, int width, int height )
 	{
 		Path = path;
-		Id = id;
+		VeldridTexture = texture;
+		VeldridTextureView = textureView;
 		Type = type;
 		Width = width;
 		Height = height;

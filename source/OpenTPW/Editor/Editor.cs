@@ -20,7 +20,7 @@ internal partial class Editor
 	{
 		ImGuiRenderer = imGuiController;
 
-		// InitIO();
+		InitIO();
 		SetTheme();
 
 		tabs.AddRange( new BaseTab[] {
@@ -33,6 +33,8 @@ internal partial class Editor
 			new CursorTab(),
 			new SceneTab()
 		} );
+
+		tabs.ForEach( x => x.ImGuiRenderer = ImGuiRenderer );
 	}
 
 	private static void SetKeyMappings( ImGuiIOPtr io )
@@ -76,7 +78,8 @@ internal partial class Editor
 		Marshal.Copy( pixels, data, 0, size );
 		defaultFontTexture = TextureBuilder.FromBytes( data, (uint)width, (uint)height ).Build();
 
-		io.Fonts.SetTexID( (IntPtr)defaultFontTexture.Id );
+		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, defaultFontTexture.VeldridTextureView );
+		io.Fonts.SetTexID( texPtr );
 		io.Fonts.ClearTexData();
 
 		SetKeyMappings( io );

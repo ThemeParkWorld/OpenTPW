@@ -17,7 +17,8 @@ internal class TexturesTab : BaseTab
 		ImGui.Begin( "Textures", ref visible );
 
 		var textureList = Asset.All.OfType<Texture>().ToList();
-		var texturePaths = textureList.Select( texture => $"{texture.Id}:\t{texture.Path}" ).ToList();
+
+		var texturePaths = textureList.Select( texture => $"{texture.Path}" ).ToList();
 
 		ImGui.Combo( "Texture", ref selectedTexture, texturePaths.ToArray(), texturePaths.Count );
 
@@ -35,9 +36,10 @@ internal class TexturesTab : BaseTab
 		if ( ratio is float.NaN )
 			ratio = 1f;
 
-		ImGui.Text( $"Texture selected: {texture.Id}, ratio: {ratio} (w: {texture.Width}, h: {texture.Height})" );
+		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
+		ImGui.Text( $"Texture selected: {texPtr}, ratio: {ratio} (w: {texture.Width}, h: {texture.Height})" );
 		ImGui.Image(
-			(IntPtr)texture.Id,
+			(IntPtr)texPtr,
 			new System.Numerics.Vector2( windowWidth, windowWidth * ratio ),
 			new System.Numerics.Vector2( 0, 1 ),
 			new System.Numerics.Vector2( 1, 0 ) );

@@ -1,11 +1,14 @@
-﻿namespace OpenTPW;
+﻿using StbImageSharp;
+using System.Runtime.InteropServices;
+using Veldrid;
+
+namespace OpenTPW;
 
 public partial class TextureBuilder
 {
-	private uint id;
 	private string type = "texture_diffuse";
 
-	private byte[]? data;
+	private byte[] data;
 	private uint width;
 	private uint height;
 
@@ -31,10 +34,28 @@ public partial class TextureBuilder
 
 	public Texture Build()
 	{
-		if ( TryGetExistingTexture( path, out var texture ) )
-			return texture;
+		if ( TryGetExistingTexture( path, out var existingTexture ) )
+			return existingTexture;
 
-		return new Texture( path, id, type, (int)width, (int)height );
+		var textureDataPtr = Marshal.AllocHGlobal( data.Length );
+		Marshal.Copy( data, 0, textureDataPtr, data.Length );
+
+		var textureDescription = TextureDescription.Texture2D(
+			width,
+			height,
+			1,
+			1,
+			PixelFormat.R8_G8_B8_A8_UNorm,
+			TextureUsage.Sampled
+		);
+
+		var texture = Device.ResourceFactory.CreateTexture( textureDescription );
+		Device.UpdateTexture( texture, textureDataPtr, (uint)data.Length, 0, 0, 0, width, height, 1, 0, 0 );
+
+		var textureView = Device.ResourceFactory.CreateTextureView( texture );
+		Marshal.FreeHGlobal( textureDataPtr );
+
+		return new Texture( path, texture, textureView, type, (int)width, (int)height );
 	}
 
 	public TextureBuilder UsePointFiltering( bool usePointFiltering = true )
@@ -67,22 +88,26 @@ public partial class TextureBuilder
 		return this;
 	}
 
-	public static TextureBuilder FromHdri( string path )
-	{
-		if ( TryGetExistingTexture( path, out _ ) )
-			return new TextureBuilder() { path = path };
-
-		var textureBuilder = new TextureBuilder();
-
-		return textureBuilder;
-	}
-
 	public static TextureBuilder FromPath( string path, bool flipY = true )
 	{
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
 
 		var textureBuilder = new TextureBuilder();
+
+		// shit-tier hack
+		if ( flipY )
+			StbImage.stbi_set_flip_vertically_on_load( 1 );
+
+		var fileData = File.ReadAllBytes( path );
+		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
+
+		StbImage.stbi_set_flip_vertically_on_load( 0 );
+
+		textureBuilder.data = image.Data;
+		textureBuilder.width = (uint)image.Width;
+		textureBuilder.height = (uint)image.Height;
+		textureBuilder.path = path;
 
 		return textureBuilder;
 	}
@@ -102,6 +127,22 @@ public partial class TextureBuilder
 	public static TextureBuilder FromStream( Stream stream, bool flipY = true )
 	{
 		var textureBuilder = new TextureBuilder();
+
+		// shit-tier hack
+		if ( flipY )
+			StbImage.stbi_set_flip_vertically_on_load( 1 );
+
+		var fileData = new byte[stream.Length];
+		stream.Read( fileData, 0, fileData.Length );
+
+		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
+
+		StbImage.stbi_set_flip_vertically_on_load( 0 );
+
+		textureBuilder.data = image.Data;
+		textureBuilder.width = (uint)image.Width;
+		textureBuilder.height = (uint)image.Height;
+		textureBuilder.path = $"Stream {stream.GetHashCode()}";
 
 		return textureBuilder;
 	}

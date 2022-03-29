@@ -75,7 +75,9 @@ internal class FileBrowserTab : BaseTab
 	private void DrawIcon( Texture icon, string text )
 	{
 		ImGui.SetCursorPos( iconPosition - new System.Numerics.Vector2( 0, IconPadding.Y * 0.5f ) );
-		ImGui.Image( (IntPtr)icon.Id, IconSize );
+
+		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, icon.VeldridTextureView );
+		ImGui.Image( texPtr, IconSize );
 
 		//
 		// Centered text offset
