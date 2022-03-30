@@ -24,9 +24,4 @@ public class Texture : Asset
 
 		All.Add( this );
 	}
-
-	public void Bind()
-	{
-
-	}
 }
