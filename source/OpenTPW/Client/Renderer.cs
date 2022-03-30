@@ -60,7 +60,7 @@ internal class Renderer
 		commandList.Begin();
 		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
 		commandList.ClearColorTarget( 0, RgbaFloat.CornflowerBlue );
-		// commandList.ClearDepthStencil( 1 );
+		commandList.ClearDepthStencil( 1 );
 	}
 
 	private void PostRender()
@@ -95,8 +95,8 @@ internal class Renderer
 		var options = new GraphicsDeviceOptions()
 		{
 			// PreferStandardClipSpaceYDirection = true,
-			// PreferDepthRangeZeroToOne = true,
-			// SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt
+			PreferDepthRangeZeroToOne = true,
+			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt
 		};
 
 		var preferredBackend = GraphicsBackend.Direct3D11;

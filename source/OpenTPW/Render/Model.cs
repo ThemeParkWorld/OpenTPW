@@ -109,12 +109,12 @@ public class Model
 			DepthStencilState = new DepthStencilStateDescription(
 				true,
 				true,
-				ComparisonKind.Always ),
+				ComparisonKind.Less ),
 
 			RasterizerState = new RasterizerStateDescription(
 				FaceCullMode.Back,
 				PolygonFillMode.Solid,
-				FrontFace.CounterClockwise,
+				FrontFace.Clockwise,
 				true,
 				false ),
 
