@@ -568,7 +568,7 @@ public class TextureFile
 			textureData[i] = (byte)decompressedBlock0[i];
 		}
 
-		var texture = TextureBuilder.FromBytes( textureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
+		var texture = TextureBuilder.Default.FromBytes( textureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
 		this.Texture = texture;
 	}
 }

@@ -16,7 +16,7 @@ public partial class Image : Panel
 	{
 		var material = new Material(
 			texture,
-			Shader.Builder.WithVertex( "content/shaders/test.vert" )
+			ShaderBuilder.Default.WithVertex( "content/shaders/test.vert" )
 						  .WithFragment( "content/shaders/test.frag" )
 						  .Build(),
 			typeof( ObjectUniformBuffer )

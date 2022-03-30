@@ -21,6 +21,10 @@ public partial class TextureBuilder
 		path = GetHashCode().ToString();
 	}
 
+	public static TextureBuilder Default => new TextureBuilder();
+	public static TextureBuilder WorldTexture => new TextureBuilder().GenerateMips();
+	public static TextureBuilder UITexture => new TextureBuilder();
+
 	private static bool TryGetExistingTexture( string path, out Texture texture )
 	{
 		var existingTexture = Asset.All.OfType<Texture>().ToList().FirstOrDefault( t => t.Path == path );
@@ -73,37 +77,7 @@ public partial class TextureBuilder
 		return this;
 	}
 
-	public TextureBuilder UsePointFiltering( bool usePointFiltering = true )
-	{
-		if ( !usePointFiltering )
-			return this;
-
-		return this;
-	}
-
-	public TextureBuilder UseNormalFormat( bool useNormal = true )
-	{
-		if ( !useNormal )
-			return this;
-
-		return this;
-	}
-
-	public TextureBuilder UseSrgbFormat( bool useSrgb = true )
-	{
-		if ( !useSrgb )
-			return this;
-
-		return this;
-	}
-
-	public TextureBuilder WithType( string type )
-	{
-		this.type = type;
-		return this;
-	}
-
-	public static TextureBuilder FromPath( string path, bool flipY = true )
+	public TextureBuilder FromPath( string path, bool flipY = true )
 	{
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
@@ -127,7 +101,7 @@ public partial class TextureBuilder
 		return textureBuilder;
 	}
 
-	public static TextureBuilder FromBytes( byte[] bytes, uint width, uint height )
+	public TextureBuilder FromBytes( byte[] bytes, uint width, uint height )
 	{
 		var textureBuilder = new TextureBuilder
 		{
@@ -139,7 +113,7 @@ public partial class TextureBuilder
 		return textureBuilder;
 	}
 
-	public static TextureBuilder FromStream( Stream stream, bool flipY = true )
+	public TextureBuilder FromStream( Stream stream, bool flipY = true )
 	{
 		var textureBuilder = new TextureBuilder();
 

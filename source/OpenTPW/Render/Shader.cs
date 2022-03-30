@@ -4,8 +4,6 @@ namespace OpenTPW;
 
 public class Shader
 {
-	public static ShaderBuilder Builder => new();
-
 	public Veldrid.Shader[] ShaderProgram { get; }
 
 	internal Shader( Veldrid.Shader[] shaderProgram )

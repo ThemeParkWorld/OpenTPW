@@ -8,6 +8,8 @@ namespace OpenTPW
 		private ShaderDescription VertexShaderDescription;
 		private ShaderDescription FragmentShaderDescription;
 
+		public static ShaderBuilder Default => new ShaderBuilder();
+
 		internal ShaderBuilder()
 		{
 

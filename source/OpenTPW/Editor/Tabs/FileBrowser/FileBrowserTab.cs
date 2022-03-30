@@ -37,7 +37,7 @@ internal class FileBrowserTab : BaseTab
 	{
 		RegisterFileHandlers();
 
-		folderIcon = TextureBuilder.FromPath( "content/icons/folder.png" ).Build();
+		folderIcon = TextureBuilder.UITexture.FromPath( "content/icons/folder.png" ).Build();
 	}
 
 	private void RegisterFileHandlers()
@@ -55,7 +55,7 @@ internal class FileBrowserTab : BaseTab
 					continue;
 
 				var regex = new Regex( attribute.RegexPattern );
-				var icon = TextureBuilder.FromPath( attribute.Icon ).Build();
+				var icon = TextureBuilder.UITexture.FromPath( attribute.Icon ).Build();
 				var registeredFileHandler = new RegisteredFileHandler( regex, type, icon );
 
 				fileHandlers.Add( registeredFileHandler );

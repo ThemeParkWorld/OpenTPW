@@ -12,7 +12,7 @@ public class ImageFileHandler : BaseFileHandler
 	public ImageFileHandler( byte[] fileData ) : base( fileData )
 	{
 		using var fileStream = new MemoryStream( fileData );
-		texture = TextureBuilder.FromStream( fileStream ).UsePointFiltering().Build();
+		texture = TextureBuilder.UITexture.FromStream( fileStream ).Build();
 	}
 
 	public override void Draw()

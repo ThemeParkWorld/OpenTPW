@@ -49,8 +49,8 @@ public class Cursor : Panel
 	{
 		// TODO: clean this up
 		var material = new Material(
-			TextureBuilder.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).UsePointFiltering().Build(),
-			Shader.Builder.WithVertex( "content/shaders/cursor/cursor.vert" )
+			TextureBuilder.UITexture.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).Build(),
+			ShaderBuilder.Default.WithVertex( "content/shaders/cursor/cursor.vert" )
 							 .WithFragment( "content/shaders/cursor/cursor.frag" )
 							 .Build(),
 			typeof( ObjectUniformBuffer )
