@@ -52,19 +52,15 @@ public class Model
 
 	private void SetupMesh( Vertex[] vertices, uint[] indices )
 	{
+		SetupMesh( vertices );
+
 		var factory = Device.ResourceFactory;
-		var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
-		vertexCount = (uint)vertices.Length;
 		indexCount = (uint)indices.Length;
 
-		VertexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( vertexCount * vertexStructSize, Veldrid.BufferUsage.VertexBuffer )
-		);
 		IndexBuffer = factory.CreateBuffer(
 			new Veldrid.BufferDescription( indexCount * sizeof( uint ), Veldrid.BufferUsage.IndexBuffer )
 		);
 
-		Device.UpdateBuffer( VertexBuffer, 0, vertices );
 		Device.UpdateBuffer( IndexBuffer, 0, indices );
 	}
 
@@ -142,8 +138,8 @@ public class Model
 				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
 		}
 
-		if ( !Material.DiffuseTexture.IsDirty )
-			Material.DiffuseTexture.GenerateMipmaps( commandList );
+		if ( Material.IsDirty )
+			Material.GenerateMipmaps( commandList );
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.SetPipeline( pipeline );

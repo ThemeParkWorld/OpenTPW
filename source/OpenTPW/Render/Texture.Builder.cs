@@ -14,7 +14,7 @@ public partial class TextureBuilder
 
 	private string path;
 
-	private bool generateMips = false;
+	private bool shouldGenerateMips = false;
 
 	public TextureBuilder()
 	{
@@ -43,11 +43,8 @@ public partial class TextureBuilder
 		if ( TryGetExistingTexture( path, out var existingTexture ) )
 			return existingTexture;
 
-		var textureDataPtr = Marshal.AllocHGlobal( data.Length );
-		Marshal.Copy( data, 0, textureDataPtr, data.Length );
-
 		uint mipLevels = 1;
-		if ( generateMips )
+		if ( shouldGenerateMips )
 			mipLevels = 8;
 
 		var textureDescription = TextureDescription.Texture2D(
@@ -60,12 +57,18 @@ public partial class TextureBuilder
 		);
 
 		var texture = Device.ResourceFactory.CreateTexture( textureDescription );
-		Device.UpdateTexture( texture, textureDataPtr, (uint)data.Length, 0, 0, 0, width, height, 1, 0, 0 );
 
-		var textureView = Device.ResourceFactory.CreateTextureView( texture );
+		var textureDataPtr = Marshal.AllocHGlobal( data.Length );
+		Marshal.Copy( data, 0, textureDataPtr, data.Length );
+		Device.UpdateTexture( texture, textureDataPtr, (uint)data.Length, 0, 0, 0, width, height, 1, 0, 0 );
 		Marshal.FreeHGlobal( textureDataPtr );
 
-		return new Texture( path, texture, textureView, type, (int)width, (int)height );
+		var textureView = Device.ResourceFactory.CreateTextureView( texture );
+
+		return new Texture( path, texture, textureView, type, (int)width, (int)height )
+		{
+			IsDirty = shouldGenerateMips
+		};
 	}
 
 	public TextureBuilder GenerateMips( bool generateMips = true )
@@ -73,7 +76,7 @@ public partial class TextureBuilder
 		if ( !generateMips )
 			return this;
 
-		this.generateMips = true;
+		this.shouldGenerateMips = true;
 		return this;
 	}
 
@@ -81,8 +84,6 @@ public partial class TextureBuilder
 	{
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
-
-		var textureBuilder = new TextureBuilder();
 
 		// shit-tier hack
 		if ( flipY )
@@ -93,30 +94,25 @@ public partial class TextureBuilder
 
 		StbImage.stbi_set_flip_vertically_on_load( 0 );
 
-		textureBuilder.data = image.Data;
-		textureBuilder.width = (uint)image.Width;
-		textureBuilder.height = (uint)image.Height;
-		textureBuilder.path = path;
+		this.data = image.Data;
+		this.width = (uint)image.Width;
+		this.height = (uint)image.Height;
+		this.path = path;
 
-		return textureBuilder;
+		return this;
 	}
 
-	public TextureBuilder FromBytes( byte[] bytes, uint width, uint height )
+	public TextureBuilder FromData( byte[] data, uint width, uint height )
 	{
-		var textureBuilder = new TextureBuilder
-		{
-			data = bytes,
-			width = width,
-			height = height
-		};
+		this.data = data;
+		this.width = width;
+		this.height = height;
 
-		return textureBuilder;
+		return this;
 	}
 
 	public TextureBuilder FromStream( Stream stream, bool flipY = true )
 	{
-		var textureBuilder = new TextureBuilder();
-
 		// shit-tier hack
 		if ( flipY )
 			StbImage.stbi_set_flip_vertically_on_load( 1 );
@@ -128,11 +124,11 @@ public partial class TextureBuilder
 
 		StbImage.stbi_set_flip_vertically_on_load( 0 );
 
-		textureBuilder.data = image.Data;
-		textureBuilder.width = (uint)image.Width;
-		textureBuilder.height = (uint)image.Height;
-		textureBuilder.path = $"Stream {stream.GetHashCode()}";
+		this.data = image.Data;
+		this.width = (uint)image.Width;
+		this.height = (uint)image.Height;
+		this.path = $"Stream {stream.GetHashCode()}";
 
-		return textureBuilder;
+		return this;
 	}
 }

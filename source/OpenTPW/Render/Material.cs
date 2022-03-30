@@ -1,4 +1,6 @@
-﻿namespace OpenTPW;
+﻿using Veldrid;
+
+namespace OpenTPW;
 
 public struct Material
 {
@@ -11,5 +13,13 @@ public struct Material
 		DiffuseTexture = diffuseTexture;
 		Shader = shader;
 		UniformBufferType = uniformBufferType;
+	}
+
+	public bool IsDirty => DiffuseTexture.IsDirty;
+
+	public void GenerateMipmaps( CommandList commandList )
+	{
+		if ( DiffuseTexture.IsDirty )
+			DiffuseTexture.GenerateMipmaps( commandList );
 	}
 }

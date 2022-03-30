@@ -29,11 +29,11 @@ public class Texture : Asset
 
 	public void GenerateMipmaps( CommandList commandList )
 	{
-		if ( IsDirty )
+		if ( !IsDirty )
 			return;
 
 		commandList.GenerateMipmaps( VeldridTexture );
 
-		IsDirty = true;
+		IsDirty = false;
 	}
 }
