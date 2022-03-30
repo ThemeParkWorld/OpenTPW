@@ -142,6 +142,9 @@ public class Model
 				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
 		}
 
+		if ( !Material.DiffuseTexture.IsDirty )
+			Material.DiffuseTexture.GenerateMipmaps( commandList );
+
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.SetPipeline( pipeline );
 

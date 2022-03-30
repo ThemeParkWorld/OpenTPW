@@ -40,4 +40,8 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Formats\Model\" />
+	</ItemGroup>
+
 </Project>

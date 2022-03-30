@@ -14,6 +14,8 @@ public partial class TextureBuilder
 
 	private string path;
 
+	private bool generateMips = false;
+
 	public TextureBuilder()
 	{
 		path = GetHashCode().ToString();
@@ -40,13 +42,17 @@ public partial class TextureBuilder
 		var textureDataPtr = Marshal.AllocHGlobal( data.Length );
 		Marshal.Copy( data, 0, textureDataPtr, data.Length );
 
+		uint mipLevels = 1;
+		if ( generateMips )
+			mipLevels = 8;
+
 		var textureDescription = TextureDescription.Texture2D(
 			width,
 			height,
-			1,
+			mipLevels,
 			1,
 			PixelFormat.R8_G8_B8_A8_UNorm,
-			TextureUsage.Sampled
+			TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 		);
 
 		var texture = Device.ResourceFactory.CreateTexture( textureDescription );
@@ -56,6 +62,15 @@ public partial class TextureBuilder
 		Marshal.FreeHGlobal( textureDataPtr );
 
 		return new Texture( path, texture, textureView, type, (int)width, (int)height );
+	}
+
+	public TextureBuilder GenerateMips( bool generateMips = true )
+	{
+		if ( !generateMips )
+			return this;
+
+		this.generateMips = true;
+		return this;
 	}
 
 	public TextureBuilder UsePointFiltering( bool usePointFiltering = true )

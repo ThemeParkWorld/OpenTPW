@@ -21,7 +21,7 @@ public class TestObject : Entity
 	public TestObject()
 	{
 		var material = new Material(
-			TextureBuilder.FromPath( "content/textures/test.png" ).Build(),
+			TextureBuilder.FromPath( "content/textures/test.png" ).GenerateMips().Build(),
 			Shader.Builder.WithVertex( "content/shaders/3d/3d.vert" )
 							 .WithFragment( "content/shaders/3d/3d.frag" )
 							 .Build(),
