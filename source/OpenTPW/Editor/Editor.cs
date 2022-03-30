@@ -35,7 +35,8 @@ internal partial class Editor
 			new FileBrowserTab(),
 			new DemoWindow(),
 			new CursorTab(),
-			new SceneTab()
+			new SceneTab(),
+			new ThemerTab()
 		} );
 
 		tabs.ForEach( x => x.ImGuiRenderer = ImGuiRenderer );
