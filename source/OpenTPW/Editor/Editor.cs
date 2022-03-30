@@ -89,11 +89,55 @@ internal partial class Editor
 		SetKeyMappings( io );
 	}
 
+	private void DrawPerfOverlay()
+	{
+		var io = ImGui.GetIO();
+		var window_flags = ImGuiWindowFlags.NoDecoration |
+			ImGuiWindowFlags.AlwaysAutoResize |
+			ImGuiWindowFlags.NoSavedSettings |
+			ImGuiWindowFlags.NoFocusOnAppearing |
+			ImGuiWindowFlags.NoNav |
+			ImGuiWindowFlags.NoInputs |
+			ImGuiWindowFlags.NoMove;
+
+		const float padding = 8.0f;
+
+		var viewport = ImGui.GetMainViewport();
+		var workPos = viewport.WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
+
+		System.Numerics.Vector2 windowPos, windowPivot;
+
+		windowPos.X = workPos.X + padding;
+		windowPos.Y = workPos.Y + padding;
+		windowPivot.X = 0.0f;
+		windowPivot.Y = 0.0f;
+
+		ImGui.SetNextWindowPos( windowPos, ImGuiCond.Always, windowPivot );
+
+		ImGui.SetNextWindowBgAlpha( 0.5f );
+
+		if ( ImGui.Begin( $"##overlay", window_flags ) )
+		{
+			string total = GC.GetTotalMemory( false ).ToSize( MathExtensions.SizeUnits.MB );
+
+			ImGui.Text( $"{io.Framerate.CeilToInt()}fps" );
+			ImGui.Separator();
+			ImGui.Text( $"{total} total" );
+		}
+
+		ImGui.End();
+	}
+
 	private void DrawMenuBar()
 	{
 		ImGui.BeginMainMenuBar();
 
-		ImGui.Text( "OpenTPW |" );
+		ImGui.Dummy( new( 4, 0 ) );
+		ImGui.Text( "OpenTPW" );
+		ImGui.Dummy( new( 4, 0 ) );
+
+		ImGui.Separator();
+		ImGui.Dummy( new( 4, 0 ) );
 
 		foreach ( var tab in tabs )
 		{
@@ -127,6 +171,8 @@ internal partial class Editor
 
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			shouldRender = !shouldRender;
+
+		DrawPerfOverlay();
 
 		if ( !shouldRender )
 			return;

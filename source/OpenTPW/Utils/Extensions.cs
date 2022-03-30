@@ -91,6 +91,14 @@ public static class MathExtensions
 	public static Vector3 Right( this Matrix4x4 matrix ) => new Vector3( matrix.M11, matrix.M21, matrix.M31 );
 	public static Vector3 Up( this Matrix4x4 matrix ) => new Vector3( matrix.M12, matrix.M22, matrix.M32 );
 	public static Vector3 Forward( this Matrix4x4 matrix ) => -new Vector3( matrix.M13, matrix.M23, matrix.M33 );
+
+	// https://stackoverflow.com/a/22733709/8176082
+	public enum SizeUnits
+	{
+		Byte, KB, MB, GB, TB, PB, EB, ZB, YB
+	}
+
+	public static string ToSize( this long value, SizeUnits unit ) => (value / (double)Math.Pow( 1024, (long)unit )).ToString( "0.00" ) + unit.ToString();
 }
 
 public static class ListExtension
