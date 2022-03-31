@@ -1,11 +1,58 @@
 ﻿using ImGuiNET;
+using System.Numerics;
+using System.Reflection;
 
 namespace OpenTPW;
 
 [EditorMenu( "Scene/Outliner" )]
 internal class SceneTab : BaseTab
 {
-	private Entity selectedEntity;
+	private Entity? selectedEntity;
+
+	class ReflectedThing
+	{
+		public string Name { get; set; }
+		public object? Value { get; set; }
+
+		public ReflectedThing( object o, FieldInfo fieldInfo )
+		{
+			Name = fieldInfo.Name;
+			Value = fieldInfo.GetValue( o );
+		}
+
+		public ReflectedThing( object o, PropertyInfo propertyInfo )
+		{
+			Name = propertyInfo.Name;
+			Value = propertyInfo.GetValue( o );
+		}
+	}
+
+	private void DrawElement( ReflectedThing thing )
+	{
+		if ( thing.Value is Vector3 vec3 )
+		{
+			var sysVec3 = vec3.GetSystemVector3();
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.InputFloat3( $"##thing_{thing.GetHashCode()}", ref sysVec3 );
+		}
+		else if ( thing.Value is Matrix4x4 mat4 )
+		{
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.Text( $"{mat4.Column1():0.00}" );
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.Text( $"{mat4.Column2():0.00}" );
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.Text( $"{mat4.Column3():0.00}" );
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.Text( $"{mat4.Column4():0.00}" );
+		}
+		else
+		{
+			ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
+			ImGui.Text( $"[{thing.Value}]" );
+			ImGui.PopStyleColor();
+		}
+	}
 
 	public override void Draw()
 	{
@@ -20,10 +67,9 @@ internal class SceneTab : BaseTab
 
 			foreach ( var entity in Entity.All )
 			{
-				var selectableText = $"{entity.Name}\n" +
-					$"({entity.GetType().Name})\n";
+				var startPos = ImGui.GetCursorPos();
 
-				if ( ImGui.Selectable( selectableText ) )
+				if ( ImGui.Selectable( entity.Name ) )
 				{
 					selectedEntity = entity;
 				}
@@ -42,27 +88,50 @@ internal class SceneTab : BaseTab
 		{
 			if ( selectedEntity != null )
 			{
-				if ( ImGui.BeginTable( $"##table_{selectedEntity.Name}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.PadOuterX ) )
+				var selectedEntityType = selectedEntity.GetType();
+
+				foreach ( var group in selectedEntityType.GetMembers().GroupBy( x => x.DeclaringType ) )
 				{
-					// TODO: Use reflection for this, combined with a [Scene.Show] attribute
-					string[] names = new[] { "Position", "Rotation", "Scale" };
-					string[] values = new[] { $"{selectedEntity.position}", $"{selectedEntity.rotation}", $"{selectedEntity.scale}" };
+					ImGui.Text( $"{group.Key}:" );
 
-					ImGui.TableNextColumn();
-					ImGui.TableHeader( "Name" );
-					ImGui.TableNextColumn();
-					ImGui.TableHeader( "Value" );
-					ImGui.TableNextRow();
-
-					for ( int i = 0; i < names.Length; i++ )
+					if ( ImGui.BeginTable( $"##table_{group}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 					{
-						ImGui.TableNextColumn();
-						ImGui.Text( $"{names[i]}" );
-						ImGui.TableNextColumn();
-						ImGui.Text( $"{values[i]}" );
-					}
+						ImGui.TableSetupColumn( "Name", ImGuiTableColumnFlags.WidthFixed, 100f );
+						ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch, 1f );
 
-					ImGui.EndTable();
+						ImGui.TableNextColumn();
+						ImGui.TableHeader( "Name" );
+						ImGui.TableNextColumn();
+						ImGui.TableHeader( "Value" );
+
+						foreach ( var item in group )
+						{
+							if ( item.MemberType != MemberTypes.Field && item.MemberType != MemberTypes.Property )
+								continue;
+
+							ImGui.TableNextRow();
+							ImGui.TableNextColumn();
+							ImGui.Text( $"{item.Name}" );
+							ImGui.TableNextColumn();
+
+							if ( item.MemberType == MemberTypes.Field )
+							{
+								var field = item as FieldInfo;
+								var thing = new ReflectedThing( selectedEntity, field );
+
+								DrawElement( thing );
+							}
+							else if ( item.MemberType == MemberTypes.Property )
+							{
+								var property = item as PropertyInfo;
+								var thing = new ReflectedThing( selectedEntity, property );
+
+								DrawElement( thing );
+							}
+						}
+
+						ImGui.EndTable();
+					}
 				}
 			}
 		}

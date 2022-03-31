@@ -64,7 +64,7 @@ partial class Editor
 
 		var style = ImGui.GetStyle();
 		style.WindowPadding = new( 8.00f, 8.00f );
-		style.FramePadding = new( 12.00f, 6.00f );
+		style.FramePadding = new( 8.00f, 4.00f );
 		style.CellPadding = new( 6.00f, 6.00f );
 		style.ItemSpacing = new( 4.00f, 4.00f );
 		style.ItemInnerSpacing = new( 2.00f, 2.00f );
