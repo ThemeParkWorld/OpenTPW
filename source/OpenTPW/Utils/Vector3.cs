@@ -47,10 +47,10 @@ public struct Vector3 : IEquatable<Vector3>
 	public readonly float Length => internalVector.Length();
 	public readonly float LengthSquared => internalVector.LengthSquared();
 
-	public readonly Vector3 Normal => this / Length;
+	public readonly Vector3 Normal => (Length == 0) ? new( 0 ) : (this / Length);
 	public void Normalize()
 	{
-		internalVector = new System.Numerics.Vector3( X, Y, Z ) / Length;
+		this = Normal;
 	}
 
 	public Vector3( float x, float y, float z )
@@ -134,4 +134,6 @@ public struct Vector3 : IEquatable<Vector3>
 	public override int GetHashCode() => HashCode.Combine( internalVector );
 
 	public override string ToString() => internalVector.ToString();
+
+	public System.Numerics.Vector3 GetSystemVector3() => internalVector;
 }
