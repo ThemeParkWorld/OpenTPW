@@ -1,6 +1,5 @@
-﻿using Veldrid;
+﻿using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
-using Veldrid.Sdl2;
 
 namespace OpenTPW;
 

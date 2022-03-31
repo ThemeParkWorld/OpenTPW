@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 public class WadArchiveFile
 {

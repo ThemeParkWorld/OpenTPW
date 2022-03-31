@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using System.Numerics;
-using System.Text;
 
 namespace OpenTPW;
 

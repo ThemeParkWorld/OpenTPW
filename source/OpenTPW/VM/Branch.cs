@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 public struct Branch
 {
