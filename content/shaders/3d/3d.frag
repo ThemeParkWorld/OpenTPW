@@ -23,6 +23,7 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
     mat4 g_mView;
     mat4 g_mProj;
+
     vec3 g_vLightPos;
     vec3 g_vLightColor;
     vec3 g_vCameraPos;

@@ -11,18 +11,23 @@ public class TestObject : Entity
 	[StructLayout( LayoutKind.Sequential )]
 	struct ObjectUniformBuffer
 	{
-		public Matrix4x4 g_mModel;
-		public Matrix4x4 g_mView;
-		public Matrix4x4 g_mProj;
+		/*
+		 * These fields are padded so that they're
+		 * aligned (as blocks) to multiples of 16.
+		 */
 
-		public System.Numerics.Vector3 g_vLightPos;
-		public float _padding0;
+		public Matrix4x4 g_mModel; // 64
+		public Matrix4x4 g_mView; // 64
+		public Matrix4x4 g_mProj; // 64
 
-		public System.Numerics.Vector3 g_vLightColor;
-		public float _padding1;
+		public System.Numerics.Vector3 g_vLightPos; // 12
+		public float _padding0; // 4
 
-		public System.Numerics.Vector3 g_vCameraPos;
-		public float _padding2;
+		public System.Numerics.Vector3 g_vLightColor; // 12
+		public float _padding1; // 4
+
+		public System.Numerics.Vector3 g_vCameraPos; // 12
+		public float _padding2; // 4
 	}
 
 	public TestObject()
@@ -48,12 +53,12 @@ public class TestObject : Entity
 			g_mView = World.Current.Camera.ViewMatrix,
 			g_mProj = World.Current.Camera.ProjMatrix,
 			g_vLightPos = World.Current.Sun.position,
-			g_vLightColor = new( 1, 1, 0 ),
+			g_vLightColor = World.Current.Sun.Color,
 			g_vCameraPos = World.Current.Camera.position,
 
 			_padding0 = 0,
 			_padding1 = 0,
-			_padding2 = 0,
+			_padding2 = 0
 		};
 
 		model.Draw( uniformBuffer, commandList );
