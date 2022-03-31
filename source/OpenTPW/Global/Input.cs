@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Veldrid;
+using Veldrid.Sdl2;
 
 namespace OpenTPW;
 
@@ -54,12 +55,12 @@ public static partial class Input
 
 		if ( io.WantCaptureMouse )
 		{
-			// mouse.Cursor.CursorMode = CursorMode.Normal;
+			Sdl2Native.SDL_ShowCursor( 1 ); // TODO: Move to a proper function
 			Mouse = new MouseInfo();
 		}
 		else
 		{
-			// mouse.Cursor.CursorMode = CursorMode.Hidden;
+			Sdl2Native.SDL_ShowCursor( 0 ); // TODO: Move to a proper function
 
 			var mousePos = new Vector2( inputSnapshot.MousePosition.X, inputSnapshot.MousePosition.Y );
 			var mouseInfo = new MouseInfo
