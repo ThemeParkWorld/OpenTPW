@@ -46,10 +46,21 @@ internal class SceneTab : BaseTab
 			ImGui.SetNextItemWidth( -1 );
 			ImGui.Text( $"{mat4.Column4():0.00}" );
 		}
+		else if ( thing.Value is string str )
+		{
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.InputText( $"##thing_{thing.GetHashCode()}", ref str, 256 );
+		}
+		else if ( thing.Value is float f )
+		{
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.SliderFloat( $"##thing_{thing.GetHashCode()}", ref f, 0.0f, 1.0f );
+		}
 		else
 		{
+			ImGui.Text( $"{thing.Value}" );
 			ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
-			ImGui.Text( $"[{thing.Value}]" );
+			ImGui.Text( $"[{thing.Value.GetType()}]" );
 			ImGui.PopStyleColor();
 		}
 	}
@@ -92,6 +103,9 @@ internal class SceneTab : BaseTab
 
 				foreach ( var group in selectedEntityType.GetMembers().GroupBy( x => x.DeclaringType ) )
 				{
+					if ( group.Key == typeof( object ) )
+						continue;
+
 					ImGui.Text( $"{group.Key}:" );
 
 					if ( ImGui.BeginTable( $"##table_{group}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
