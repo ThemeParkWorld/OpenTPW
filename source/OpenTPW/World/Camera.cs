@@ -66,8 +66,8 @@ public class Camera : Entity
 
 		wasPressed = Input.Mouse.Right;
 
-		wishVelocity = Forward * wishDir * Time.Delta * cameraSpeed;
-		wishVelocity += Right * wishDir * Time.Delta * cameraSpeed;
+		wishVelocity = Forward * wishDir.X * Time.Delta * cameraSpeed;
+		wishVelocity += Right * wishDir.Y * Time.Delta * cameraSpeed;
 		wishVelocity.Z = 0;
 
 		wishHeight += -Input.Mouse.Wheel;
