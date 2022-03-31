@@ -17,7 +17,7 @@ public class Camera : Entity
 	private float wishYaw = 0f;
 	private float yaw = 0f;
 	private float wishHeight = 8f;
-	private float cameraSpeed = 40f;
+	private float cameraSpeed = 100f;
 
 	private void CalcViewProjMatrix()
 	{
@@ -40,6 +40,9 @@ public class Camera : Entity
 		);
 	}
 
+	private Vector2 mouseAnchor;
+	private bool wasPressed = false;
+
 	public override void Update()
 	{
 		base.Update();
@@ -48,8 +51,23 @@ public class Camera : Entity
 		// Get user input
 		//
 
-		wishVelocity = Forward * Input.Forward * Time.Delta * cameraSpeed;
-		wishVelocity += Right * Input.Right * Time.Delta * cameraSpeed;
+		var wishDir = new Vector3( Input.Forward, Input.Right, 0 ).Normal;
+
+		if ( Input.Mouse.Right && !wasPressed )
+		{
+			mouseAnchor = Input.Mouse.Position;
+		}
+
+		if ( Input.Mouse.Right )
+		{
+			var delta = mouseAnchor - Input.Mouse.Position;
+			wishDir = new Vector3( delta.Y, -delta.X, 0 ) / 512f;
+		}
+
+		wasPressed = Input.Mouse.Right;
+
+		wishVelocity = Forward * wishDir * Time.Delta * cameraSpeed;
+		wishVelocity += Right * wishDir * Time.Delta * cameraSpeed;
 		wishVelocity.Z = 0;
 
 		wishHeight += -Input.Mouse.Wheel;
