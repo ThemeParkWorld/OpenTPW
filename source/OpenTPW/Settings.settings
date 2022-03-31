@@ -9,7 +9,7 @@
       <Value Profile="(Default)">1280, 720</Value>
     </Setting>
     <Setting Name="PreferredBackend" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Direct3D11</Value>
+      <Value Profile="(Default)">Vulkan</Value>
     </Setting>
   </Settings>
 </SettingsFile>

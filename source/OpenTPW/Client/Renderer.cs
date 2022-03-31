@@ -94,7 +94,7 @@ internal class Renderer
 	{
 		var options = new GraphicsDeviceOptions()
 		{
-			// PreferStandardClipSpaceYDirection = true,
+			PreferStandardClipSpaceYDirection = true,
 			PreferDepthRangeZeroToOne = true,
 			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt
 		};

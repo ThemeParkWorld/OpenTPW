@@ -45,7 +45,7 @@ public partial class TextureBuilder
 
 		uint mipLevels = 1;
 		if ( shouldGenerateMips )
-			mipLevels = 8;
+			mipLevels = 5;
 
 		var textureDescription = TextureDescription.Texture2D(
 			width,

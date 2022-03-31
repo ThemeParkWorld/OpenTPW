@@ -26,7 +26,6 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
     vec3 g_vLightPos;
     vec3 g_vLightColor;
     vec3 g_vCameraPos;
-    int g_bHighlighted;
 } g_oUbo;
 
 vec3 lambert( vec3 vLightDir, vec3 vNormal ) 
@@ -47,12 +46,6 @@ vec3 specular( vec3 vLightDir, vec3 vNormal, vec3 vCameraDir, float fShininess )
 
 void main() 
 {
-    if ( g_oUbo.g_bHighlighted == 1 )
-    {
-        fragColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords ) * 1.5;
-        return;
-    }
-
     vec3 vLightDir = normalize( g_oUbo.g_vLightPos - vs_out.vPosition );
 
     vec3 vLambert = lambert( vLightDir, vs_out.vNormal );
@@ -64,6 +57,4 @@ void main()
     vec4 vColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords );
 
     fragColor = vec4( vLambert + vAmbient + vSpecular, 1.0 ) * vColor;
-
-    fragColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords );
 }

@@ -17,7 +17,6 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
     vec3 g_vLightPos;
     vec3 g_vLightColor;
     vec3 g_vCameraPos;
-    int g_bHighlighted;
 } g_oUbo;
 
 //
@@ -32,9 +31,8 @@ layout( location = 0 ) out struct VS_OUT {
 void main() {
     vs_out.vTexCoords = texCoords;
     vs_out.vNormal = normal;
+    vs_out.vPosition = vec3( g_oUbo.g_mModel * vec4( position, 1.0 ));
 
     vec4 pos = g_oUbo.g_mModel * vec4( position, 1.0 );
-    vs_out.vPosition = pos.xyz;
-
     gl_Position = g_oUbo.g_mProj * g_oUbo.g_mView * pos;
 }

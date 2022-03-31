@@ -91,7 +91,7 @@ public class Model
 					Kind = ResourceKind.UniformBuffer,
 					Name = "g_oUbo",
 					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Vertex
+					Stages = ShaderStages.Vertex | ShaderStages.Fragment
 				}
 			}
 		};
@@ -122,8 +122,9 @@ public class Model
 
 		pipeline = Device.ResourceFactory.CreateGraphicsPipeline( pipelineDescription );
 
+		uint uboSizeInBytes = 4 * (uint)Marshal.SizeOf( Material.UniformBufferType );
 		uniformBuffer = Device.ResourceFactory.CreateBuffer(
-			new BufferDescription( 4 * (uint)Marshal.SizeOf( Material.UniformBufferType ),
+			new BufferDescription( uboSizeInBytes,
 				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
 
 		var resourceSetDescription = new ResourceSetDescription( rsrcLayout, material.DiffuseTexture.VeldridTexture, Device.Aniso4xSampler, uniformBuffer );
