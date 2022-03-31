@@ -223,14 +223,6 @@ internal class FileBrowserTab : BaseTab
 		ImGui.Begin( "Files", ref visible );
 
 		//
-		// Search box
-		//
-		{
-			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputText( "##search", ref searchBoxText, 256 );
-		}
-
-		//
 		// Breadcrumbs
 		//
 		{
@@ -248,6 +240,22 @@ internal class FileBrowserTab : BaseTab
 				ImGui.Text( Path.DirectorySeparatorChar.ToString() );
 				ImGui.SameLine();
 			}
+		}
+
+		//
+		// Search box
+		//
+		{
+			var windowInnerWidth = ImGui.GetWindowContentRegionMax().X;
+
+			ImGui.SameLine();
+			ImGui.SetCursorPosX( windowInnerWidth - 300f );
+			ImGui.Text( "Search" );
+			ImGui.SameLine();
+			ImGui.Dummy( new System.Numerics.Vector2( 4, 0 ) );
+			ImGui.SameLine();
+			ImGui.SetNextItemWidth( 250f );
+			ImGui.InputText( "##search", ref searchBoxText, 256 );
 		}
 
 		ImGui.NewLine();
