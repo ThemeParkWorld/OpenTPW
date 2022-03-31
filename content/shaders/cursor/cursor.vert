@@ -25,4 +25,5 @@ layout( location = 0 ) out struct VS_OUT {
 void main() {
     vs_out.texCoords = texCoords;
     gl_Position = g_oUbo.g_mModel * vec4( position, 1.0 );
+    gl_Position.z = 0; // We could probably do this better in a dedicated pipeline
 }

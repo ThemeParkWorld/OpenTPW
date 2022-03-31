@@ -25,7 +25,7 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
 void main() {
     vec2 texCoords = vs_out.texCoords;
     texCoords.x = ( texCoords.x / 4 );
-    // texCoords.x += g_oUbo.g_iFrame * 0.25;
+    texCoords.x += g_oUbo.g_iFrame * 0.25;
     
     fragColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), texCoords );
 
