@@ -1,5 +1,4 @@
-﻿using ImGuiNET;
-using Veldrid;
+﻿using Veldrid;
 using Veldrid.StartupUtilities;
 
 namespace OpenTPW;
@@ -59,7 +58,7 @@ internal class Renderer
 	{
 		commandList.Begin();
 		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
-		commandList.ClearColorTarget( 0, RgbaFloat.CornflowerBlue );
+		commandList.ClearColorTarget( 0, RgbaFloat.Black );
 		commandList.ClearDepthStencil( 1 );
 	}
 
