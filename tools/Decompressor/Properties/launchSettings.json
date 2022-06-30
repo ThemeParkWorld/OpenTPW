@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Decompressor": {
+      "commandName": "Project",
+      "commandLineArgs": "-m LZSS -f input.bin",
+      "workingDirectory": "F:\\Projects\\OpenTPW\\tools\\Decompressor"
+    }
+  }
+}
