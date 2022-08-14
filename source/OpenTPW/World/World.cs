@@ -27,7 +27,7 @@ public class World
 	{
 		Camera = new Camera();
 		Sun = new Sun() { position = new( 0, 10, 10 ) };
-		_ = new TestObject();
+		_ = new Terrain();
 		_ = new Ride( GameDir.GetPath( "/data/levels/jungle/rides/bouncy.wad" ) );
 	}
 
