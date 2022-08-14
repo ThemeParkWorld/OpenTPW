@@ -174,10 +174,11 @@ internal partial class Editor
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			shouldRender = !shouldRender;
 
-		DrawPerfOverlay();
-
 		if ( !shouldRender )
+		{
+			DrawPerfOverlay();
 			return;
+		}
 
 		DrawMenuBar();
 
