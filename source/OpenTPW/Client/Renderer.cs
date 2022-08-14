@@ -110,6 +110,7 @@ internal class Renderer
 		}
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
+		Device.SyncToVerticalBlank = true;
 
 		var windowTitle = $"OpenTPW | {Device.BackendType}";
 		Window.Current.SdlWindow.Title = windowTitle;
