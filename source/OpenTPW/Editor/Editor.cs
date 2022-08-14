@@ -70,6 +70,7 @@ internal partial class Editor
 		var io = ImGui.GetIO();
 
 		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB;
+		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
 
 		io.Fonts.Clear();
 
