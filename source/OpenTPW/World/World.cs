@@ -28,12 +28,12 @@ public class World
 		Camera = new Camera();
 		Sun = new Sun() { position = new( 0, 10, 10 ) };
 		_ = new TestObject();
+		_ = new Ride( GameDir.GetPath( "/data/levels/jungle/rides/bouncy.wad" ) );
 	}
 
 	private void SetupHud()
 	{
 		Hud = new();
-		// Hud.AddChild( new Image( TextureBuilder.FromPath( GameDir.GetPath( "data/Init/1024/Welcome.tga" ) ).Build() ) );
 		Hud.AddChild( new Cursor() );
 	}
 
