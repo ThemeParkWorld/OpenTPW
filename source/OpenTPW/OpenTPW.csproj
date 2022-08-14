@@ -11,6 +11,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Formats\Model\**" />
+	  <EmbeddedResource Remove="Formats\Model\**" />
+	  <None Remove="Formats\Model\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="icon.ico" />
 	</ItemGroup>
 
@@ -38,10 +44,6 @@
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Formats\Model\" />
 	</ItemGroup>
 
 </Project>

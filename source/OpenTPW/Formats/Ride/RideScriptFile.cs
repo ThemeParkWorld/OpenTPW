@@ -165,6 +165,7 @@ public class RideScriptFile
 			{
 				Disassembly += $".branch_{currentCount - 1}\n";
 			}
+
 			Disassembly += $"\t{vm.Instructions[i]}\n";
 			currentCount += vm.Instructions[i].GetCount();
 		}
