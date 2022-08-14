@@ -6,7 +6,7 @@
 
 public class FileSystem
 {
-	public static FileSystem Game => new FileSystem( Settings.Default.GamePath );
+	public static FileSystem Game { get; } = new FileSystem( Settings.Default.GamePath );
 
 	private string BasePath { get; }
 
