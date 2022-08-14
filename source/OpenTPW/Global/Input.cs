@@ -73,40 +73,40 @@ public static partial class Input
 			};
 
 			Mouse = mouseInfo;
-
-			Right = 0;
-			Forward = 0;
-
-			var newKeysDown = inputSnapshot.KeyEvents.Where( x => x.Down ).Select( x => x.Key );
-			var newKeysUp = inputSnapshot.KeyEvents.Where( x => !x.Down ).Select( x => x.Key );
-
-			Keyboard = new KeyboardInfo(
-				Keyboard.KeysDown.Concat( newKeysDown )
-					.Distinct()
-					.Where( x => !newKeysUp.Contains( x ) )
-					.ToList()
-			);
-
-			bool IsKeyPressed( Key k ) => Keyboard.KeysDown.Contains( k );
-
-			if ( IsKeyPressed( Key.A ) )
-				Right -= 1;
-			if ( IsKeyPressed( Key.D ) )
-				Right += 1;
-			if ( IsKeyPressed( Key.W ) )
-				Forward += 1;
-			if ( IsKeyPressed( Key.S ) )
-				Forward -= 1;
-
-			LastKeysDown = KeysDown.ToList();
-			KeysDown.Clear();
-
-			if ( IsKeyPressed( Key.F1 ) )
-				KeysDown.Add( InputButton.ConsoleToggle );
-			if ( IsKeyPressed( Key.Left ) )
-				KeysDown.Add( InputButton.RotateLeft );
-			if ( IsKeyPressed( Key.Right ) )
-				KeysDown.Add( InputButton.RotateRight );
 		}
+
+		Right = 0;
+		Forward = 0;
+
+		var newKeysDown = inputSnapshot.KeyEvents.Where( x => x.Down ).Select( x => x.Key );
+		var newKeysUp = inputSnapshot.KeyEvents.Where( x => !x.Down ).Select( x => x.Key );
+
+		Keyboard = new KeyboardInfo(
+			Keyboard.KeysDown.Concat( newKeysDown )
+				.Distinct()
+				.Where( x => !newKeysUp.Contains( x ) )
+				.ToList()
+		);
+
+		bool IsKeyPressed( Key k ) => Keyboard.KeysDown.Contains( k );
+
+		if ( IsKeyPressed( Key.A ) )
+			Right -= 1;
+		if ( IsKeyPressed( Key.D ) )
+			Right += 1;
+		if ( IsKeyPressed( Key.W ) )
+			Forward += 1;
+		if ( IsKeyPressed( Key.S ) )
+			Forward -= 1;
+
+		LastKeysDown = KeysDown.ToList();
+		KeysDown.Clear();
+
+		if ( IsKeyPressed( Key.F1 ) )
+			KeysDown.Add( InputButton.ConsoleToggle );
+		if ( IsKeyPressed( Key.Left ) )
+			KeysDown.Add( InputButton.RotateLeft );
+		if ( IsKeyPressed( Key.Right ) )
+			KeysDown.Add( InputButton.RotateRight );
 	}
 }
