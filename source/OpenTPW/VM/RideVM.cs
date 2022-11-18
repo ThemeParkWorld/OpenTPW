@@ -86,8 +86,22 @@ public partial class RideVM
 
 	public void BranchTo( int value )
 	{
-		var destBranch = Branches.First( b => b.CompiledOffset == value );
-		CurrentPos = destBranch.InstructionOffset;
+		//
+		// HACK: Values are provided as offsets in terms of instruction size, i.e.
+		// an offset of 7 might be 3 opcodes and 4 operands.
+		// To get around this, we convert to a position in the file, and then locate
+		// that offset in the instruction list.
+		// This is super hacky (and probably slow) and could probably be avoided
+		// if the disassembler / file handler gets re-written.
+		//
+
+		var fileOffset = value * 4; // Each opcode + operands is 4 bytes
+		fileOffset += (int)Instructions.First().offset;
+
+		CurrentPos = Instructions.FindIndex( x => x.offset == fileOffset );
+		CurrentPos += 1; // Ignore NO-OP
+
+		Log.Trace( $"Branching to .label_{value} / {fileOffset} (location: {CurrentPos})" );
 	}
 
 	public void Run( bool run = true )
