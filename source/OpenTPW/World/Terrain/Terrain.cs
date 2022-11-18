@@ -6,7 +6,11 @@ public class Terrain : ModelEntity
 	{
 		base.Spawn();
 
-		Model = Primitives.Plane.GenerateModel( Material.Default );
+		// TODO: File System
+		var texture = new TextureFile( @"C:\Users\Alex\BLACKHOLE\terrain.wad\grd_ctr1.wct" );
+		var material = new Material( texture.Texture );
+
+		Model = Primitives.Plane.GenerateModel( material );
 		scale = new Vector3( 100f );
 	}
 }

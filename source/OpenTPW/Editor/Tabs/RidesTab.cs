@@ -84,16 +84,17 @@ internal class RidesTab : BaseTab
 					EditorHelpers.DrawColoredText( $"0x{instruction.offset:X4}: ", col );
 				}
 
+				var opcodeHandler = vm.FindOpcodeHandler( instruction.opcode )?.GetCustomAttribute<OpcodeHandlerAttribute>();
+
 				ImGui.SameLine();
-				EditorHelpers.DrawColoredText( $"{instruction.opcode}", OneDark.Instruction );
+
+				EditorHelpers.DrawColoredText( $"{instruction.opcode}", (opcodeHandler == null) ? OneDark.Warning : OneDark.Instruction );
 
 				// Opcode info tooltip
 				if ( ImGui.IsItemHovered() )
 				{
 					ImGui.BeginTooltip();
 					ImGui.Text( $"{instruction.opcode}" );
-
-					var opcodeHandler = vm.FindOpcodeHandler( instruction.opcode )?.GetCustomAttribute<OpcodeHandlerAttribute>();
 
 					if ( opcodeHandler != null )
 					{

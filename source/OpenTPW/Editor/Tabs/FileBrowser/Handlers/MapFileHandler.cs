@@ -9,6 +9,7 @@ public class MapFileHandler : BaseFileHandler
 	public MapFileHandler( byte[] fileData ) : base( fileData )
 	{
 	}
+
 	public byte GetRandomByte( int seed )
 	{
 		unchecked
@@ -20,14 +21,14 @@ public class MapFileHandler : BaseFileHandler
 
 	public System.Numerics.Vector4 GetRandomColor( int seed )
 	{
-		switch( seed )
+		switch ( seed )
 		{
 			case 0:
 				return new System.Numerics.Vector4( 0, 0, 0, 1 );
 			case 1:
 				return System.Numerics.Vector4.One;
 			case 2:
-				return new System.Numerics.Vector4( 0.5f, 0.5f, 0f, 1 );
+				return new System.Numerics.Vector4( 0.1f, 0.5f, 0.4f, 1 );
 			case 3:
 				return new System.Numerics.Vector4( 1.0f, 0.5f, 1.0f, 1 );
 			case 17:
@@ -63,7 +64,7 @@ public class MapFileHandler : BaseFileHandler
 		{
 			ImGui.PushStyleColor( ImGuiCol.Text, GetRandomColor( b ) );
 			ImGui.Text( "-" );
-			ImGui.PopStyleColor(1 );
+			ImGui.PopStyleColor( 1 );
 
 			i++;
 

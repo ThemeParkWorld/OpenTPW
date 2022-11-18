@@ -25,6 +25,12 @@ public partial class RideVM
 	public List<Branch> Branches { get; set; } = new List<Branch>();
 	public byte[] FileData { get; set; }
 
+	private Dictionary<Opcode, MethodInfo> OpcodeHandlers { get; } = Assembly.GetExecutingAssembly().GetTypes()
+		.SelectMany( t => t.GetMethods() )
+		.Where( x => x.GetCustomAttribute<OpcodeHandlerAttribute>() != null )
+		.Select( x => (x.GetCustomAttribute<OpcodeHandlerAttribute>().Opcode, x) )
+		.ToDictionary( x => x.Opcode, x => x.x );
+
 	public RideVM( Stream stream )
 	{
 		rsseqFile = new RideScriptFile( this );
@@ -39,14 +45,12 @@ public partial class RideVM
 		instruction.Invoke();
 	}
 
-	public MethodInfo FindOpcodeHandler( Opcode opcodeId )
+	public MethodInfo? FindOpcodeHandler( Opcode opcodeId )
 	{
-		var handlerAttribute = Assembly.GetExecutingAssembly().GetTypes()
-					  .SelectMany( t => t.GetMethods() )
-					  .Where( x => x.GetCustomAttribute<OpcodeHandlerAttribute>()?.Opcode == opcodeId )
-					  .ToArray();
+		if ( OpcodeHandlers.TryGetValue( opcodeId, out var handlerAttribute ) )
+			return handlerAttribute;
 
-		return handlerAttribute.FirstOrDefault();
+		return null;
 	}
 
 	public void CallOpcodeHandler( Opcode opcodeId, params Operand[] operands )
