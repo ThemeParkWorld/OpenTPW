@@ -54,6 +54,14 @@ public partial class RideVM
 
 	public void Step()
 	{
+		if ( CurrentPos >= Instructions.Count - 1 )
+		{
+			// Shit, we reached the end of the instructions list..
+			// TODO: How do we handle this gracefully in-game?
+			// We'll just take it from the top for now..
+			CurrentPos = 0;
+		}
+
 		var instruction = Instructions[CurrentPos++];
 		Log.Trace( $"Invoking {instruction.opcode} at position {CurrentPos}" );
 
