@@ -1,6 +1,5 @@
 ﻿namespace OpenTPW;
 
-
 /// <summary>
 /// Animations, objects, etc.
 /// </summary>
@@ -36,7 +35,6 @@ public class ScriptDefs
 		OBJ_SOUND_GLO_BMP = 11,
 	}
 
-
 	public enum Coaster
 	{
 		// Rollercoaster specific
@@ -61,7 +59,6 @@ public class ScriptDefs
 		WALK_ACTION_HEAD = 4,
 		WALK_ACTION_THROW = 5,
 		WALK_ACTION_CHEER = 6,
-
 	}
 
 	public enum Bumper

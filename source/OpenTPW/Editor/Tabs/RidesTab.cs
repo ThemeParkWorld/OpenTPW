@@ -178,23 +178,36 @@ internal class RidesTab : BaseTab
 
 			if ( ImGui.BeginTabItem( "Variables" ) )
 			{
-				ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
-				ImGui.BeginChild( "ride_variables" );
-				ImGui.PushFont( Editor.MonospaceFont );
-
-				for ( int i = 0; i < vm.Variables.Count; i++ )
+				if ( ImGui.BeginTable( "vm_variables", 2, ImGuiTableFlags.PadOuterX ) )
 				{
-					var variableValue = vm.Variables[i];
-					var variableName = vm.VariableNames[i];
-					EditorHelpers.DrawColoredText( $"{variableName}", OneDark.Generic );
-					ImGui.SameLine();
-					EditorHelpers.DrawColoredText( $"{variableValue}", OneDark.Generic );
+					ImGui.TableNextColumn();
+					ImGui.TableHeader( "Name" );
+					ImGui.TableNextColumn();
+					ImGui.TableHeader( "Value" );
+					ImGui.TableNextRow();
+
+					for ( int i = 0; i < vm.Variables.Count; i++ )
+					{
+						var variableValue = vm.Variables[i];
+						var variableName = vm.VariableNames[i];
+
+						ImGui.TableNextColumn();
+						ImGui.SetNextItemWidth( -1 );
+						ImGui.LabelText( $"##{variableName}_label", variableName );
+
+						ImGui.TableNextColumn();
+						ImGui.SetNextItemWidth( -1 );
+						if ( ImGui.InputInt( $"##{variableName}input", ref variableValue ) )
+							vm.Variables[i] = variableValue;
+					}
+
+					ImGui.EndTable();
 				}
 
-				ImGui.PopFont();
-				ImGui.EndChild();
-				ImGui.EndTabItem();
-				ImGui.PopStyleColor();
+				ImGui.Separator();
+
+				EditorHelpers.ApplyPadding();
+				EditorHelpers.DrawColoredText( $"Flags:\n{vm.Flags}", OneDark.Generic );
 			}
 
 			if ( ImGui.BeginTabItem( "Hex" ) )

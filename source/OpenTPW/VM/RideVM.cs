@@ -20,10 +20,12 @@ public partial class RideVM
 	public Dictionary<long, string> Strings { get; } = new Dictionary<long, string>();
 	public List<int> Variables { get; set; } = new List<int>();
 	public List<string> VariableNames { get; set; } = new List<string>();
-	public VMFlags Flags { get; private set; } = new VMFlags();
+	public VMFlags Flags { get; set; } = VMFlags.None;
 	public VMConfig Config { get; set; } = new VMConfig();
 	public List<Branch> Branches { get; set; } = new List<Branch>();
 	public byte[] FileData { get; set; }
+
+	public List<int> Visitors { get; set; } = new();
 
 	private Dictionary<Opcode, MethodInfo> OpcodeHandlers { get; } = Assembly.GetExecutingAssembly().GetTypes()
 		.SelectMany( t => t.GetMethods() )
@@ -35,6 +37,11 @@ public partial class RideVM
 	{
 		rsseqFile = new RideScriptFile( this );
 		rsseqFile.ReadFile( stream );
+
+		// Set up basic ride variables
+		Variables[(int)RideVariables.VAR_RIDECLOSED] = 1;
+		Variables[(int)RideVariables.VAR_CAPACITY] = 16;
+		Variables[(int)RideVariables.VAR_DURATION] = 30;
 	}
 
 	public void Step()
