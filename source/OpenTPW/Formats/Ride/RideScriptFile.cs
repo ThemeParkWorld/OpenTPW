@@ -87,7 +87,6 @@ public class RideScriptFile
 
 			if ( (binaryReader.BaseStream.Position - instructionOffset) / 4 >= expectedInstructions + 1 )
 			{
-				Log.Warning( $"Hit max instruction count" );
 				vm.Instructions.Add( new Instruction( vm, binaryReader.BaseStream.Position, (Opcode)currentOpcode, currentOperands.ToArray() ) );
 				break;
 			}

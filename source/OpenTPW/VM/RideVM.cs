@@ -38,6 +38,14 @@ public partial class RideVM
 		rsseqFile = new RideScriptFile( this );
 		rsseqFile.ReadFile( stream );
 
+		// DEBUG: Log implemented opcode counts
+		var implementedOpcodes = OpcodeHandlers.Keys.ToList();
+		var implementedCount = implementedOpcodes.Count;
+		var totalCount = 210; // Total number, see https://opentpw.gu3.me/formats/rsse-vm-instructions.html
+		var totalPercent = (float)implementedCount / totalCount * 100;
+
+		Log.Info( $"Implemented {implementedCount} / {totalCount} ({totalPercent.CeilToInt()}%) opcodes" );
+
 		// Set up basic ride variables
 		Variables[(int)RideVariables.VAR_RIDECLOSED] = 1;
 		Variables[(int)RideVariables.VAR_CAPACITY] = 16;
