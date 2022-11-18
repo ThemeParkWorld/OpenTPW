@@ -53,7 +53,7 @@ public partial class OpcodeHandlers
 		[OpcodeHandler( Opcode.ADDOBJ, "Add an object" )]
 		public static void AddObj( ref RideVM vm, Operand type, Operand parameter, Operand id, Operand slot )
 		{
-			switch ( (ScriptDefs)type.Value )
+			switch ( (ScriptDefs.Effects)type.Value )
 			{
 				//case ScriptDefs.OBJ_PTCL:
 				//case ScriptDefs.OBJ_SOUND_LOC_AMB:
