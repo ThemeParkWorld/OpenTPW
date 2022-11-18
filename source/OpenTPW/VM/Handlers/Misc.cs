@@ -70,5 +70,19 @@ public partial class OpcodeHandlers
 					break;
 			}
 		}
+
+		[OpcodeHandler( Opcode.DBGMSG, "Debug Message" )]
+		public static void DbgMsg( ref RideVM vm, Operand value )
+		{
+			// I don't even think this is used anywhere, but it has been implemented for completeness' sake.
+			Log.Trace( $"Debug message: {vm.Strings[value.Value]}" );
+		}
+
+		[OpcodeHandler( Opcode.RAND, "Generate a random number" )]
+		public static void Random( ref RideVM vm, Operand dest, Operand maxValue )
+		{
+			var random = System.Random.Shared.Next( 0, maxValue.Value );
+			dest.Value = random;
+		}
 	}
 }

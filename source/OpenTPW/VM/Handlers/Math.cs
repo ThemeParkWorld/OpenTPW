@@ -29,5 +29,19 @@ partial class OpcodeHandlers
 			if ( value.Value < 0 )
 				vm.Flags |= RideVM.VMFlags.Sign;
 		}
+
+		[OpcodeHandler( Opcode.CMP, "Compare two values and set any flags according to the result." )]
+		public static void Compare( ref RideVM vm, Operand a, Operand b )
+		{
+			vm.Flags = RideVM.VMFlags.None;
+
+			if ( a.Value == b.Value )
+				vm.Flags |= RideVM.VMFlags.Zero;
+
+			if ( a.Value < b.Value )
+				vm.Flags |= RideVM.VMFlags.Sign;
+
+			// TODO: What the fuck is the crit flag for
+		}
 	}
 }
