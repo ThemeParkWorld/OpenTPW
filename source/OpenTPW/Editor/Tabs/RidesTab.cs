@@ -84,7 +84,8 @@ internal class RidesTab : BaseTab
 					EditorHelpers.DrawColoredText( $"0x{instruction.offset:X4}: ", col );
 				}
 
-				var opcodeHandler = vm.FindOpcodeHandler( instruction.opcode )?.GetCustomAttribute<OpcodeHandlerAttribute>();
+				var opcodeHandlerFunc = vm.FindOpcodeHandler( instruction.opcode );
+				var opcodeHandler = opcodeHandlerFunc?.GetCustomAttribute<OpcodeHandlerAttribute>();
 
 				ImGui.SameLine();
 
@@ -94,7 +95,21 @@ internal class RidesTab : BaseTab
 				if ( ImGui.IsItemHovered() )
 				{
 					ImGui.BeginTooltip();
-					ImGui.Text( $"{instruction.opcode}" );
+
+					if ( opcodeHandlerFunc != null )
+					{
+						var parameters = opcodeHandlerFunc.GetParameters()[1..];
+						var paramStr = string.Join( ", ", parameters.Select( x => x.Name ) );
+
+						if ( parameters.Length > 0 )
+							paramStr = $" {paramStr} ";
+
+						ImGui.Text( $"{instruction.opcode}({paramStr})" );
+					}
+					else
+					{
+						ImGui.Text( $"Unimplemented opcode!" );
+					}
 
 					if ( opcodeHandler != null )
 					{

@@ -17,22 +17,22 @@ public partial class OpcodeHandlers
 		}
 
 		[OpcodeHandler( Opcode.COPY, "Copy a value" )]
-		public static void Copy( ref RideVM vm, Operand a, Operand b )
+		public static void Copy( ref RideVM vm, Operand dest, Operand source )
 		{
-			Log.Trace( $"{a.Value} -> {b.Value}" );
-			a.Value = b.Value;
-			Log.Trace( $"res: {a.Value}" );
+			Log.Trace( $"{dest.Value} -> {source.Value}" );
+			dest.Value = source.Value;
+			Log.Trace( $"res: {dest.Value}" );
 		}
 
 		[OpcodeHandler( Opcode.NAME, "Set ride name" )]
-		public static void Name( ref RideVM vm, Operand value )
+		public static void Name( ref RideVM vm, Operand newName )
 		{
-			vm.ScriptName = vm.Strings[value.Value];
+			vm.ScriptName = vm.Strings[newName.Value];
 			Log.Trace( $"Set ride name to {vm.ScriptName}" );
 		}
 
 		[OpcodeHandler( Opcode.SETLV, "Set level" )]
-		public static void SetLv( ref RideVM vm, Operand value )
+		public static void SetLv( ref RideVM vm, Operand unknown )
 		{
 			Log.Trace( "TODO: Set level" );
 		}
