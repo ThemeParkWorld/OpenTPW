@@ -2,10 +2,15 @@
 
 public partial class RideVM
 {
-	public struct VMFlags
+	[Flags]
+	public enum VMFlags
 	{
-		public bool Sign { get; set; }
-		public bool Zero { get; set; }
-		public bool Crit { get; set; }
+		None,
+
+		Sign = 1,
+		Zero = 2,
+		Crit = 4,
+
+		All = Sign | Zero | Crit
 	}
 }

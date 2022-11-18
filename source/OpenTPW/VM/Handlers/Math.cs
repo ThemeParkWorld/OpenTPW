@@ -15,5 +15,19 @@ partial class OpcodeHandlers
 		{
 			c.Value = a.Value - b.Value;
 		}
+
+		[OpcodeHandler( Opcode.TEST, "Set flags depending on the value given." )]
+		public static void Test( ref RideVM vm, Operand value )
+		{
+			vm.Flags = RideVM.VMFlags.None;
+
+			if ( value.Value == 0 )
+				vm.Flags |= RideVM.VMFlags.Zero;
+
+			// TODO: What the fuck is the crit flag for
+
+			if ( value.Value < 0 )
+				vm.Flags |= RideVM.VMFlags.Sign;
+		}
 	}
 }
