@@ -1,4 +1,6 @@
-﻿namespace OpenTPW;
+﻿using System.IO.Compression;
+
+namespace OpenTPW;
 
 public class TextureFile
 {
@@ -308,13 +310,23 @@ public class TextureFile
 	static float ComputeDequantizationScaleCbCr( int n ) => 1.0f - ((float)n * -0.25f);
 	static float ComputeDequantizationScaleA( int n ) => (float)n + 1.0f;
 
+	public TextureFile( Stream stream )
+	{
+		Load( stream );
+	}
+
 	public TextureFile( string path )
 	{
 		//
 		// Setup readers
 		//
 		using var fileStream = File.OpenRead( path );
-		using var binaryReader = new BinaryReader( fileStream );
+		Load( fileStream );
+	}
+
+	private void Load( Stream stream )
+	{
+		using var binaryReader = new BinaryReader( stream );
 
 		//
 		// Read header
@@ -359,27 +371,31 @@ public class TextureFile
 		if ( header.BlockSize1 > 0 )
 			blockData = blockData.Concat( header.Block1 ).ToArray();
 
-		var blockReader = new BitReader( blockData );
 
 		sbyte[] Decompress()
 		{
+			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3;
+			using var outputStream = new MemoryStream( maxSize );
+			using var outputWriter = new BinaryWriter( outputStream );
+
+			var blockReader = new BitReader( blockData );
 			if ( header.CompressionType == CompressionType.LZSS )
 			{
-				const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3;
-				using var outputStream = new MemoryStream( maxSize );
-				using var outputWriter = new BinaryWriter( outputStream );
-
 				if ( !LZSS.Decompress( blockReader, outputWriter ) )
 				{
 					// throw new Exception();
 				}
-
-				return outputStream.ToArray().Select( x => (sbyte)x ).ToArray();
 			}
-			else
+			else if ( header.CompressionType == CompressionType.ZLIB )
 			{
-				throw new Exception();
+				// HACK!!!
+				blockData = blockData[0x1E..];
+				using var inputStream = new MemoryStream( blockData );
+				using var decompressor = new DeflateStream( inputStream, CompressionMode.Decompress );
+				decompressor.CopyTo( outputStream );
 			}
+
+			return outputStream.ToArray().Select( x => (sbyte)x ).ToArray();
 		}
 
 		var decompressedBlock0 = Decompress();
@@ -418,7 +434,7 @@ public class TextureFile
 				output[((y * header.Width + x) * 4) + 1] = g;
 				output[((y * header.Width + x) * 4) + 2] = b;
 
-				output[((y * header.Width + x) * 4) + 3] = 1.0f;
+				output[((y * header.Width + x) * 4) + 3] = 255.0f;
 			}
 		}
 
