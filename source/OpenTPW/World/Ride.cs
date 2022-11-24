@@ -13,7 +13,7 @@ public class Ride : Entity
 		var rideName = Path.GetFileNameWithoutExtension( rideArchive );
 
 		fileSystem = new WadFileSystem( rideArchive );
-		VM = new RideVM( fileSystem.OpenRead( rideName + ".rse" ) );
+		VM = new RideVM( FileSystem.Game.OpenRead( rideName + ".rse" ) );
 		var settingsFile = new SettingsFile( fileSystem.OpenRead( rideName + ".sam" ) );
 
 		Log.Trace( $"Loaded ride {settingsFile.Entries.First( x => x.Item1 == "Info.Name" ).Item2}" );

@@ -1,5 +1,6 @@
 ﻿namespace OpenTPW;
 
+[Obsolete]
 public class WadFileSystem : IDisposable
 {
 	private WadArchive archive;
@@ -21,16 +22,12 @@ public class WadFileSystem : IDisposable
 
 	public bool FileExists( string path )
 	{
-		return archive.Files.Any( x => FileMatchesPredicate( x, path ) );
+		return false;
 	}
 
 	public Stream OpenRead( string path )
 	{
-		if ( !FileExists( path ) )
-			throw new FileNotFoundException( $"Path {path} doesn't exist on this archive" );
-
-		var archiveFile = archive.Files.First( x => FileMatchesPredicate( x, path ) );
-		var stream = new MemoryStream( archiveFile.Data );
+		var stream = new MemoryStream( new byte[0] );
 		return stream;
 	}
 }

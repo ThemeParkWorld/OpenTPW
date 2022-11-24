@@ -12,7 +12,7 @@ public class TextureFile
 		LZSS = 0x13
 	};
 
-	struct Header
+	public struct Header
 	{
 		public CompressionType CompressionType { get; set; }
 		public byte Version { get; set; }
@@ -310,6 +310,8 @@ public class TextureFile
 	static float ComputeDequantizationScaleCbCr( int n ) => 1.0f - ((float)n * -0.25f);
 	static float ComputeDequantizationScaleA( int n ) => (float)n + 1.0f;
 
+	public Header FileHeader { get; private set; }
+
 	public TextureFile( Stream stream )
 	{
 		Load( stream );
@@ -374,7 +376,7 @@ public class TextureFile
 
 		sbyte[] Decompress()
 		{
-			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3;
+			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
 			using var outputStream = new MemoryStream( maxSize );
 			using var outputWriter = new BinaryWriter( outputStream );
 
@@ -405,12 +407,17 @@ public class TextureFile
 		List<float> outputY = Enumerable.Repeat( 0f, size * size ).ToList();
 		List<float> outputCb = Enumerable.Repeat( 0f, size * size ).ToList();
 		List<float> outputCr = Enumerable.Repeat( 0f, size * size ).ToList();
-		List<float> outputA = Enumerable.Repeat( 1f, size * size ).ToList();
+		List<float> outputA = Enumerable.Repeat( 255f, size * size ).ToList();
 
 		ImageDecodeState state = new( size );
 		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, ComputeDequantizationScaleY( header.YChannelQuantizationScale ) );
 		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, ComputeDequantizationScaleCbCr( header.CbChannelQuantizationScale ) );
 		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, ComputeDequantizationScaleCbCr( header.CrChannelQuantizationScale ) );
+
+		if ( header.BitCount == 32 )
+		{
+			// DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputA, ComputeDequantizationScaleA( header.AChannelQuantizationScale ) );
+		}
 
 		List<float> output = Enumerable.Repeat( 0f, header.Width * header.Height * 4 ).ToList();
 
@@ -429,12 +436,13 @@ public class TextureFile
 				float r = cy + 1.402f * (cr);
 				float g = cy - 0.344136f * (cb) - 0.714136f * (cr);
 				float b = cy + 1.772f * (cb);
+				float a = outputA[y * maxSize + x];
 
 				output[((y * header.Width + x) * 4)] = r;
 				output[((y * header.Width + x) * 4) + 1] = g;
 				output[((y * header.Width + x) * 4) + 2] = b;
 
-				output[((y * header.Width + x) * 4) + 3] = 255.0f;
+				output[((y * header.Width + x) * 4) + 3] = a;
 			}
 		}
 
@@ -459,5 +467,6 @@ public class TextureFile
 
 		var texture = TextureBuilder.Default.FromData( flippedTextureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
 		Texture = texture;
+		FileHeader = header;
 	}
 }

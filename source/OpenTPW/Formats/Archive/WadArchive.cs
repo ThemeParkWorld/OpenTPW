@@ -9,7 +9,12 @@ public class WadArchive
 {
 	private WadStream memoryStream;
 	public byte[] Buffer { get; internal set; }
-	public List<WadArchiveFile> Files { get; internal set; }
+
+	/// <summary>
+	/// The root directory ("/") for this archive.
+	/// This may contain a collection of <see cref="WadArchiveItem"/>s as children.
+	/// </summary>
+	public WadArchiveDirectory Root { get; internal set; }
 
 	public WadArchive( string path )
 	{
@@ -66,6 +71,13 @@ public class WadArchive
 		// Unused / unknown
 		_ = memoryStream.ReadInt32();
 
+		//
+		// Whenever a filename contains a directory name (e.g. "textures/hi.wct"),
+		// every file that comes after it will omit that directory name - but should
+		// be considered part of the subdirectory.
+		//
+		var currentSubdirectory = "";
+
 		// Details directory
 		for ( var i = 0; i < fileCount; ++i )
 		{
@@ -110,17 +122,62 @@ public class WadArchive
 
 			// Set file's name name
 			memoryStream.Seek( filenameOffset, SeekOrigin.Begin );
-			newFile.Name = memoryStream.ReadString( (int)filenameLength );
+			newFile.Name = memoryStream.ReadString( (int)filenameLength - 1 ); // String is null terminated
+
+			//
+			// Retrieve the target subdirectory within the archive's
+			// file tree (and add to the tree if necessary)
+			//
+			WadArchiveDirectory? subDirectory = Root;
+
+			{
+				if ( newFile.Name.Contains( "\\" ) )
+				{
+					currentSubdirectory = newFile.Name[..(newFile.Name.LastIndexOf( "\\" ))];
+					newFile.Name = newFile.Name[(newFile.Name.LastIndexOf( "\\" ) + 1)..];
+				}
+
+				// Are we currently in the root directory?
+				if ( !string.IsNullOrEmpty( currentSubdirectory ) )
+				{
+					// Find a subdirectory object..
+					var splitPath = currentSubdirectory.Split( "\\" );
+
+					foreach ( string dir in splitPath )
+					{
+						WadArchiveDirectory newSubDir;
+
+						newSubDir = subDirectory.Children.OfType<WadArchiveDirectory>().FirstOrDefault( x => x.Name == dir );
+
+						if ( newSubDir == null )
+						{
+							// ..or create one if it doesn't exist
+							newSubDir = new WadArchiveDirectory( dir );
+							subDirectory.Children.Add( newSubDir );
+							subDirectory = newSubDir;
+						}
+
+						subDirectory = newSubDir;
+					}
+				}
+			}
 
 			// Get file's raw data
 			memoryStream.Seek( dataOffset, SeekOrigin.Begin );
 			newFile.Data = memoryStream.ReadBytes( (int)dataLength );
 
+			// Decompress file if necessary
+			if ( newFile.Compressed )
+			{
+				var refpack = new Refpack( newFile.Data );
+				newFile.Data = refpack.Decompress().ToArray();
+			}
+
 			newFile.ArchiveOffset = (int)dataOffset;
 			newFile.ParentArchive = this;
 
-			newFile.Decompress();
-			Files.Add( newFile );
+			// Add to selected subdirectory
+			subDirectory.Children.Add( newFile );
 
 			// Return to initial position, skip to the next file's data
 			memoryStream.Seek( initialPos + 40, SeekOrigin.Begin );
@@ -138,8 +195,71 @@ public class WadArchive
 		tempStreamReader.Close();
 
 		memoryStream = new WadStream( Buffer );
-		Files = new List<WadArchiveFile>();
+		Root = new WadArchiveDirectory( "/" );
 
 		ReadArchive();
+	}
+
+	private T GetItem<T>( string internalPath ) where T : WadArchiveItem
+	{
+		var internalDirectory = Root;
+
+		if ( internalPath == "" )
+			throw new Exception( $"Path was empty" );
+
+		var splitPath = internalPath.Split( "\\" );
+
+		for ( int i = 0; i < splitPath.Length; i++ )
+		{
+			string dir = splitPath[i];
+
+			if ( i == splitPath.Length - 1 )
+			{
+				return internalDirectory.Children.OfType<T>().First( x => x.Name == dir );
+			}
+
+			internalDirectory = internalDirectory.Children.OfType<WadArchiveDirectory>().First( x => x.Name == dir );
+		}
+
+		throw new FileNotFoundException( $"File not found: {internalPath}" );
+	}
+
+	private List<T> EnumerateItems<T>( string internalPath ) where T : WadArchiveItem
+	{
+		var internalDirectory = Root;
+
+		if ( internalPath != "" )
+		{
+			var splitPath = internalPath.Split( "\\" );
+
+			foreach ( string dir in splitPath )
+			{
+				internalDirectory = internalDirectory.Children.OfType<WadArchiveDirectory>().First( x => x.Name == dir );
+			}
+		}
+
+		return internalDirectory.Children.OfType<T>().ToList();
+	}
+
+	public WadArchiveFile GetFile( string internalPath )
+	{
+		return GetItem<WadArchiveFile>( internalPath );
+	}
+
+	public WadArchiveDirectory GetDirectory( string internalPath )
+	{
+		return GetItem<WadArchiveDirectory>( internalPath );
+	}
+
+	public string[] GetFiles( string internalPath )
+	{
+		var files = EnumerateItems<WadArchiveFile>( internalPath );
+		return files.Select( x => x.Name ).ToArray();
+	}
+
+	public string[] GetDirectories( string internalPath )
+	{
+		var files = EnumerateItems<WadArchiveDirectory>( internalPath );
+		return files.Select( x => x.Name ).ToArray();
 	}
 }

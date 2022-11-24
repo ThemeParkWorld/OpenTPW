@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -8,12 +7,33 @@ namespace OpenTPW;
 [EditorMenu( "Debug/File Tree" )]
 internal class FileBrowserTab : BaseTab
 {
-	private string searchBoxText = "";
 	private string selectedDirectory = "data";
 
-	private Texture folderIcon;
+	/// <summary>
+	/// Represents <see cref="selectedDirectory"/>, but clears and re-builds the current
+	/// filesystem icon cache when set.
+	/// </summary>
+	private string SelectedDirectory
+	{
+		get => selectedDirectory;
+		set
+		{
+			selectedDirectory = value;
 
-	private List<FilePreviewTab> subTabs = new();
+			IconCache.Clear();
+			CacheDirectory( selectedDirectory, selectedDirectory );
+		}
+	}
+
+	/// <summary>
+	/// Represents icons to display within the currently selected directory.
+	/// </summary>
+	private List<(Texture Icon, string Path, bool IsDirectory)> IconCache = new();
+
+	private Texture FolderIcon { get; }
+	private Texture ArchiveIcon { get; }
+
+	private List<FilePreviewTab> SubTabs { get; } = new();
 
 	struct RegisteredFileHandler
 	{
@@ -36,8 +56,10 @@ internal class FileBrowserTab : BaseTab
 	public FileBrowserTab()
 	{
 		RegisterFileHandlers();
+		CacheDirectory( SelectedDirectory, SelectedDirectory );
 
-		folderIcon = TextureBuilder.UITexture.FromPath( "content/icons/folder.png" ).Build();
+		FolderIcon = TextureBuilder.UITexture.FromPath( "content/icons/folder.png" ).Build();
+		ArchiveIcon = TextureBuilder.UITexture.FromPath( "content/icons/archive.png" ).Build();
 	}
 
 	private void RegisterFileHandlers()
@@ -76,7 +98,9 @@ internal class FileBrowserTab : BaseTab
 	{
 		ImGui.SetCursorPos( iconPosition - new System.Numerics.Vector2( 0, IconPadding.Y * 0.5f ) );
 
-		EditorHelpers.Image( icon, IconSize );
+		EditorHelpers.Image( icon ?? FolderIcon, IconSize );
+
+		text = Path.GetFileName( text );
 
 		//
 		// Centered text offset
@@ -119,96 +143,47 @@ internal class FileBrowserTab : BaseTab
 		}
 	}
 
-	private void StartProcess( string processName, string arguments )
+	private void CacheDirectory( string rootPath, string directory )
 	{
-		var process = new Process();
-		process.StartInfo.FileName = processName;
-		process.StartInfo.Arguments = arguments;
-
-		Log.Trace( arguments );
-		process.Start();
-	}
-
-	private void DisplayDirectory( string rootPath, string directory )
-	{
-		foreach ( var subDir in Directory.GetDirectories( directory ) )
+		foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )
 		{
-			var subDirName = Path.GetFileName( subDir );
-
-			if ( searchBoxText.Length == 0 )
-			{
-				DrawIcon( folderIcon, subDirName );
-
-				//
-				// Context menu
-				//
-				if ( ImGui.BeginPopupContextItem() )
-				{
-					ImGui.Text( $"Folder: {subDirName}" );
-					ImGui.Separator();
-
-					if ( ImGui.Selectable( "Show in Explorer" ) )
-						StartProcess( "explorer.exe", $"/select,\"{subDir}\"" );
-
-					ImGui.EndPopup();
-				}
-
-				if ( ImGui.IsItemClicked() )
-				{
-					selectedDirectory = Path.GetRelativePath( Settings.Default.GamePath, subDir );
-				}
-			}
-			else
-			{
-				DisplayDirectory( rootPath, subDir );
-			}
+			var icon = subDir.EndsWith( ".wad" ) ? ArchiveIcon : FolderIcon;
+			IconCache.Add( (icon, subDir, true) );
 		}
 
-		foreach ( var file in Directory.GetFiles( directory ) )
+		foreach ( var file in FileSystem.Game.GetFiles( directory ) )
 		{
-			if ( searchBoxText.Length > 0 && !file.Contains( searchBoxText ) )
-				continue;
-
 			var fileHandler = FindFileHandler( Path.GetExtension( file ) );
 			var icon = fileHandler.Icon;
 
-			DrawIcon( icon, Path.GetFileName( file ) );
+			IconCache.Add( (icon, file, false) );
+		}
+	}
 
-			//
-			// Context menu
-			//
-			if ( ImGui.BeginPopupContextItem() )
-			{
-				ImGui.Text( $"File: {Path.GetFileName( file )}" );
-				ImGui.Separator();
-
-				if ( ImGui.Selectable( "Show in Explorer" ) )
-					StartProcess( "explorer.exe", $"/select,\"{file}\"" );
-
-				if ( ImGui.Selectable( "Open in Hex Editor" ) )
-				{
-					var fileData = File.ReadAllBytes( file );
-					subTabs.Add( new FilePreviewTab( fileData, new GenericFileHandler( fileData ) ) );
-				}
-
-				if ( ImGui.Selectable( "Open in HxD" ) )
-					StartProcess( @"C:\Program Files\HxD\HxD.exe", $"\"{file}\"" );
-
-				if ( ImGui.Selectable( "Open in Notepad" ) )
-					StartProcess( @"notepad.exe", $"\"{file}\"" );
-
-
-				ImGui.EndPopup();
-			}
+	private void DrawCurrentDirectory()
+	{
+		foreach ( var icon in IconCache.ToArray() )
+		{
+			DrawIcon( icon.Icon, icon.Path );
 
 			if ( ImGui.IsItemClicked() )
 			{
-				var fileData = File.ReadAllBytes( file );
+				if ( icon.IsDirectory )
+				{
+					// Move into the selected directory
+					SelectedDirectory = Path.GetRelativePath( Settings.Default.GamePath, icon.Path );
+				}
+				else
+				{
+					// Open the registered file handler for the selected file
+					var fileHandler = FindFileHandler( Path.GetExtension( icon.Path ) );
+					var fileData = FileSystem.Game.ReadAllBytes( icon.Path );
 
-				var args = new object[] { fileData };
-				selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;
+					var args = new object[] { fileData };
+					selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;
 
-				subTabs.Add( new FilePreviewTab( fileData, selectedFileHandler ) );
+					SubTabs.Add( new FilePreviewTab( fileData, selectedFileHandler ) );
+				}
 			}
 		}
 	}
@@ -227,35 +202,19 @@ internal class FileBrowserTab : BaseTab
 		//
 		{
 			string totalPath = "";
-			foreach ( var directory in selectedDirectory.Split( Path.DirectorySeparatorChar ) )
+			foreach ( var directory in SelectedDirectory.Split( Path.DirectorySeparatorChar ) )
 			{
 				totalPath = Path.Join( totalPath, directory );
 
 				if ( ImGui.Button( directory ) )
 				{
-					selectedDirectory = totalPath;
+					SelectedDirectory = totalPath;
 				}
 
 				ImGui.SameLine();
 				ImGui.Text( Path.DirectorySeparatorChar.ToString() );
 				ImGui.SameLine();
 			}
-		}
-
-		//
-		// Search box
-		//
-		{
-			var windowInnerWidth = ImGui.GetWindowContentRegionMax().X;
-
-			ImGui.SameLine();
-			ImGui.SetCursorPosX( windowInnerWidth - 300f );
-			ImGui.Text( "Search" );
-			ImGui.SameLine();
-			ImGui.Dummy( new System.Numerics.Vector2( 4, 0 ) );
-			ImGui.SameLine();
-			ImGui.SetNextItemWidth( 250f );
-			ImGui.InputText( "##search", ref searchBoxText, 256 );
 		}
 
 		ImGui.NewLine();
@@ -267,14 +226,12 @@ internal class FileBrowserTab : BaseTab
 
 		{
 			iconPosition = IconPadding;
-
-			var path = GameDir.GetPath( selectedDirectory );
-			DisplayDirectory( path, path );
+			DrawCurrentDirectory();
 		}
 
 		ImGui.EndChild();
 		ImGui.End();
 
-		subTabs.ForEach( x => x.Draw() );
+		SubTabs.ForEach( x => x.Draw() );
 	}
 }

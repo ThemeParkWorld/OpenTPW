@@ -1,17 +1,16 @@
 ﻿using ImGuiNET;
-using System.Numerics;
 
 namespace OpenTPW;
 
 [FileHandler( @"\.wct", icon: "content/icons/image.png" )]
 public class TextureFileHandler : BaseFileHandler
 {
-	private Texture texture;
+	private TextureFile textureFile;
 
 	public TextureFileHandler( byte[] fileData ) : base( fileData )
 	{
 		using var fileStream = new MemoryStream( fileData );
-		texture = new TextureFile( fileStream ).Texture;
+		textureFile = new TextureFile( fileStream );
 	}
 
 	public override void Draw()
@@ -21,16 +20,13 @@ public class TextureFileHandler : BaseFileHandler
 		ImGui.Text( $"File type: Texture" );
 
 		var windowWidth = ImGui.GetWindowSize().X;
-		float ratio = texture.Height / (float)texture.Width;
+		float ratio = textureFile.Texture.Height / (float)textureFile.Texture.Width;
 
 		if ( ratio is float.NaN )
 			ratio = 1f;
 
-		EditorHelpers.Image( texture, new Vector2( windowWidth, windowWidth * ratio ) );
+		ImGui.Text( textureFile.FileHeader.ToString() );
 
-		var startPos = ImGui.GetItemRectMin();
-
-		var drawList = ImGui.GetWindowDrawList();
-		var col = ImGui.GetColorU32( Vector4.One );
+		EditorHelpers.Image( textureFile.Texture, new Vector2( windowWidth, windowWidth * ratio ) );
 	}
 }
