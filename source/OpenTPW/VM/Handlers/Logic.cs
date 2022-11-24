@@ -49,8 +49,15 @@ partial class OpcodeHandlers
 		[OpcodeHandler( Opcode.JSR, "Jump to a subroutine." )]
 		public static void JumpSubRoutine( ref RideVM vm, Operand location )
 		{
-			// TODO: call stack
+			vm.Stack.Enqueue( vm.CurrentPos );
 			vm.BranchTo( location.Value );
+		}
+
+		[OpcodeHandler( Opcode.RETURN, "Return from a subroutine." )]
+		public static void Return( ref RideVM vm )
+		{
+			int targetPos = vm.Stack.Dequeue();
+			vm.CurrentPos = targetPos;
 		}
 	}
 }

@@ -26,6 +26,7 @@ public partial class RideVM
 	public byte[] FileData { get; set; }
 
 	public List<int> Visitors { get; set; } = new();
+	public Queue<int> Stack { get; set; } = new();
 
 	private Dictionary<Opcode, MethodInfo> OpcodeHandlers { get; } = Assembly.GetExecutingAssembly().GetTypes()
 		.SelectMany( t => t.GetMethods() )
@@ -54,13 +55,13 @@ public partial class RideVM
 
 	public void Step()
 	{
-		if ( CurrentPos >= Instructions.Count - 1 )
-		{
-			// Shit, we reached the end of the instructions list..
-			// TODO: How do we handle this gracefully in-game?
-			// We'll just take it from the top for now..
-			CurrentPos = 0;
-		}
+		//if ( CurrentPos >= Instructions.Count - 1 )
+		//{
+		//	// Shit, we reached the end of the instructions list..
+		//	// TODO: How do we handle this gracefully in-game?
+		//	// We'll just take it from the top for now..
+		//	CurrentPos = 0;
+		//}
 
 		var instruction = Instructions[CurrentPos++];
 		Log.Trace( $"Invoking {instruction.opcode} at position {CurrentPos}" );
@@ -112,8 +113,18 @@ public partial class RideVM
 		Log.Trace( $"Branching to .label_{value} / {fileOffset} (location: {CurrentPos})" );
 	}
 
-	public void Run( bool run = true )
+	private TimeSince TimeSinceLastTick;
+	public void Update()
 	{
-		this.IsRunning = run;
+		if ( IsRunning && TimeSinceLastTick > 1f / 5f )
+		{
+			Step();
+			TimeSinceLastTick = 0;
+		}
+	}
+
+	public void Run()
+	{
+		IsRunning = !IsRunning;
 	}
 }

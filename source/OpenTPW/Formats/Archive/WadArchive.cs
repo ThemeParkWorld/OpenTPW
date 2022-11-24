@@ -3,7 +3,7 @@
 /*
  * Special thanks to Fatbag: http://wiki.niotso.org/RefPack, 
  * WATTO: http://wiki.xentax.com/index.php/WAD_DWFB, 
- * and Rhys: https://github.com/RHY3756547/FreeSO/blob/master/TSOClient/tso.files/FAR3/Decompresser.cs.
+ * and Rhys: https://github.com/riperiperi/FreeSO/blob/master/TSOClient/tso.files/FAR3/Decompresser.cs.
  */
 public class WadArchive
 {

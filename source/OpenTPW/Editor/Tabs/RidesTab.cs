@@ -30,7 +30,7 @@ internal class RidesTab : BaseTab
 		// Toolbar
 		//
 		{
-			if ( ImGui.Button( "Debug" ) )
+			if ( ImGui.Button( vm.IsRunning ? "Stop" : "Start" ) )
 				vm.Run();
 
 			ImGui.SameLine();
@@ -223,6 +223,40 @@ internal class RidesTab : BaseTab
 
 				EditorHelpers.ApplyPadding();
 				EditorHelpers.DrawColoredText( $"Flags:\n{vm.Flags}", OneDark.Generic );
+
+				EditorHelpers.ApplyPadding();
+				var stackStr = string.Join( "\n", vm.Stack.Select( x => x.ToString() ) );
+				EditorHelpers.DrawColoredText( $"Stack:\n{stackStr}", OneDark.Generic );
+
+				if ( ImGui.BeginTable( "vm_config", 2, ImGuiTableFlags.PadOuterX ) )
+				{
+					var properties = vm.Config.GetType().GetProperties();
+
+					ImGui.TableNextColumn();
+					ImGui.TableHeader( "Name" );
+					ImGui.TableNextColumn();
+					ImGui.TableHeader( "Value" );
+					ImGui.TableNextRow();
+
+					for ( int i = 0; i < properties.Length; i++ )
+					{
+						int propertyValue = (int)properties[i].GetValue( vm.Config );
+						var propertyName = properties[i].Name;
+
+						ImGui.TableNextColumn();
+						ImGui.SetNextItemWidth( -1 );
+						ImGui.LabelText( $"##{propertyName}_label", propertyName );
+
+						ImGui.TableNextColumn();
+						ImGui.SetNextItemWidth( -1 );
+						if ( ImGui.InputInt( $"##{propertyName}input", ref propertyValue ) )
+							properties[i].SetValue( vm.Config, propertyValue );
+					}
+
+					ImGui.EndTable();
+				}
+
+				ImGui.EndTabItem();
 			}
 
 			if ( ImGui.BeginTabItem( "Hex" ) )

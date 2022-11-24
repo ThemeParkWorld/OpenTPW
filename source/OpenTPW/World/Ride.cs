@@ -57,6 +57,13 @@ public class Ride : Entity
 		}
 	}
 
+	public override void Update()
+	{
+		base.Update();
+
+		VM.Update();
+	}
+
 	[Event.FileSystem.HotLoad]
 	private void OnHotLoad()
 	{
