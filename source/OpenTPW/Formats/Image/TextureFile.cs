@@ -72,16 +72,6 @@ public class TextureFile
 		return (uint)(1 << (int)n);
 	}
 
-	static float g_Scale0 = (float)(((MathF.Sqrt( 3.0f ) + 1.0f) / 4.0f) / MathF.Sqrt( 2 ));
-	static float g_Scale1 = (float)(((MathF.Sqrt( 3.0f ) + 3.0f) / 4.0f) / MathF.Sqrt( 2 ));
-	static float g_Scale2 = (float)(((3.0 - MathF.Sqrt( 3.0f )) / 4.0f) / MathF.Sqrt( 2 ));
-	static float g_Scale3 = (float)(((1.0 - MathF.Sqrt( 3.0f )) / 4.0f) / MathF.Sqrt( 2 ));
-
-	static float g_Scale0_ = (float)(((MathF.Sqrt( 3.0f ) + 1.0f) / 4.0f));
-	static float g_Scale1_ = (float)(((MathF.Sqrt( 3.0f ) + 3.0f) / 4.0f));
-	static float g_Scale2_ = (float)(((3.0 - MathF.Sqrt( 3.0f )) / 4.0f));
-	static float g_Scale3_ = (float)(((1.0 - MathF.Sqrt( 3.0f )) / 4.0f));
-
 	struct D4Coefficients
 	{
 		public float H0;
@@ -131,110 +121,16 @@ public class TextureFile
 		}
 	}
 
-	static float ApplyScalingCoefficientsInv( float valueA, float valueB, float prevValueA, float prevValueB, D4Coefficients coefs )
-	{
-		return prevValueA * coefs.IH0 + prevValueB * coefs.IH1 + valueA * coefs.IH2 + valueB * coefs.IH3;
-	}
-
-	static float ApplyWaveCoefficientsInv( float valueA, float valueB, float prevValueA, float prevValueB, D4Coefficients coefs )
-	{
-		return prevValueA * coefs.IG0 + prevValueB * coefs.IG1 + valueA * coefs.IG2 + valueB * coefs.IG3;
-	}
-
-	static float ApplyScalingCoefficientsInv2( float smoothVal, float coef, float previousSmoothVal, float previousCoef, D4Coefficients coefs )
-	{
-		return previousSmoothVal * coefs.IH0 + previousCoef * coefs.IH1 +
-			smoothVal * coefs.IH2 + coef * coefs.IH3;
-	}
-
-	static float ApplyWaveCoefficientsInv2( float smoothVal, float coef, float previousSmoothVal, float previousCoef, D4Coefficients coefs )
-	{
-		return previousSmoothVal * coefs.IG0 + previousCoef * coefs.IG1 +
-			smoothVal * coefs.IG2 + coef * coefs.IG3;
-	}
-
-	static float ApplyScalingCoefficientsInv3( float smooth0, float coef0, float smooth1, float coef1, D4Coefficients coefs )
+	static float ApplyScalingCoefficientsInv( float smooth0, float coef0, float smooth1, float coef1, D4Coefficients coefs )
 	{
 		return smooth0 * coefs.IH0 + coef0 * coefs.IH1 +
 			smooth1 * coefs.IH2 + coef1 * coefs.IH3;
 	}
 
-	static float ApplyWaveCoefficientsInv3( float smooth0, float coef0, float smooth1, float coef1, D4Coefficients coefs )
+	static float ApplyWaveCoefficientsInv( float smooth0, float coef0, float smooth1, float coef1, D4Coefficients coefs )
 	{
 		return smooth0 * coefs.IG0 + coef0 * coefs.IG1 +
 			smooth1 * coefs.IG2 + coef1 * coefs.IG3;
-	}
-
-	private void D4InverseTransform( Func<float> fetchFn, int size, D4Coefficients coefs, ref List<float> pOutput )
-	{
-		int i, j, outIndex = 0;
-		int halfSize = size / 2;
-
-		for ( i = 0; i < size; i++ )
-		{
-			float valueA = fetchFn.Invoke();
-			float valueB = fetchFn.Invoke();
-
-			float previousA = valueA;
-			float previousB = valueB;
-
-			for ( j = 0; j < halfSize; j++ )
-			{
-				valueA = fetchFn.Invoke();
-				valueB = fetchFn.Invoke();
-
-				pOutput[outIndex + j * 2] = ApplyScalingCoefficientsInv( valueA, valueB, previousA, previousB, coefs );
-				pOutput[outIndex + j * 2 + 1] = ApplyWaveCoefficientsInv( valueA, valueB, previousA, previousB, coefs );
-
-				previousA = valueA;
-				previousB = valueB;
-			}
-
-			pOutput[outIndex + j * 2] = ApplyScalingCoefficientsInv( valueA, valueB, previousA, previousB, coefs );
-			pOutput[outIndex + j * 2 + 1] = ApplyWaveCoefficientsInv( valueA, valueB, previousA, previousB, coefs );
-
-			outIndex += size;
-		}
-	}
-
-	void D4InverseTransform2( int size, ref List<float> pSrc, ref List<float> pDest, D4Coefficients coefs )
-	{
-		int halfSize = size / 2;
-		int i = 0, j = 0;
-
-		int offsetA = 0;
-		int offsetB = size;
-		int offsetC = size * halfSize;
-		int offsetD = size + size * halfSize;
-
-		int outputIndexStart = size * 2;
-		int inputIndexStart = 0;
-
-		for ( i = 0; i < halfSize - 1; i++ )
-		{
-			for ( j = 0; j < size - 1; j++ )
-			{
-				pDest[outputIndexStart + j * 2] = ApplyScalingCoefficientsInv(
-					pSrc[inputIndexStart + j + offsetB], pSrc[inputIndexStart + j + offsetD],
-					pSrc[inputIndexStart + j + offsetA], pSrc[inputIndexStart + j + offsetC],
-					coefs );
-
-				pDest[outputIndexStart + j * 2 + 1] = ApplyWaveCoefficientsInv(
-					pSrc[inputIndexStart + j + offsetB], pSrc[inputIndexStart + j + offsetD],
-					pSrc[inputIndexStart + j + offsetA], pSrc[inputIndexStart + j + offsetC],
-					coefs );
-			}
-		}
-
-		pDest[outputIndexStart + j * 2] = ApplyScalingCoefficientsInv(
-			pSrc[inputIndexStart + j + offsetB], pSrc[inputIndexStart + j + offsetD],
-			pSrc[inputIndexStart + j + offsetA], pSrc[inputIndexStart + j + offsetC],
-			coefs );
-
-		pDest[outputIndexStart + j * 2 + 1] = ApplyWaveCoefficientsInv(
-			pSrc[inputIndexStart + j + offsetB], pSrc[inputIndexStart + j + offsetD],
-			pSrc[inputIndexStart + j + offsetA], pSrc[inputIndexStart + j + offsetC],
-			coefs );
 	}
 
 	enum D4Component
@@ -255,11 +151,9 @@ public class TextureFile
 		}
 	}
 
-	void D4InverseTransform3( Func<int, D4Component, int> indexLookup, Func<int, D4Component, int> outputIndexLookup, ref List<float> pSrc, ref List<float> pDest, int offset, int size, D4Coefficients coefs )
+	void D4InverseTransform( Func<int, D4Component, int> indexLookup, Func<int, D4Component, int> outputIndexLookup, ref List<float> pSrc, ref List<float> pDest, int offset, int size, D4Coefficients coefs )
 	{
-		int i;
-
-		for ( i = 0; i < size; i++ )
+		for ( int i = 0; i < size; i++ )
 		{
 			float s0, w0, s1, w1;
 			int s0i, w0i, s1i, w1i;
@@ -286,62 +180,40 @@ public class TextureFile
 			int s0d = outputIndexLookup( i, D4Component.Scale );
 			int w0d = outputIndexLookup( i, D4Component.Wavelet );
 
-			pDest[s0d + offset] = ApplyScalingCoefficientsInv3( s0, w0, s1, w1, coefs );
-			pDest[w0d + offset] = ApplyWaveCoefficientsInv3( s0, w0, s1, w1, coefs );
+			pDest[s0d + offset] = ApplyScalingCoefficientsInv( s0, w0, s1, w1, coefs );
+			pDest[w0d + offset] = ApplyWaveCoefficientsInv( s0, w0, s1, w1, coefs );
 		}
 	}
 
-	private bool DecodeChannel( ref ImageDecodeState state, int size, ref int[] pSrc, ref List<float> outputBuffer, float dequantizationScale )
+	private bool DecodeChannel( ref ImageDecodeState state, int size, ref sbyte[] pSrc, ref List<float> outputBuffer, float dequantizationScale )
 	{
-		int i = 0, count;
-		count = size * (size / 2);
+		int count = size * (size / 2);
 
 		int pSrcIndex = 0;
 
 		//
 		// Step 1: Dequantize
 		//
-		for ( i = 0; i < count; i++ )
+		for ( int i = 0; i < count; ++i )
 		{
-			//if ( pSrcEnd - pSrc < sizeof( int8_t ) )
-			//{
-			//	return false;
-			//}
+			int val = pSrc[0];
+			pSrc = pSrc.Skip( 1 ).ToArray();
 
-			//int32_t val = *(pSrc++);
-			int val = pSrc[pSrcIndex++];
-
-			if ( val == char.MinValue )
+			if ( val == sbyte.MinValue )
 			{
-				//	if ( pSrcEnd - pSrc < sizeof( int16_t ) )
-				//	{
-				//		return false;
-				//	}
-
-				//	val = *(int16_t*)pSrc;
-				//	pSrc += sizeof( int16_t );
-				val = pSrc[pSrcIndex++];
+				val = pSrc[0] | (pSrc[1] << 8);
+				pSrc = pSrc.Skip( 2 ).ToArray();
 			}
 
 			state.DequantizationBuffer[i * 2] = (float)val;
 
-			//if ( pSrcEnd - pSrc < sizeof( int8_t ) )
-			//{
-			//	return false;
-			//}
+			val = pSrc[0];
+			pSrc = pSrc.Skip( 1 ).ToArray();
 
-			val = pSrc[pSrcIndex++];
-
-			if ( val == char.MinValue )
+			if ( val == sbyte.MinValue )
 			{
-				//	if ( pSrcEnd - pSrc < sizeof( int16_t ) )
-				//	{
-				//		return false;
-				//	}
-
-				//	val = *(int16_t*)pSrc;
-				//	pSrc += sizeof( int16_t );
-				val = pSrc[pSrcIndex++];
+				val = pSrc[0] | (pSrc[1] << 8);
+				pSrc = pSrc.Skip( 2 ).ToArray();
 			}
 
 			state.DequantizationBuffer[i * 2 + 1] = (float)val;
@@ -351,9 +223,9 @@ public class TextureFile
 		// Step 2: decode rows
 		//
 		D4Coefficients coefs = new( dequantizationScale );
-		for ( i = 0; i < size; i++ )
+		for ( int i = 0; i < size; i++ )
 		{
-			D4InverseTransform3(
+			D4InverseTransform(
 
 			// Index lookup
 			( index, component ) =>
@@ -389,14 +261,13 @@ public class TextureFile
 		//
 		// Step 3: decode columns
 		//
-
 		coefs = new( 1.0f );
-		for ( i = 0; i < size; ++i )
+		for ( int i = 0; i < size; ++i )
 		{
 			int sOffset = 0;
 			int wOffset = size * (size / 2);
 			int colOffset = i;
-			D4InverseTransform3(
+			D4InverseTransform(
 
 			// Index lookup
 			( index, component ) =>
@@ -474,8 +345,6 @@ public class TextureFile
 			header.Block1 = binaryReader.ReadBytes( header.BlockSize1 );
 		}
 
-		Log.Trace( header );
-
 		//
 		// Decode image
 		//
@@ -492,7 +361,7 @@ public class TextureFile
 
 		var blockReader = new BitReader( blockData );
 
-		byte[] Decompress()
+		sbyte[] Decompress()
 		{
 			if ( header.CompressionType == CompressionType.LZSS )
 			{
@@ -505,8 +374,7 @@ public class TextureFile
 					// throw new Exception();
 				}
 
-				Log.Trace( BitConverter.ToString( outputStream.ToArray() ).Replace( "-", " " ) );
-				return outputStream.ToArray();
+				return outputStream.ToArray().Select( x => (sbyte)x ).ToArray();
 			}
 			else
 			{
@@ -514,8 +382,7 @@ public class TextureFile
 			}
 		}
 
-		var decompressedBlock0 = Decompress().Select( x => (int)x ).ToArray();
-		// var decompressedBlock1 = Decompress().Select( x => (int)x ).ToArray();
+		var decompressedBlock0 = Decompress();
 
 		int size = (int)Math.Max( GetAlignedSize( (uint)Math.Max( header.Height, header.Width ) ), 8 );
 
@@ -523,11 +390,6 @@ public class TextureFile
 		List<float> outputCb = Enumerable.Repeat( 0f, size * size ).ToList();
 		List<float> outputCr = Enumerable.Repeat( 0f, size * size ).ToList();
 		List<float> outputA = Enumerable.Repeat( 1f, size * size ).ToList();
-
-		float float8 = 1.0f - ((float)header.YChannelQuantizationScale * -0.5f);
-		float floatA = 1.0f - ((float)header.CbChannelQuantizationScale * -0.25f);
-		float floatC = 1.0f - ((float)header.CrChannelQuantizationScale * -0.25f);
-		float floatE = (float)header.AChannelQuantizationScale + 1.0f;
 
 		ImageDecodeState state = new( size );
 		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, ComputeDequantizationScaleY( header.YChannelQuantizationScale ) );
@@ -548,11 +410,9 @@ public class TextureFile
 				float cb = outputCb[((y / 2) * (maxSize / 2) + (x / 2))];
 				float cr = outputCr[((y / 2) * (maxSize / 2) + (x / 2))];
 
-				float r = cy + 1.402f * (cr - 128.0f);
-				float g = cy - 0.344136f * (cb - 128.0f) - 0.714136f * (cr - 128.0f);
-				float b = cy + 1.772f * (cb - 128.0f);
-
-				Log.Trace( $"YCbCr: {cy},{cb},{cr} :: RGB: {r},{g},{b}" );
+				float r = cy + 1.402f * (cr);
+				float g = cy - 0.344136f * (cb) - 0.714136f * (cr);
+				float b = cy + 1.772f * (cb);
 
 				output[((y * header.Width + x) * 4)] = r;
 				output[((y * header.Width + x) * 4) + 1] = g;
@@ -565,10 +425,23 @@ public class TextureFile
 		List<byte> textureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
 		for ( int i = 0; i < output.Count; i++ )
 		{
-			textureData[i] = (byte)decompressedBlock0[i];
+			textureData[i] = (byte)output[i].Clamp( 0f, 255f );
 		}
 
-		var texture = TextureBuilder.Default.FromData( textureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
-		this.Texture = texture;
+		// Flip texture
+		List<byte> flippedTextureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
+		for ( int y = 0; y < header.Height; y++ )
+		{
+			for ( int x = 0; x < header.Width; x++ )
+			{
+				for ( int i = 0; i < 4; i++ )
+				{
+					flippedTextureData[((y * header.Width + x) * 4) + i] = textureData[(((header.Height - y - 1) * header.Width + x) * 4) + i];
+				}
+			}
+		}
+
+		var texture = TextureBuilder.Default.FromData( flippedTextureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
+		Texture = texture;
 	}
 }

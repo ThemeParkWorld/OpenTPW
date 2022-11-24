@@ -19,27 +19,25 @@ public class BitReader
 		this.value = 0;
 	}
 
-	public int GetBits( int length )
+	public short GetBits( int length )
 	{
 		if ( bitsRemaining < length )
 		{
+			// No data left!!
+			if ( offset + 1 >= buffer.Length )
+				return 0;
+
 			int fetch = (buffer[offset] | (buffer[offset + 1] << 8)) & 0xFFFF;
 			offset += 2;
-			Log.Trace( $"Fetch {fetch:X4}" );
 			value = value | (fetch << bitsRemaining);
 			bitsRemaining += 16;
 		}
 
-		int returnValue = value & ((1 << length) - 1);
+		short returnValue = (short)(value & ((1 << length) - 1));
 
 		bitsRemaining -= length;
 		value >>= length;
 
 		return returnValue;
-	}
-
-	public int GetOffset()
-	{
-		return this.offset;
 	}
 }

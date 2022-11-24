@@ -7,7 +7,7 @@ public class Terrain : ModelEntity
 		base.Spawn();
 
 		// TODO: File System
-		var texture = new TextureFile( @"C:\Users\Alex\BLACKHOLE\terrain.wad\grd_ctr1.wct" );
+		var texture = new TextureFile( @"C:\Users\Alex\BLACKHOLE\monkey.wad\m_face4 (1).wct" );
 		var material = new Material( texture.Texture );
 
 		Model = Primitives.Plane.GenerateModel( material );
