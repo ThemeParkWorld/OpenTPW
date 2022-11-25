@@ -215,10 +215,10 @@ public class WadArchive
 
 			if ( i == splitPath.Length - 1 )
 			{
-				return internalDirectory.Children.OfType<T>().First( x => x.Name == dir );
+				return internalDirectory.Children.OfType<T>().First( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
 			}
 
-			internalDirectory = internalDirectory.Children.OfType<WadArchiveDirectory>().First( x => x.Name == dir );
+			internalDirectory = internalDirectory.Children.OfType<WadArchiveDirectory>().First( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
 		}
 
 		throw new FileNotFoundException( $"File not found: {internalPath}" );
@@ -234,7 +234,7 @@ public class WadArchive
 
 			foreach ( string dir in splitPath )
 			{
-				internalDirectory = internalDirectory.Children.OfType<WadArchiveDirectory>().First( x => x.Name == dir );
+				internalDirectory = internalDirectory.Children.OfType<WadArchiveDirectory>().First( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
 			}
 		}
 

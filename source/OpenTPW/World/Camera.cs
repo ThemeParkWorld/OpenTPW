@@ -17,7 +17,7 @@ public class Camera : Entity
 	private float wishYaw = 0f;
 	private float yaw = 0f;
 	private float wishHeight = 8f;
-	private float cameraSpeed = 100f;
+	private float cameraSpeed = 128f;
 
 	private void CalcViewProjMatrix()
 	{
@@ -36,7 +36,7 @@ public class Camera : Entity
 			90.0f.DegreesToRadians(),
 			Screen.Aspect,
 			0.1f,
-			1000.0f
+			10000.0f
 		);
 	}
 
@@ -71,7 +71,7 @@ public class Camera : Entity
 		wishVelocity.Z = 0;
 
 		wishHeight += -Input.Mouse.Wheel;
-		wishHeight = wishHeight.Clamp( 1, 10 );
+		wishHeight = wishHeight.Clamp( 1f, 10f );
 
 		if ( Input.Pressed( InputButton.RotateLeft ) )
 			wishYaw -= 90;
@@ -83,16 +83,16 @@ public class Camera : Entity
 		//
 
 		// Apply velocity
-		velocity += wishVelocity;
+		velocity += wishVelocity * Time.Delta;
 
 		// Apply drag
-		velocity *= 1 - Time.Delta * 10f;
+		velocity = Vector3.Lerp( velocity, Vector3.Zero, Time.Delta * 5f );
 
 		// Rotate camera
 		yaw = yaw.LerpTo( wishYaw, 10f * Time.Delta );
 
 		// Move camera
-		position += velocity * Time.Delta;
+		position += velocity;
 		position.Z = position.Z.LerpTo( wishHeight, 10f * Time.Delta );
 
 		// Run view/proj matrix calculations

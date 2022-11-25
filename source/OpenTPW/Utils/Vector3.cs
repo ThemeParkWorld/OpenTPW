@@ -136,4 +136,13 @@ public struct Vector3 : IEquatable<Vector3>
 	public override string ToString() => internalVector.ToString();
 
 	public System.Numerics.Vector3 GetSystemVector3() => internalVector;
+
+	public static Vector3 Lerp( Vector3 a, Vector3 b, float t )
+	{
+		return new Vector3(
+			a.X.LerpTo( b.X, t ),
+			a.Y.LerpTo( b.Y, t ),
+			a.Z.LerpTo( b.Z, t )
+		);
+	}
 }

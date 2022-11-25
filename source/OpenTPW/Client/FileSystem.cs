@@ -40,7 +40,7 @@ public class FileSystem
 
 	public Stream OpenRead( string relativePath )
 	{
-		return InternalOpenFile( relativePath );
+		return InternalOpenFile( GetAbsolutePath( relativePath ) );
 	}
 
 	public string[] GetDirectories( string relativePath )

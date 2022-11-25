@@ -322,7 +322,7 @@ public class TextureFile
 		//
 		// Setup readers
 		//
-		using var fileStream = File.OpenRead( path );
+		using var fileStream = FileSystem.Game.OpenRead( path );
 		Load( fileStream );
 	}
 
