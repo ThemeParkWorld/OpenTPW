@@ -42,20 +42,20 @@ public class Cursor : Panel
 		if ( cursorType == Input.CursorTypes.Cash )
 			return "Cash";
 
-		return "C" + (cursorType.ToString().Substring( 0, 3 ).ToLower());
+		return "C" + cursorType.ToString()[..3].ToLower();
 	}
 
 	private void LoadTexture()
 	{
-		// TODO: clean this up
-		var material = new Material(
-			TextureBuilder.UITexture.FromPath( GameDir.GetPath( $"data/ui/cursors/{GetImageName( cursorType )}.tga" ) ).Build(),
-			ShaderBuilder.Default.WithVertex( "content/shaders/cursor/cursor.vert" )
-							 .WithFragment( "content/shaders/cursor/cursor.frag" )
-							 .Build(),
-			typeof( ObjectUniformBuffer )
-		);
+		var cursorPath = $"data/ui/cursors/{GetImageName( cursorType )}.tga";
+		var texture = TextureBuilder.UITexture.FromPath( GameDir.GetPath( cursorPath ) ).Build();
+		var shader = ShaderBuilder.Default
+							.WithVertex( "content/shaders/cursor/cursor.vert" )
+							.WithFragment( "content/shaders/cursor/cursor.frag" )
+							.Build();
+		var uniformBufferType = typeof( ObjectUniformBuffer );
 
+		var material = new Material( texture, shader, uniformBufferType );
 		model = Primitives.Plane.GenerateModel( material );
 	}
 

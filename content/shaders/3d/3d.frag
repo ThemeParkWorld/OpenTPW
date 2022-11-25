@@ -57,5 +57,5 @@ void main()
 
     vec4 vColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords );
 
-    fragColor = vec4( vLambert + vAmbient + vSpecular, 1.0 ) * vColor;
+    fragColor = vec4( vLambert + vAmbient, 1.0 ) * vColor;
 }

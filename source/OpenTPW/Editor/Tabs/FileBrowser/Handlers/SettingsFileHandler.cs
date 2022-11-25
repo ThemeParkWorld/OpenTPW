@@ -35,9 +35,9 @@ public class SettingsFileHandler : BaseFileHandler
 			foreach ( var item in settingsFile.Entries )
 			{
 				ImGui.TableNextColumn();
-				ImGui.Text( $"{item.Item1}" );
+				ImGui.Text( $"{item.Key}" );
 				ImGui.TableNextColumn();
-				ImGui.Text( $"{item.Item2}" );
+				ImGui.Text( $"{item.Value}" );
 			}
 
 			ImGui.EndTable();

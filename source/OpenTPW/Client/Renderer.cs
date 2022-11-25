@@ -101,6 +101,7 @@ internal class Renderer
 
 		var preferredBackend = GraphicsBackend.Direct3D11;
 		var preferredBackendStr = Settings.Default.PreferredBackend;
+
 		if ( !string.IsNullOrEmpty( preferredBackendStr ) )
 		{
 			preferredBackend = (GraphicsBackend)Enum.Parse(

@@ -3,7 +3,7 @@ using Veldrid;
 
 namespace OpenTPW;
 
-public class Model
+public class Model : Asset
 {
 	private DeviceBuffer uniformBuffer;
 	private Pipeline pipeline;
@@ -26,6 +26,8 @@ public class Model
 
 		SetupMesh( vertices, indices );
 		SetupResources( material );
+
+		All.Add( this );
 	}
 
 	public Model( Vertex[] vertices, Material material )
@@ -35,6 +37,8 @@ public class Model
 
 		SetupMesh( vertices );
 		SetupResources( material );
+
+		All.Add( this );
 	}
 
 	private void SetupMesh( Vertex[] vertices )

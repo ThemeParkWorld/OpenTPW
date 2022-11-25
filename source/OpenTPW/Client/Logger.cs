@@ -26,11 +26,6 @@ public class Logger
 		if ( str == null )
 			return;
 
-#if RELEASE
-		if ( severity == Level.Error )
-			throw new Exception( str );
-#endif
-
 		Console.ForegroundColor = SeverityToConsoleColor( severity );
 		Console.WriteLine( $"[{DateTime.Now.ToLongTimeString()}] {str}" );
 

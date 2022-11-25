@@ -2,13 +2,15 @@
 
 namespace OpenTPW;
 
-public class Shader
+public class Shader : Asset
 {
 	public Veldrid.Shader[] ShaderProgram { get; }
 
 	internal Shader( Veldrid.Shader[] shaderProgram )
 	{
 		ShaderProgram = shaderProgram;
+
+		All.Add( this );
 	}
 
 	public void Use()

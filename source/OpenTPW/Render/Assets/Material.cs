@@ -2,7 +2,7 @@
 
 namespace OpenTPW;
 
-public struct Material
+public class Material : Asset
 {
 	public Shader Shader { get; set; }
 	public Type UniformBufferType { get; }
@@ -26,6 +26,8 @@ public struct Material
 								.WithFragment( "content/shaders/3d/3d.frag" )
 								.Build();
 		UniformBufferType = typeof( ObjectUniformBuffer );
+
+		All.Add( this );
 	}
 
 	public Material( Texture diffuseTexture, Shader shader, Type uniformBufferType )
@@ -33,6 +35,8 @@ public struct Material
 		DiffuseTexture = diffuseTexture;
 		Shader = shader;
 		UniformBufferType = uniformBufferType;
+
+		All.Add( this );
 	}
 
 	public bool IsDirty => DiffuseTexture.IsDirty;

@@ -1,8 +1,5 @@
 ﻿namespace OpenTPW;
 
-// TODO: Proper struct for SettingsPair
-using SettingsPair = MutablePair<string, string>;
-
 public class SettingsFile
 {
 	// TODO: Read hoarding & shape data
@@ -56,17 +53,17 @@ public class SettingsFile
 				{
 					if ( isKey )
 					{
-						if ( lineBuffer.Item1 == null )
+						if ( lineBuffer.Key == null )
 						{
-							lineBuffer.Item1 = wordBuffer ?? default;
+							lineBuffer.Key = wordBuffer ?? default;
 							isKey = false;
 						}
 					}
 					else
 					{
-						if ( lineBuffer.Item2 == null )
+						if ( lineBuffer.Value == null )
 						{
-							lineBuffer.Item2 = wordBuffer ?? default;
+							lineBuffer.Value = wordBuffer ?? default;
 							isKey = true;
 						}
 					}
@@ -74,7 +71,7 @@ public class SettingsFile
 
 				if ( IsNewLine( character ) )
 				{
-					if ( lineBuffer.Item1 != null && lineBuffer.Item2 != null )
+					if ( lineBuffer.Key != null && lineBuffer.Value != null )
 						samPairs.Add( lineBuffer );
 
 					lineBuffer = new SettingsPair();

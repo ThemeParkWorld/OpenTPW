@@ -14,13 +14,7 @@ public class RootPanel : Entity
 
 	public override void Render( CommandList commandList )
 	{
-		// TODO: Move this to some sort of renderer class
-		// Gl.Disable( Silk.NET.OpenGL.EnableCap.DepthTest );
-
 		Children.ForEach( child => child.Draw( commandList ) );
-
-		// TODO: Move this to some sort of renderer class
-		// Gl.Enable( Silk.NET.OpenGL.EnableCap.DepthTest );
 	}
 
 	public override void Update()

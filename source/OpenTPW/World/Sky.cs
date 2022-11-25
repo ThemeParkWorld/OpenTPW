@@ -11,6 +11,7 @@ public class Sky : ModelEntity
 		var shader = ShaderBuilder.Default.WithVertex( "content/shaders/3d/3d.vert" )
 								.WithFragment( "content/shaders/unlit/unlit.frag" )
 								.Build();
+
 		var uniformBufferType = typeof( ObjectUniformBuffer );
 
 		var material = new Material( texture, shader, uniformBufferType );

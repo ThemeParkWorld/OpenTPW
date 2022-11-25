@@ -21,7 +21,7 @@ public class Camera : Entity
 
 	private void CalcViewProjMatrix()
 	{
-		var lookAt = new Vector3( position.X, position.Y + 4, 0 );
+		var lookAt = new Vector3( position.X, position.Y, 0 );
 
 		var cameraPos = lookAt + new Vector3(
 			MathF.Cos( yaw.DegreesToRadians() ) * position.Z,

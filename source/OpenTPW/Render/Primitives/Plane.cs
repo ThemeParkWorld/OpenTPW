@@ -38,19 +38,19 @@ partial class Primitives
 			3, 1, 0,
 		};
 
-		public static Model GenerateModel( Material material, Point2? _size = null )
+		public static Model GenerateModel( Material material, Point2? _repeats = null )
 		{
-			var size = _size ?? new Point2( 1, 1 );
+			var repeats = _repeats ?? new Point2( 1, 1 );
 
-			var vertices = new Vertex[4 * size.X * size.Y];
-			var indices = new uint[6 * size.X * size.Y];
+			var vertices = new Vertex[4 * repeats.X * repeats.Y];
+			var indices = new uint[6 * repeats.X * repeats.Y];
 
-			for ( int y = 0; y < size.Y; y++ )
+			for ( int y = 0; y < repeats.Y; y++ )
 			{
-				for ( int x = 0; x < size.X; x++ )
+				for ( int x = 0; x < repeats.X; x++ )
 				{
-					var offset = (y * size.X + x) * 4;
-					var indexOffset = (y * size.X + x) * 6;
+					var offset = (y * repeats.X + x) * 4;
+					var indexOffset = (y * repeats.X + x) * 6;
 
 					for ( int i = 0; i < 4; i++ )
 					{
@@ -68,9 +68,9 @@ partial class Primitives
 			}
 
 			// Shift to center
-			if ( size.X > 1 && size.Y > 1 )
+			if ( repeats.X > 1 && repeats.Y > 1 )
 			{
-				var center = new Point2( size.X / 2, size.Y / 2 );
+				var center = new Point2( repeats.X / 2, repeats.Y / 2 );
 
 				for ( int i = 0; i < vertices.Length; i++ )
 				{
