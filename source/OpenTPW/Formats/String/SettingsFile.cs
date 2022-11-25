@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-public class SettingsFile
+public sealed class SettingsFile : BaseFormat
 {
 	// TODO: Read hoarding & shape data
 
@@ -9,7 +9,16 @@ public class SettingsFile
 
 	public List<SettingsPair> Entries { get; set; } = new();
 
+	public SettingsFile( string path )
+	{
+		ReadFromFile( path );
+	}
 	public SettingsFile( Stream stream )
+	{
+		ReadFromStream( stream );
+	}
+
+	protected override void ReadFromStream( Stream stream )
 	{
 		using var binaryReader = new BinaryReader( stream );
 

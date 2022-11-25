@@ -3,7 +3,7 @@
 /// <summary>
 /// A file containing data within a <see cref="WadArchive"/>.
 /// </summary>
-public class WadArchiveFile : WadArchiveItem
+public sealed class WadArchiveFile : WadArchiveItem
 {
 	public bool Compressed { get; set; }
 	public uint DecompressedSize { get; set; }

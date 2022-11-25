@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-public class MapFile
+public sealed class MapFile : BaseFormat
 {
 	// Guesswork / placeholders
 	public enum TileType
@@ -12,7 +12,17 @@ public class MapFile
 		BrickPath = 144,
 	}
 
+	public MapFile( string path )
+	{
+		ReadFromFile( path );
+	}
+
 	public MapFile( Stream stream )
+	{
+		ReadFromStream( stream );
+	}
+
+	protected override void ReadFromStream( Stream stream )
 	{
 	}
 }

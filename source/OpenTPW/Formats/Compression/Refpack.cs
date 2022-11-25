@@ -2,7 +2,7 @@
 
 namespace OpenTPW;
 
-public partial class Refpack
+public sealed partial class Refpack
 {
 	private byte[] Data { get; set; }
 

@@ -10,10 +10,7 @@ public class ShaderBuilder
 
 	public static ShaderBuilder Default => new ShaderBuilder();
 
-	internal ShaderBuilder()
-	{
-
-	}
+	private ShaderBuilder() { }
 
 	private ShaderDescription CreateShaderDescription( string path, ShaderStages shaderStage )
 	{

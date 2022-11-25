@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-public class RideScriptFile
+public sealed class RideScriptFile : BaseFormat
 {
 	private RideVM vm;
 	private List<string> variables = new List<string>();
@@ -10,12 +10,19 @@ public class RideScriptFile
 	public string Disassembly { get; private set; } = "";
 	public int VariableCount => variables.Count;
 
-	public RideScriptFile( RideVM vm )
+	public RideScriptFile( RideVM vm, string path )
 	{
 		this.vm = vm;
+		ReadFromFile( path );
 	}
 
-	public void ReadFile( Stream stream )
+	public RideScriptFile( RideVM vm, Stream stream )
+	{
+		this.vm = vm;
+		ReadFromStream( stream );
+	}
+
+	protected override void ReadFromStream( Stream stream )
 	{
 		using var binaryReader = new BinaryReader( stream );
 		ReadFileContents( binaryReader );

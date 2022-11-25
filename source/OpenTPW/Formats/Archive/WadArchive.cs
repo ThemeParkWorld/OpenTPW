@@ -5,7 +5,12 @@
  * WATTO: http://wiki.xentax.com/index.php/WAD_DWFB, 
  * and Rhys: https://github.com/riperiperi/FreeSO/blob/master/TSOClient/tso.files/FAR3/Decompresser.cs.
  */
-public class WadArchive
+
+//
+// This CANNOT derive from BaseFormat as that would cause a stack overflow/infinite loop!
+// This should be its own standalone class!
+//
+public sealed class WadArchive
 {
 	private WadStream memoryStream;
 	public byte[] Buffer { get; internal set; }
@@ -19,12 +24,12 @@ public class WadArchive
 	public WadArchive( string path )
 	{
 		using var fileStream = File.OpenRead( path );
-		LoadArchive( fileStream );
+		ReadFromStream( fileStream );
 	}
 
 	public WadArchive( Stream stream )
 	{
-		LoadArchive( stream );
+		ReadFromStream( stream );
 	}
 
 	public void Dispose()
@@ -184,7 +189,7 @@ public class WadArchive
 		}
 	}
 
-	public void LoadArchive( Stream stream )
+	protected void ReadFromStream( Stream stream )
 	{
 		// Set up read buffer
 		var tempStreamReader = new StreamReader( stream );

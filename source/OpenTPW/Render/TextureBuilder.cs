@@ -16,14 +16,14 @@ public partial class TextureBuilder
 
 	private bool shouldGenerateMips = false;
 
-	public TextureBuilder()
-	{
-		path = GetHashCode().ToString();
-	}
-
 	public static TextureBuilder Default => new TextureBuilder();
 	public static TextureBuilder WorldTexture => new TextureBuilder().GenerateMips();
 	public static TextureBuilder UITexture => new TextureBuilder();
+
+	private TextureBuilder()
+	{
+		path = GetHashCode().ToString();
+	}
 
 	private static bool TryGetExistingTexture( string path, out Texture texture )
 	{

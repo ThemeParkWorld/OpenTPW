@@ -4,7 +4,7 @@
 /// Allows reading from a byte array on a bit-by-bit basis.
 /// Mainly used for LZSS (de-)compression.
 /// </summary>
-public class BitReader
+public sealed class BitReader
 {
 	private byte[] buffer;
 	private int offset;

@@ -2,7 +2,7 @@
 
 namespace OpenTPW;
 
-internal class WadStream : MemoryStream
+internal sealed class WadStream : MemoryStream
 {
 	public WadStream( byte[] buffer ) : base( buffer ) { }
 

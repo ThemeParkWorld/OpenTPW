@@ -36,8 +36,7 @@ public partial class RideVM
 
 	public RideVM( Stream stream )
 	{
-		rsseqFile = new RideScriptFile( this );
-		rsseqFile.ReadFile( stream );
+		rsseqFile = new RideScriptFile( this, stream );
 
 		// DEBUG: Log implemented opcode counts
 		var implementedOpcodes = OpcodeHandlers.Keys.ToList();

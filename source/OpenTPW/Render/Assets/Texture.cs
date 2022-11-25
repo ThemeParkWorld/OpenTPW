@@ -13,8 +13,6 @@ public class Texture : Asset
 	public Veldrid.Texture VeldridTexture { get; }
 	public Veldrid.TextureView VeldridTextureView { get; }
 
-	public static TextureBuilder Builder => new();
-
 	internal Texture( string path, Veldrid.Texture texture, Veldrid.TextureView textureView, string type, int width, int height )
 	{
 		Path = path;
