@@ -30,7 +30,7 @@ OpenTPW is a re-implementation of [Sim Theme Park / Theme Park World](https://en
 
 ## Documentation
 
-File format information is available within this repo's [wiki](https://github.com/xezno/OpenTPW/wiki).  Keep in mind that this information is a work-in-progress, and therefore might not be of incredible detail - however, upon completion, it still aims to be as useful, detailed, and as in-depth as possible.
+File format information is available at the [OpenTPW formats](https://opentpw.gu3.me/formats/) website. Keep in mind that this information is a work-in-progress, and therefore might not be of incredible detail - however, upon completion, it still aims to be as useful, detailed, and as in-depth as possible.
 
 ## Contributing
 
