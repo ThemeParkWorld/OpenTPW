@@ -22,7 +22,7 @@ internal class FilePreviewTab : BaseTab
 		if ( !visible )
 			return;
 
-		ImGui.SetNextWindowSizeConstraints( new System.Numerics.Vector2( 512, 512 ), new System.Numerics.Vector2( float.MaxValue, float.MaxValue ) );
+		ImGui.SetNextWindowSizeConstraints( new System.Numerics.Vector2( 512, 512 ), new System.Numerics.Vector2( 1024, 1024 ) );
 		ImGui.Begin( $"File Preview##{GetHashCode()}", ref visible );
 
 		FileHandler.Draw();
