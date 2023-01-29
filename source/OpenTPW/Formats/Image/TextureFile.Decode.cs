@@ -78,23 +78,23 @@ partial class TextureFile
 		for ( int i = 0; i < count; ++i )
 		{
 			int val = pSrc[0];
-			pSrc = pSrc.Skip( 1 ).ToArray();
+			Array.Copy( pSrc, 1, pSrc, 0, pSrc.Length - 1 );
 
 			if ( val == sbyte.MinValue )
 			{
 				val = pSrc[0] | (pSrc[1] << 8);
-				pSrc = pSrc.Skip( 2 ).ToArray();
+				Array.Copy( pSrc, 2, pSrc, 0, pSrc.Length - 2 );
 			}
 
 			state.DequantizationBuffer[i * 2] = (float)val;
 
 			val = pSrc[0];
-			pSrc = pSrc.Skip( 1 ).ToArray();
+			Array.Copy( pSrc, 1, pSrc, 0, pSrc.Length - 1 );
 
 			if ( val == sbyte.MinValue )
 			{
 				val = pSrc[0] | (pSrc[1] << 8);
-				pSrc = pSrc.Skip( 2 ).ToArray();
+				Array.Copy( pSrc, 2, pSrc, 0, pSrc.Length - 2 );
 			}
 
 			state.DequantizationBuffer[i * 2 + 1] = (float)val;
