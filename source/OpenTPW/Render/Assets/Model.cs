@@ -135,7 +135,7 @@ public class Model : Asset
 		resourceSet = Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
 	}
 
-	internal void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : struct
+	internal void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : unmanaged
 	{
 		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
 		{
