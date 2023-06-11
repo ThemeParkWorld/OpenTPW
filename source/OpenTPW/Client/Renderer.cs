@@ -99,7 +99,7 @@ internal class Renderer
 			Debug = true
 		};
 
-		var preferredBackend = GraphicsBackend.Direct3D11;
+		var preferredBackend = GraphicsBackend.Vulkan;
 		var preferredBackendStr = Settings.Default.PreferredBackend;
 
 		if ( !string.IsNullOrEmpty( preferredBackendStr ) )
