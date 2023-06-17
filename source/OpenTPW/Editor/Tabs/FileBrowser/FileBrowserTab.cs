@@ -120,7 +120,7 @@ internal class FileBrowserTab : BaseTab
 		{
 			var pos = ImGui.GetItemRectMin();
 			var col = OneDark.Comment;
-			col.W = 0.25f;
+			col.A = 0.25f;
 
 			var halfPadding = IconPadding / 2f;
 			var rectOffset = new System.Numerics.Vector2( 0, -8 );

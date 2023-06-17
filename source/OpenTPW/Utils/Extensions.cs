@@ -70,6 +70,7 @@ public static class MathExtensions
 		return new Vector3( x, y, z );
 	}
 
+	[Obsolete( "Use Color.Parse" )]
 	public static System.Numerics.Vector4 GetColor( string hex )
 	{
 		var color = ColorTranslator.FromHtml( hex );
