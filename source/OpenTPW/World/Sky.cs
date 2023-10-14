@@ -6,7 +6,7 @@ public class Sky : ModelEntity
 	{
 		base.Spawn();
 
-		var texture = TextureBuilder.Default.FromData( new byte[4] { 42, 205, 244, 255 }, 1, 1 ).Build();
+		var texture = new Texture( new byte[4] { 42, 205, 244, 255 }, 1, 1 );
 
 		var shader = ShaderBuilder.Default.WithVertex( "content/shaders/3d/3d.vert" )
 								.WithFragment( "content/shaders/unlit/unlit.frag" )

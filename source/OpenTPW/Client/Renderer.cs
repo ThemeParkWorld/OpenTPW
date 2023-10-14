@@ -18,7 +18,10 @@ internal class Renderer
 	public Renderer()
 	{
 		Event.Register( this );
+	}
 
+	public void Run()
+	{
 		Init();
 
 		lastFrame = DateTime.Now;
@@ -122,5 +125,16 @@ internal class Renderer
 	{
 		imguiRenderer.WindowResized( newSize.X, newSize.Y );
 		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
+	}
+
+	public void ImmediateSubmit( Action<CommandList> action )
+	{
+		var commandList = Device.ResourceFactory.CreateCommandList();
+		commandList.Begin();
+
+		action( commandList );
+
+		commandList.End();
+		Device.SubmitCommands( commandList );
 	}
 }

@@ -6,11 +6,13 @@
 /// </summary>
 internal class Game
 {
-	Renderer renderer;
+	public static Renderer renderer;
 
 	public Game()
 	{
 		Log.Trace( "Initializing game" );
 		renderer = new();
+
+		renderer.Run();
 	}
 }

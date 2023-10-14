@@ -131,7 +131,7 @@ public class Model : Asset
 			new BufferDescription( uboSizeInBytes,
 				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
 
-		var resourceSetDescription = new ResourceSetDescription( rsrcLayout, material.DiffuseTexture.VeldridTexture, Device.Aniso4xSampler, uniformBuffer );
+		var resourceSetDescription = new ResourceSetDescription( rsrcLayout, material.DiffuseTexture.NativeTexture, Device.Aniso4xSampler, uniformBuffer );
 		resourceSet = Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
 	}
 
@@ -142,9 +142,6 @@ public class Model : Asset
 			throw new Exception( $"Tried to set unmatching uniform buffer object" +
 				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
 		}
-
-		if ( Material.IsDirty )
-			Material.GenerateMipmaps( commandList );
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.SetPipeline( pipeline );

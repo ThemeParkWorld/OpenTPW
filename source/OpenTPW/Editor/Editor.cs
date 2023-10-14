@@ -82,9 +82,9 @@ internal partial class Editor
 		int size = width * height * bpp;
 		byte[] data = new byte[size];
 		Marshal.Copy( pixels, data, 0, size );
-		defaultFontTexture = TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
+		defaultFontTexture = new Texture( data, width, height );
 
-		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, defaultFontTexture.VeldridTextureView );
+		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, defaultFontTexture.NativeTextureView );
 		io.Fonts.SetTexID( texPtr );
 		io.Fonts.ClearTexData();
 
