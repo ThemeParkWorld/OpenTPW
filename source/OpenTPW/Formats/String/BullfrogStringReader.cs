@@ -43,8 +43,7 @@ internal class BullfrogStringReader
 
 	private void ReadFile()
 	{
-		/*
-		
+		/*	
 		Header
 			4 bytes: Magic number - "BFST"
 			4 bytes: Unknown
@@ -73,6 +72,33 @@ internal class BullfrogStringReader
 		Log.Info($"String Count: {count}", true);
 
 		var offset = memoryStream.ReadInt32();
-		Log.Info($"String Offset: {offset}", true);
+		Log.Info( $"String Offset: {offset}", true );
+
+		//Start looping through strings
+		//First lets get the office
+		for ( int i = 0; i < count; i++ )
+		{
+
+			memoryStream.Seek( offset, SeekOrigin.Begin );
+			
+			//unknown
+			_ = memoryStream.ReadUIntN( 1 );
+
+			//String Length
+			var stringLength = memoryStream.ReadUIntN( 3 );
+
+			// Char encoding
+			var encodingOffset = 0;
+
+			var stringChars = "";
+			//loop through character encoding
+			for( int j = 0; j < encodingOffset; j++ )
+			{
+				return;
+			}
+
+			//Padding (possibly longer?)
+			_ = memoryStream.Seek( 4, SeekOrigin.Current );
+		}
 	}
 }
