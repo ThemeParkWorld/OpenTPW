@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenTPW.Formats.String;
-internal class BullfrogStringReader
+internal class BullfrogStringReader : BaseFormat
 {
 	private BullfrogStringStream memoryStream;
 	public byte[] buffer;
@@ -26,7 +26,7 @@ internal class BullfrogStringReader
 		memoryStream.Dispose();
 	}
 
-	private void ReadFromStream(Stream stream)
+	protected override void ReadFromStream(Stream stream)
 	{
 		// Set up read buffer
 		var tempStreamReader = new StreamReader( stream );
