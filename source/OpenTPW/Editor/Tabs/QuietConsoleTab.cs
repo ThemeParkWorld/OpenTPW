@@ -1,17 +1,23 @@
 ﻿using ImGuiNET;
+using OpenTPW.Formats.String;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenTPW;
 
-[EditorMenu( "Debug/Console" )]
-internal class ConsoleTab : BaseTab
+[EditorMenu( "Debug/TestConsole" )]
+internal class QuietConsoleTab : BaseTab
 {
-	List<ConsoleItem> items = new();
 	string consoleInput = "";
-
-	public ConsoleTab()
+	List<ConsoleItem> items = new();
+	
+	public QuietConsoleTab()
 	{
-		Logger.OnLog += ( severity, str ) =>
+		Logger.QuietLog += ( severity, str ) =>
 		{
 			var color = severity switch
 			{
@@ -54,6 +60,11 @@ internal class ConsoleTab : BaseTab
 
 		if ( ImGui.Button( "Submit" ) )
 		{
+			if ( consoleInput == "BFST" )
+			{
+				string file = $"{Settings.Default.GamePath}\\data\\Language\\English\\ENTERTAINER_NAMES.str";
+				new BullfrogStringReader( file );
+			}
 			Log.Info( $"Console input: '{consoleInput}'" );
 			consoleInput = "";
 		}

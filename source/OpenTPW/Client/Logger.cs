@@ -15,16 +15,21 @@ public class Logger
 
 	public void Trace( object obj ) => Log( obj?.ToString(), Level.Trace );
 	public void Info( object obj ) => Log( obj?.ToString(), Level.Info );
+	public void Info( object obj, bool quiet = false ) => Log( obj?.ToString(), Level.Info, quiet );
 	public void Warning( object obj ) => Log( obj?.ToString(), Level.Warning );
 	public void Error( object obj ) => Log( obj?.ToString(), Level.Error );
 
 	public delegate void LogDelegate( Level severity, string logText );
 	public static LogDelegate? OnLog;
+	public static LogDelegate? QuietLog;
 
-	private static void Log( string? str, Level severity = Level.Trace )
+	private static void Log( string? str, Level severity = Level.Trace, bool quiet = false )
 	{
 		if ( str == null )
 			return;
+
+		if( quiet )
+			QuietLog?.Invoke( severity, str );
 
 		Console.ForegroundColor = SeverityToConsoleColor( severity );
 		Console.WriteLine( $"[{DateTime.Now.ToLongTimeString()}] {str}" );
