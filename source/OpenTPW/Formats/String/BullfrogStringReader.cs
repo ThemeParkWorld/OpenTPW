@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTPW.Formats.String;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace OpenTPW;
 public sealed class BullfrogStringReader : BaseFormat
 {
 	private BullfrogStringStream memoryStream;
+	private MTUReader mtuReader = new MTUReader( $"{Settings.Default.GamePath}\\data\\Language\\English\\MBToUni.dat" );
 	public byte[] buffer;
 
 	public BullfrogStringReader (string path )
@@ -44,6 +46,8 @@ public sealed class BullfrogStringReader : BaseFormat
 
 	private void ReadFile()
 	{
+		memoryStream.Seek( 0, SeekOrigin.Begin );
+
 		/*	
 		Header
 			4 bytes: Magic number - "BFST"
@@ -68,39 +72,62 @@ public sealed class BullfrogStringReader : BaseFormat
 		//Unknown
 		_ = memoryStream.ReadInt32();
 
+
 		//String Count
-		var count = memoryStream.ReadInt32();
+		var count = 3;
+		var stringCount = memoryStream.ReadInt32();
 		Log.Info($"String Count: {count}", true);
+		
+		var initialMemPos = memoryStream.Position;
 
-		var offset = memoryStream.ReadInt32();
-		Log.Info( $"String Offset: {offset}", true );
-
-		//Start looping through strings
-		//First lets get the office
-		for ( int i = 0; i < count; i++ )
+		for ( int i = 0; i < count - 1; i++ )
 		{
-			GC.Collect();
+			Log.Info($"Back to initial pos: {initialMemPos}", true);
 
-			var initialMemPos = memoryStream.Position;
+			memoryStream.Seek( 4 * (i), SeekOrigin.Current );
 
-			// Move passed Unknown byte
-			memoryStream.Seek( 1, SeekOrigin.Current );
-			
-			//String Length
-			var stringLength = memoryStream.ReadUIntN( 3 );
+			// Find offset number
+			int offset = memoryStream.ReadInt32();
 
-			// Char encoding
-			var encodingOffset = 0;
+			//Log.Info( $"Memory Position: {memoryStream.Position}", true );
+			Log.Info( $"Offset: {offset}" , true);
 
-			var stringChars = "";
-			//loop through character encoding
-			for( int j = 0; j < encodingOffset; j++ )
+			// go to offset address
+			// need to account offset for inital 12 bytes
+			memoryStream.Seek( offset + 12 , SeekOrigin.Begin );
+
+			// Unknown - we still want to verify it is 0x1
+			var unknownOne = memoryStream.ReadByte();
+			if(unknownOne != 1 )
 			{
-				return;
+				throw new Exception( $"String Offset not working - offset set to {unknownOne} @ Pos:{memoryStream.Position}" );
 			}
 
-			//Padding (possibly longer?)
+			// String Length
+			var stringLength = memoryStream.ReadByte();
+			StringBuilder output = new StringBuilder();
+
+			//unused after string length
+			_ = memoryStream.ReadByte();
+			_ = memoryStream.ReadByte();
+
+			// Characters
+			for ( int j = 0; j < stringLength - 1; j++ )
+			{
+				var mtuPos = memoryStream.ReadByte();
+				var character = mtuReader.GetCharacter( mtuPos );
+				output.Append( character );
+			}
+
+			Log.Info($"{output}", true );
+
+			// Padding (possibly longer?)
 			_ = memoryStream.Seek( 4, SeekOrigin.Current );
+
+			// Go back to intial position
+			memoryStream.Seek( initialMemPos, SeekOrigin.Begin );
+			
 		}
+
 	}
 }
