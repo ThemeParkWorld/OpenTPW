@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenTPW.Formats.String;
-internal class MTUStream
+internal sealed class MTUStream : BaseStream
 {
+	public MTUStream( byte[] buffer ) : base( buffer ) { }
 }

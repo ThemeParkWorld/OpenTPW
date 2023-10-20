@@ -4,9 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vulkan;
 
-namespace OpenTPW.Formats.String;
-internal class BullfrogStringReader : BaseFormat
+namespace OpenTPW;
+public sealed class BullfrogStringReader : BaseFormat
 {
 	private BullfrogStringStream memoryStream;
 	public byte[] buffer;
@@ -78,12 +79,13 @@ internal class BullfrogStringReader : BaseFormat
 		//First lets get the office
 		for ( int i = 0; i < count; i++ )
 		{
+			GC.Collect();
 
-			memoryStream.Seek( offset, SeekOrigin.Begin );
+			var initialMemPos = memoryStream.Position;
+
+			// Move passed Unknown byte
+			memoryStream.Seek( 1, SeekOrigin.Current );
 			
-			//unknown
-			_ = memoryStream.ReadUIntN( 1 );
-
 			//String Length
 			var stringLength = memoryStream.ReadUIntN( 3 );
 

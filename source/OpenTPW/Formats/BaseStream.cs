@@ -1,10 +1,9 @@
 ﻿using System.Text;
 
 namespace OpenTPW;
-internal class BullfrogStringStream : BaseStream
+public class BaseStream : MemoryStream
 {
-	public BullfrogStringStream( byte[] buffer ) : base( buffer ) { }
-
+	public BaseStream( byte[] buffer ) : base( buffer ) { }
 	public byte[] ReadBytes( int length, bool bigEndian = false )
 	{
 		var bytes = new byte[length];
@@ -39,5 +38,4 @@ internal class BullfrogStringStream : BaseStream
 	{
 		return BitConverter.ToUInt32( ReadBytes( n, bigEndian ), 0 );
 	}
-
 }
