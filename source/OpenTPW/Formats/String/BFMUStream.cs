@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenTPW.Formats.String;
-internal sealed class MTUStream : BaseStream
+internal sealed class BFMUStream : BaseStream
 {
-	public MTUStream( byte[] buffer ) : base( buffer ) { }
+	public BFMUStream( byte[] buffer ) : base( buffer ) { }
 }

@@ -6,18 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenTPW;
-public sealed class MTUReader : BaseFormat
+public sealed class BFMUReader : BaseFormat
 {
 	private BFMUStream memoryStream;
 	public byte[] buffer;
 
-	public MTUReader( string path )
+	public BFMUReader( string path )
 	{
 		using var fileStream = File.OpenRead( path );
 		ReadFromStream( fileStream );
 	}
 
-	public MTUReader( Stream stream )
+	public BFMUReader( Stream stream )
 	{
 		ReadFromStream( stream );
 	}
@@ -102,6 +102,8 @@ public sealed class MTUReader : BaseFormat
 	public char GetCharacter(int character)
 	{
 		var array = CharacterArray();
+		
+		// Characters are offset by 0x01 in the BFMU!
 		return array[character - 0x01];
 	}
 

@@ -1,9 +1,9 @@
 ﻿using System.Text;
 
 namespace OpenTPW;
-internal class BullfrogStringStream : BaseStream
+internal class BFSTStream : BaseStream
 {
-	public BullfrogStringStream( byte[] buffer ) : base( buffer ) { }
+	public BFSTStream( byte[] buffer ) : base( buffer ) { }
 
 	public byte[] ReadBytes( int length, bool bigEndian = false )
 	{

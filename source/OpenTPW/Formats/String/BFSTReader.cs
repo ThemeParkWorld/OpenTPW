@@ -5,22 +5,24 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Veldrid.MetalBindings;
 using Vulkan;
 
 namespace OpenTPW;
-public sealed class BullfrogStringReader : BaseFormat
+public sealed class BFSTReader : BaseFormat
 {
-	private BullfrogStringStream memoryStream;
-	private MTUReader mtuReader = new MTUReader( $"{Settings.Default.GamePath}\\data\\Language\\English\\MBToUni.dat" );
+	private BFSTStream memoryStream;
+	private BFMUReader mtuReader = new BFMUReader( $"{Settings.Default.GamePath}\\data\\Language\\English\\MBToUni.dat" );
 	public byte[] buffer;
 
-	public BullfrogStringReader (string path )
+
+	public BFSTReader (string path )
 	{
 		using var fileStream = File.OpenRead( path );
 		ReadFromStream( fileStream );
 	}
 
-	public BullfrogStringReader (Stream stream )
+	public BFSTReader (Stream stream )
 	{
 		ReadFromStream(stream);
 	}
@@ -39,7 +41,7 @@ public sealed class BullfrogStringReader : BaseFormat
 		tempStreamReader.BaseStream.Read( buffer, 0, fileLength );
 		tempStreamReader.Close();
 
-		memoryStream = new BullfrogStringStream( buffer );
+		memoryStream = new BFSTStream( buffer );
 
 		ReadFile();
 	}
@@ -80,17 +82,15 @@ public sealed class BullfrogStringReader : BaseFormat
 		
 		var initialMemPos = memoryStream.Position;
 
-		for ( int i = 0; i < count - 1; i++ )
-		{
-			Log.Info($"Back to initial pos: {initialMemPos}", true);
+		var charArray = mtuReader.CharacterArray();
 
+		for ( int i = 0; i < stringCount; i++ )
+		{
+			// Go to next offset based on iteration
 			memoryStream.Seek( 4 * (i), SeekOrigin.Current );
 
 			// Find offset number
 			int offset = memoryStream.ReadInt32();
-
-			//Log.Info( $"Memory Position: {memoryStream.Position}", true );
-			Log.Info( $"Offset: {offset}" , true);
 
 			// go to offset address
 			// need to account offset for inital 12 bytes
@@ -105,24 +105,23 @@ public sealed class BullfrogStringReader : BaseFormat
 
 			// String Length
 			var stringLength = memoryStream.ReadByte();
-			StringBuilder output = new StringBuilder();
 
 			//unused after string length
 			_ = memoryStream.ReadByte();
 			_ = memoryStream.ReadByte();
 
+			StringBuilder output = new StringBuilder();
+
 			// Characters
-			for ( int j = 0; j < stringLength - 1; j++ )
+			for ( int j = 0; j < stringLength; j++ )
 			{
 				var mtuPos = memoryStream.ReadByte();
-				var character = mtuReader.GetCharacter( mtuPos );
-				output.Append( character );
+				var readCharacter = mtuReader.GetCharacter( mtuPos );
+				output.Append( readCharacter );
 			}
 
-			Log.Info($"{output}", true );
-
-			// Padding (possibly longer?)
-			_ = memoryStream.Seek( 4, SeekOrigin.Current );
+			Log.Info( $"String ID: {i+1}", true );
+			Log.Info($"{output + "\n\n"}", true );
 
 			// Go back to intial position
 			memoryStream.Seek( initialMemPos, SeekOrigin.Begin );

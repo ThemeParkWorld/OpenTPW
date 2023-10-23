@@ -64,13 +64,13 @@ internal class QuietConsoleTab : BaseTab
 			if ( consoleInput == "BFST" )
 			{
 				string bfstFile = $"{Settings.Default.GamePath}\\data\\Language\\English\\ENTERTAINER_NAMES.str";
-				new BullfrogStringReader( bfstFile );
+				new BFSTReader( bfstFile );
 			}
 
 			if ( consoleInput == "MTU" )
 			{
 				string file = $"{Settings.Default.GamePath}\\data\\Language\\English\\MBToUni.dat";
-				new string(new MTUReader( file ).CharacterArray());
+				new BFMUReader( file ).CharacterArray();
 			}
 
 			Log.Info( $"Console input: '{consoleInput}'" );
