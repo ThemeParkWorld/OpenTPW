@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace OpenTPW.Formats.String;
-internal class BullfrogStringStream : MemoryStream
+namespace OpenTPW;
+internal class BFSTStream : BaseStream
 {
-	public BullfrogStringStream( byte[] buffer ) : base( buffer ) { }
+	public BFSTStream( byte[] buffer ) : base( buffer ) { }
 
 	public byte[] ReadBytes( int length, bool bigEndian = false )
 	{

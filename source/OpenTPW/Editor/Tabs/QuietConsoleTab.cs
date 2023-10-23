@@ -2,6 +2,7 @@
 using OpenTPW.Formats.String;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -62,9 +63,16 @@ internal class QuietConsoleTab : BaseTab
 		{
 			if ( consoleInput == "BFST" )
 			{
-				string file = $"{Settings.Default.GamePath}\\data\\Language\\English\\ENTERTAINER_NAMES.str";
-				new BullfrogStringReader( file );
+				string bfstFile = $"{Settings.Default.GamePath}\\data\\Language\\English\\ENTERTAINER_NAMES.str";
+				new BFSTReader( bfstFile );
 			}
+
+			if ( consoleInput == "MTU" )
+			{
+				string file = $"{Settings.Default.GamePath}\\data\\Language\\English\\MBToUni.dat";
+				new BFMUReader( file ).CharacterArray();
+			}
+
 			Log.Info( $"Console input: '{consoleInput}'" );
 			consoleInput = "";
 		}
