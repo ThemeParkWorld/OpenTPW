@@ -1,6 +1,7 @@
 ﻿using OpenTPW.Formats.String;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -46,7 +47,7 @@ public sealed class BFSTReader : BaseFormat
 		ReadFile();
 	}
 
-	private void ReadFile()
+	public string[] ReadFile()
 	{
 		memoryStream.Seek( 0, SeekOrigin.Begin );
 
@@ -76,13 +77,11 @@ public sealed class BFSTReader : BaseFormat
 
 
 		//String Count
-		var count = 3;
 		var stringCount = memoryStream.ReadInt32();
-		Log.Info($"String Count: {count}", true);
 		
+		//Save Pos and create
 		var initialMemPos = memoryStream.Position;
-
-		var charArray = mtuReader.CharacterArray();
+		List<string> outputList = new List<string>();
 
 		for ( int i = 0; i < stringCount; i++ )
 		{
@@ -110,23 +109,23 @@ public sealed class BFSTReader : BaseFormat
 			_ = memoryStream.ReadByte();
 			_ = memoryStream.ReadByte();
 
-			StringBuilder output = new StringBuilder();
-
+			StringBuilder str = new StringBuilder();
 			// Characters
 			for ( int j = 0; j < stringLength; j++ )
 			{
 				var mtuPos = memoryStream.ReadByte();
 				var readCharacter = mtuReader.GetCharacter( mtuPos );
-				output.Append( readCharacter );
+				str.Append( readCharacter );
 			}
-
-			Log.Info( $"String ID: {i+1}", true );
-			Log.Info($"{output + "\n\n"}", true );
+			
+			outputList.Add( str.ToString() );
 
 			// Go back to intial position
 			memoryStream.Seek( initialMemPos, SeekOrigin.Begin );
 			
 		}
 
+		return outputList.ToArray();
 	}
+
 }
