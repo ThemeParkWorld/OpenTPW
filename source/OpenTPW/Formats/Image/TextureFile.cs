@@ -160,7 +160,7 @@ public partial class TextureFile : BaseFormat
 			}
 		}
 
-		var texture = TextureBuilder.Default.FromData( flippedTextureData.ToArray(), (uint)header.Width, (uint)header.Height ).Build();
+		var texture = new Texture( flippedTextureData.ToArray(), header.Width, header.Height );
 		Texture = texture;
 		FileHeader = header;
 	}

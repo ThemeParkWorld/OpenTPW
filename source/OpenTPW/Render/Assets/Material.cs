@@ -1,6 +1,4 @@
-﻿using Veldrid;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 public class Material : Asset
 {
@@ -9,7 +7,7 @@ public class Material : Asset
 	public Texture DiffuseTexture { get; set; }
 
 	public static Material Default => new Material(
-			TextureBuilder.WorldTexture.FromPath( "content/textures/test.png" ).Build(),
+			new Texture( "content/textures/test.png" ),
 			ShaderBuilder.Default.WithVertex( "content/shaders/3d/3d.vert" )
 							 .WithFragment( "content/shaders/3d/3d.frag" )
 							 .Build(),
@@ -37,13 +35,5 @@ public class Material : Asset
 		UniformBufferType = uniformBufferType;
 
 		All.Add( this );
-	}
-
-	public bool IsDirty => DiffuseTexture.IsDirty;
-
-	public void GenerateMipmaps( CommandList commandList )
-	{
-		if ( DiffuseTexture.IsDirty )
-			DiffuseTexture.GenerateMipmaps( commandList );
 	}
 }
