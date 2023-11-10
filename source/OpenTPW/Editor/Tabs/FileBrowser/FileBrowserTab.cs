@@ -147,7 +147,7 @@ internal class FileBrowserTab : BaseTab
 	{
 		foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )
 		{
-			var icon = subDir.EndsWith( ".wad" ) ? ArchiveIcon : FolderIcon;
+			var icon = subDir.EndsWith( ".wad" ) || subDir.EndsWith( ".sdt" ) ? ArchiveIcon : FolderIcon;
 			IconCache.Add( (icon, subDir, true) );
 		}
 

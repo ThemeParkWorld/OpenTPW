@@ -7,7 +7,8 @@ public class FileSystem
 	public static FileSystem Game { get; } = new FileSystem( Settings.Default.GamePath );
 	private string BasePath { get; }
 
-	private Dictionary<string, WadArchive> ArchiveCache { get; } = new();
+	private Dictionary<string, WadArchive> WadArchiveCache { get; } = new();
+	private Dictionary<string, SDTArchive> SdtArchiveCache { get; } = new();
 
 	public FileSystem( string relativePath )
 	{
@@ -46,7 +47,12 @@ public class FileSystem
 	public string[] GetDirectories( string relativePath )
 	{
 		var dirs = InternalGetDirectories( GetAbsolutePath( relativePath ) );
-		var archives = InternalGetFiles( GetAbsolutePath( relativePath ) ).Where( x => x.EndsWith( ".wad" ) );
+		var archives = InternalGetFiles( GetAbsolutePath( relativePath ) ).Where( x => x.EndsWith( ".wad" ) || x.EndsWith( ".sdt" ));
+		
+		if( dirs == null )
+		{
+			return archives.ToArray();
+		}
 
 		return dirs.Concat( archives ).ToArray();
 	}
@@ -63,10 +69,21 @@ public class FileSystem
 	/// </summary>
 	private WadArchive GetArchive( string relativePath )
 	{
-		if ( !ArchiveCache.TryGetValue( relativePath, out var archive ) )
+		if ( !WadArchiveCache.TryGetValue( relativePath, out var archive ) )
 		{
 			archive = new WadArchive( GetAbsolutePath( relativePath ) );
-			ArchiveCache[relativePath] = archive;
+			WadArchiveCache[relativePath] = archive;
+		}
+
+		return archive;
+	}
+
+	private SDTArchive GetSdtArchive( string relativePath )
+	{
+		if( !SdtArchiveCache.TryGetValue( relativePath, out var archive ) )
+		{
+			archive = new SDTArchive( GetAbsolutePath( relativePath ) );
+			SdtArchiveCache[relativePath] = archive;
 		}
 
 		return archive;
@@ -78,6 +95,14 @@ public class FileSystem
 	private bool IsWad( string relativePath )
 	{
 		return relativePath.Contains( ".wad" );
+	}
+
+	/// <summary>
+	/// Checks if a path is located within (or points to) a SDT
+	/// </summary>
+	private bool IsSdt( string relativePath )
+	{
+		return relativePath.Contains( ".sdt" );
 	}
 
 	/// <summary>
@@ -100,6 +125,23 @@ public class FileSystem
 		return (archivePath, internalPath);
 	}
 
+	private (string SdtPath, string InternalPath) DissectSdtPath( string relativePath )
+	{
+		if ( !relativePath.Contains( ".sdt" ) )
+			return ("", "");
+
+		// Find archive in path
+		var archivePath = relativePath[..(relativePath.IndexOf( ".wad" ) + 4)];
+
+		if ( relativePath.EndsWith( ".sdt" ) )
+			return (archivePath, "");
+
+		// Find file in path
+		var internalPath = relativePath[(relativePath.IndexOf( ".wad" ) + 5)..];
+
+		return (archivePath, internalPath);
+	}
+
 	/// <summary>
 	/// Handles enumerating through directories based on whether they're part of a WAD or not
 	/// </summary>
@@ -111,6 +153,10 @@ public class FileSystem
 			var archive = GetArchive( archivePath );
 
 			return archive.GetDirectories( internalPath ).Select( x => relativePath + "\\" + x ).ToArray();
+		}
+		else if ( IsSdt (relativePath) )
+		{
+			return new string[0];
 		}
 		else
 		{
@@ -130,6 +176,12 @@ public class FileSystem
 
 			return archive.GetFiles( internalPath ).Select( x => relativePath + "\\" + x ).ToArray();
 		}
+		else if ( IsSdt( relativePath ) )
+		{ 
+			var archive = GetSdtArchive( relativePath );
+			return archive.GetFiles( relativePath ).Select( x => relativePath + "\\" + x ).ToArray();
+	
+		}
 		else
 		{
 			return Directory.GetFiles( relativePath );
@@ -148,6 +200,19 @@ public class FileSystem
 
 			var file = archive.GetFile( internalPath );
 
+			return new MemoryStream( file.Data );
+		}
+		else if ( relativePath.Contains(".mp2" ) )
+		{
+			int lastSlash = relativePath.LastIndexOf( '\\' );
+			string internalPath = relativePath.Substring( 0, lastSlash );
+			string name = relativePath.Substring( relativePath.LastIndexOf( '\\' ) + (relativePath.Length - lastSlash) );
+			
+			var archive = GetSdtArchive( internalPath );
+
+			
+			var file = archive.GetFile( name );
+			
 			return new MemoryStream( file.Data );
 		}
 		else
