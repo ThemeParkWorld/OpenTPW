@@ -1,16 +1,9 @@
-﻿using OpenTPW;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
+﻿
 namespace OpenTPW;
 public class SDTArchive
 {
 	private SDTStream memoryStream;
+	private MP2Reader mp2Reader;
 	public byte[] buffer;
 	public List<MP2File> soundFiles;
 
@@ -41,6 +34,7 @@ public class SDTArchive
 		tempStreamReader.BaseStream.Read( buffer, 0, fileLength );
 		tempStreamReader.Close();
 		memoryStream = new SDTStream( buffer );
+		mp2Reader = new MP2Reader( new MemoryStream(buffer) );
 
 		ReadArchive();
 	}
@@ -78,7 +72,7 @@ public class SDTArchive
 
 		// Gather Offsets
 		for ( int i = 0; i < fileCount; i++ ) 
-		{ 
+		{
 			offsets.Add( memoryStream.ReadInt32() );
 			Log.Info( $"Offset Found at: {offsets[i] }", true );
 		}
@@ -86,74 +80,10 @@ public class SDTArchive
 		Log.Info( $"", true );
 		Log.Info( $"", true );
 
-		var listPosition = 0;
 		foreach ( int offset in offsets )
 		{
-			Log.Info( $"Going to offset: {offset}" , true );
-			memoryStream.Seek( offset , SeekOrigin.Begin );
-			Log.Info( $"Seeked to memory position: {memoryStream.Position}", true );
-
-			// Check if we only need to entire file data
-			if ( !dataOnly ) 
-			{
-				var headerSize = memoryStream.ReadInt32();
-				Log.Info( $"Header Size: {headerSize}", true );
-
-				var dataSize = memoryStream.ReadInt32();
-				Log.Info( $"Data Size: {dataSize}", true );
-
-				var fileName = memoryStream.ReadString( 16 ).TrimEnd( '\0' );
-				Log.Info( $"File Name: {fileName}", true );
-
-				var sampleRate = memoryStream.ReadInt32();
-				Log.Info( $"Sample Rate: {sampleRate}", true );
-
-				var resolution = memoryStream.ReadInt32();
-				Log.Info( $"Resolution: {resolution}", true );
-
-				var soundType = memoryStream.ReadInt32();
-				Log.Info( $"Sound/File Type: {soundType}", true );
-
-
-				// Unknown
-				_ = memoryStream.ReadInt32();
-
-				var samples = memoryStream.ReadInt32();
-				Log.Info( $"Samples: {samples}", true );
-				Log.Info( $"", true );
-				Log.Info( $"", true );
-
-				// Unknown
-				_ = memoryStream.ReadInt32();
-
-				//Rest of Data
-				var fileData = memoryStream.ReadBytes( dataSize );
-
-				if ( fileName.Contains( ".mp2" ) )
-				{
-					MP2File soundFile = new MP2File( fileName, fileData, sampleRate, resolution, soundType, samples );
-				
-					soundFiles.Add( soundFile );
-				}
-			}
-			else
-			{
-				int size;
-				if ( offsets.Count < offsets[listPosition + 1] )
-				{
-					size = offsets[listPosition + 1] - offset;
-				}
-				else 
-				{
-					size = (int)(memoryStream.Length - memoryStream.Position);
-				}
-				
-				var data = memoryStream.ReadBytes( size );
-				MP2File soundFile = new MP2File( data );
-
-				soundFiles.Add( soundFile );
-			}
-			listPosition++;
+			MP2File mp2File = mp2Reader.GetFile( memoryStream, offset );
+			soundFiles.Add( mp2File );
 		}
 	}
 

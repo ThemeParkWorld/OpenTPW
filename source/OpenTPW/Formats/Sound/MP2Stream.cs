@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenTPW.Formats.Sound;
+namespace OpenTPW;
 public class MP2Stream : BaseStream
 {
 	public MP2File MP2File;

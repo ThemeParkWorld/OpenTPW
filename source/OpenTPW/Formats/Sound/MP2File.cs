@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 public sealed class MP2File
 {
 	public string Name { get; set; }
 	public int Header { get; set; }
+	public byte[] SoundData { get; set; }
 	public byte[] Data { get; set; }
 	public int SampleRate { get; set; }
 	public int Resolution { get; set; }
@@ -23,25 +18,17 @@ public sealed class MP2File
 	public SoundType _SoundType;
 	public int Samples { get; set; }
 
-	public MP2File( string name, byte[] data, int sampleRate, int resolution, int soundType, int samples )
+
+
+	public MP2File( int header, string name, byte[] soundData, int sampleRate, int resolution, int soundType, int samples, byte[] data )
 	{
+		this.Header = header;
 		this.Name = name;
-		this.Data = data;
+		this.SoundData = soundData;
 		this.SampleRate = sampleRate;
 		this.Resolution = resolution;
 		this._SoundType = (SoundType)soundType;
 		this.Samples = samples;
-	}
-	public MP2File( byte[] data )
-	{
 		this.Data = data;
-	}
-
-	public MemoryStream GetStream()
-	{
-		var stream = new MemoryStream( this.Data );
-		stream.Seek( 0 , SeekOrigin.Begin ); // Reset position to 0 so we start from the beginning.
-
-		return stream;
 	}
 }

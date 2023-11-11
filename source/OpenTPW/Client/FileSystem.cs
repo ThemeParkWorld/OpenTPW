@@ -202,7 +202,7 @@ public class FileSystem
 
 			return new MemoryStream( file.Data );
 		}
-		else if ( relativePath.Contains(".mp2" ) )
+		else if ( relativePath.Contains(".m" ) )
 		{
 			int lastSlash = relativePath.LastIndexOf( '\\' );
 			string internalPath = relativePath.Substring( 0, lastSlash );

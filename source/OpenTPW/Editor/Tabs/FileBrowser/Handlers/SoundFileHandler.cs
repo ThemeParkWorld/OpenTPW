@@ -1,25 +1,22 @@
 ﻿using ImGuiNET;
-using OpenTPW.Formats.Sound;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OpenTPW;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
-using Vortice.Multimedia;
+using NAudio;
+using NAudio.Wave;
 
 namespace OpenTPW;
 
 [FileHandler( @"\.mp2" )]
 public class SoundFileHandler : BaseFileHandler
 {
+	private MP2Reader mp2Reader;
 	private MP2File mp2File;
-	private SoundPlayer sound;
 
 	public SoundFileHandler( byte[] fileData ) : base( fileData )
 	{
-		mp2File = new MP2File( fileData );
-		sound = new SoundPlayer( mp2File.GetStream() );
+		using var stream = new MP2Stream( fileData );
+		mp2Reader = new MP2Reader( stream );
+		mp2File = mp2Reader.GetFile( stream );
 	}
 
 	public override void Draw()
@@ -28,22 +25,45 @@ public class SoundFileHandler : BaseFileHandler
 		base.Draw();
 
 		ImGui.Text( $"File type: MP2" );
+		ImGui.Text( $"File Name: {mp2File.Name}" );
+		ImGui.Text( $"Sound Type: {mp2File._SoundType.ToString()}" );
 		ImGui.PushStyleColor( ImGuiCol.FrameBg, OneDark.Background );
 		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
 		ImGui.PushFont( Editor.MonospaceFont );
-
-		sound.Load();
 		if ( ImGui.Button( "Play" ) )
 		{
-			if( sound.IsLoadCompleted ) 
-			{ 
-				sound.Play();
+			//using ( MemoryStream ms = new MemoryStream( data ) )
+			//{
+			//	using ( WaveStream wave = new BlockAlignReductionStream( WaveFormatConversionStream.CreatePcmStream( new Mp3FileReader( ms ) ) ) )
+			//	{
+			//		using ( WaveOutEvent waveOut = new WaveOutEvent() )
+			//		{
+			//			waveOut.Init( blockAlignedStream );
+			//			waveOut.Play();
+			//			while ( waveOut.PlaybackState == PlaybackState.Playing )
+			//			{
+			//				System.Threading.Thread.Sleep( 100 );
+			//			}
+			//		}
+			//	}
+			//}
+
+			BufferedWaveProvider waveProvider = new BufferedWaveProvider( new WaveFormat( mp2File.SampleRate, 1 ) );
+			using ( WaveOutEvent waveOut = new WaveOutEvent() )
+			{
+				waveOut.Init( waveProvider );
+				waveOut.Play();
 			}
 		}
 
-		if( ImGui.Button( "Stop" ) )
+
+		if ( ImGui.Button( "Stop" ) )
 		{
-			sound.Stop();
+		}
+
+		if( ImGui.Button( "Create File" ) )
+		{
+			System.IO.File.WriteAllBytes( $"content\\audio\\{mp2File.Name}", mp2File.Data );
 		}
 
 		ImGui.PopFont();
