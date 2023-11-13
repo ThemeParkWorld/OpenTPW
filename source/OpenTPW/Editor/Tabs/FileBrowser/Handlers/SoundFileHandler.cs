@@ -1,8 +1,4 @@
 ﻿using ImGuiNET;
-using OpenTPW;
-using System.Media;
-using NAudio;
-using NAudio.Wave;
 
 namespace OpenTPW;
 
@@ -21,49 +17,21 @@ public class SoundFileHandler : BaseFileHandler
 
 	public override void Draw()
 	{
-
 		base.Draw();
 
 		ImGui.Text( $"File type: MP2" );
 		ImGui.Text( $"File Name: {mp2File.Name}" );
-		ImGui.Text( $"Sound Type: {mp2File._SoundType.ToString()}" );
 		ImGui.PushStyleColor( ImGuiCol.FrameBg, OneDark.Background );
 		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
 		ImGui.PushFont( Editor.MonospaceFont );
 		if ( ImGui.Button( "Play" ) )
 		{
-			//using ( MemoryStream ms = new MemoryStream( data ) )
-			//{
-			//	using ( WaveStream wave = new BlockAlignReductionStream( WaveFormatConversionStream.CreatePcmStream( new Mp3FileReader( ms ) ) ) )
-			//	{
-			//		using ( WaveOutEvent waveOut = new WaveOutEvent() )
-			//		{
-			//			waveOut.Init( blockAlignedStream );
-			//			waveOut.Play();
-			//			while ( waveOut.PlaybackState == PlaybackState.Playing )
-			//			{
-			//				System.Threading.Thread.Sleep( 100 );
-			//			}
-			//		}
-			//	}
-			//}
-
-			BufferedWaveProvider waveProvider = new BufferedWaveProvider( new WaveFormat( mp2File.SampleRate, 1 ) );
-			using ( WaveOutEvent waveOut = new WaveOutEvent() )
-			{
-				waveOut.Init( waveProvider );
-				waveOut.Play();
-			}
+			AudioPlayer.PlaySound( new MemoryStream( mp2File.Data ) );
 		}
-
 
 		if ( ImGui.Button( "Stop" ) )
 		{
-		}
 
-		if( ImGui.Button( "Create File" ) )
-		{
-			System.IO.File.WriteAllBytes( $"content\\audio\\{mp2File.Name}", mp2File.Data );
 		}
 
 		ImGui.PopFont();
