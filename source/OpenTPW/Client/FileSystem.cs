@@ -104,6 +104,11 @@ public class FileSystem
 	{
 		return relativePath.Contains( ".sdt" );
 	}
+	private bool IsMP2( string relativePath )
+	{
+		return relativePath.Contains( ".m" ) && relativePath.Contains( ".sdt" );
+	}
+
 
 	/// <summary>
 	/// Gets the archive path and internal path for a particular path
@@ -202,11 +207,12 @@ public class FileSystem
 
 			return new MemoryStream( file.Data );
 		}
-		else if ( relativePath.Contains(".m" ) )
+		else if ( IsMP2( relativePath ) )
 		{
 			int lastSlash = relativePath.LastIndexOf( '\\' );
 			string internalPath = relativePath.Substring( 0, lastSlash );
-			string name = relativePath.Substring( relativePath.LastIndexOf( '\\' ) + (relativePath.Length - lastSlash) );
+			int length = relativePath.Length;
+			string name = relativePath.Substring( internalPath.Length + 1 , relativePath.Length - internalPath.Length - 1 );  // +1 on index so we start after the '\' and -1 so we account for the index change prior
 			
 			var archive = GetSdtArchive( internalPath );
 
