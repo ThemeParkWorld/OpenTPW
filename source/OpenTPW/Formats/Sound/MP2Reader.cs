@@ -1,5 +1,9 @@
 ﻿
 namespace OpenTPW;
+
+
+// BIG SHOUT TO Toksisitee - https://github.com/Toksisitee/PopSoundEditor
+
 public class MP2Reader : BaseFormat
 {
 	private MP2Stream memoryStream;
@@ -39,8 +43,8 @@ public class MP2Reader : BaseFormat
 		 * 4 bytes: Header size
 		 * 4 bytes: Data size
 		 * 16 bytes: File name (usually null terminated)
-		 * 4 bytes: Sample rate
-		 * 4 bytes: Resolution
+		 * 4 bytes: Sample rate (Int16)
+		 * 4 bytes: BitsPerSample
 		 * 4 bytes: Sound type
 		 * 4 bytes: Unknown
 		 * 4 bytes: Samples
@@ -58,11 +62,25 @@ public class MP2Reader : BaseFormat
 		var fileName = memoryStream.ReadString( 16 ).TrimEnd( '\0' );
 		Log.Info( $"File Name: {fileName}", true );
 
-		var sampleRate = memoryStream.ReadInt32();
+		if ( !fileName.EndsWith( ".mp2" ) )
+		{
+			bool hasExtension = fileName.Contains( '.' );
+			if ( !hasExtension )
+			{
+				fileName += ".mp2";
+			}
+			else
+			{
+				fileName = fileName.Substring( 0, fileName.LastIndexOf( "." ) ) + ".mp2";
+			}
+
+		}
+
+		var sampleRate = memoryStream.ReadInt16();
 		Log.Info( $"Sample Rate: {sampleRate}", true );
 
-		var resolution = memoryStream.ReadInt32();
-		Log.Info( $"Resolution: {resolution}", true );
+		var bitsPerSample = memoryStream.ReadInt32();
+		Log.Info( $"Resolution: {bitsPerSample}", true );
 
 		var soundType = memoryStream.ReadInt32();
 		Log.Info( $"Sound/File Type: {soundType}", true );
@@ -79,18 +97,17 @@ public class MP2Reader : BaseFormat
 		// Unknown
 		_ = memoryStream.ReadInt32();
 
-		//Rest of Data
+		// Rest of Data
 		var soundData = memoryStream.ReadBytes( soundDataSize );
 
 		// Gather full byte data of file
-		// 48 = the amount of bytes read before this check
-		var dataSize = 48 + soundDataSize;
+		var dataSize = headerSize + soundDataSize;
 
 		// We seek back to offset to capture full data set
 		memoryStream.Seek ( offset, SeekOrigin.Begin );
 		byte[] data = memoryStream.ReadBytes( dataSize );
 		
-		return new MP2File( headerSize, fileName, soundData, sampleRate, resolution, soundType, samples, data );
+		return new MP2File( headerSize, fileName, soundData, sampleRate, bitsPerSample, soundType, samples, data );
 
 
 	}

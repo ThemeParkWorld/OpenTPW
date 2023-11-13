@@ -6,7 +6,7 @@ public sealed class MP2File
 	public byte[] SoundData { get; set; }
 	public byte[] Data { get; set; }
 	public int SampleRate { get; set; }
-	public int Resolution { get; set; }
+	public int BitsPerSample { get; set; }
 	public enum SoundType
 	{
 		NONE = 0, //  on blanks
@@ -20,13 +20,13 @@ public sealed class MP2File
 
 
 
-	public MP2File( int header, string name, byte[] soundData, int sampleRate, int resolution, int soundType, int samples, byte[] data )
+	public MP2File( int header, string name, byte[] soundData, int sampleRate, int bitsPerSample, int soundType, int samples, byte[] data )
 	{
 		this.Header = header;
 		this.Name = name;
 		this.SoundData = soundData;
-		this.SampleRate = sampleRate;
-		this.Resolution = resolution;
+		this.SampleRate = 22050;
+		this.BitsPerSample = 16;
 		this._SoundType = (SoundType)soundType;
 		this.Samples = samples;
 		this.Data = data;
