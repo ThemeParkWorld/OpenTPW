@@ -24,6 +24,11 @@ public class BaseStream : MemoryStream
 		return Encoding.ASCII.GetString( ReadBytes( length, bigEndian ) );
 	}
 
+	public int ReadInt16( bool bigEndian = false )
+	{
+		return BitConverter.ToInt16( ReadBytes( 4, bigEndian ), 0 );
+	}
+
 	public int ReadInt32( bool bigEndian = false )
 	{
 		return BitConverter.ToInt32( ReadBytes( 4, bigEndian ), 0 );
