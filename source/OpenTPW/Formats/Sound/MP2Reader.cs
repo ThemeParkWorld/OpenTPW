@@ -38,7 +38,6 @@ public class MP2Reader : BaseFormat
 
 	public MP2File GetFile( MemoryStream stream, int offset = 0, bool dataOnly = false )
 	{
-
 		/*
 		 * 4 bytes: Header size
 		 * 4 bytes: Data size
@@ -54,14 +53,10 @@ public class MP2Reader : BaseFormat
 		memoryStream.Seek( offset, SeekOrigin.Begin );
 
 		var headerSize = memoryStream.ReadInt32();
-		Log.Info( $"Header Size: {headerSize}", true );
-
 		var soundDataSize = memoryStream.ReadInt32();
-		Log.Info( $"Data Size: {soundDataSize}", true );
-
 		var fileName = memoryStream.ReadString( 16 ).TrimEnd( '\0' );
-		Log.Info( $"File Name: {fileName}", true );
-
+		
+		// Add MP2 to end of file so we can handle it properly
 		if ( !fileName.EndsWith( ".mp2" ) )
 		{
 			bool hasExtension = fileName.Contains( '.' );
@@ -77,22 +72,13 @@ public class MP2Reader : BaseFormat
 		}
 
 		var sampleRate = memoryStream.ReadInt16();
-		Log.Info( $"Sample Rate: {sampleRate}", true );
-
 		var bitsPerSample = memoryStream.ReadInt32();
-		Log.Info( $"Resolution: {bitsPerSample}", true );
-
 		var soundType = memoryStream.ReadInt32();
-		Log.Info( $"Sound/File Type: {soundType}", true );
-
 
 		// Unknown
 		_ = memoryStream.ReadInt32();
 
 		var samples = memoryStream.ReadInt32();
-		Log.Info( $"Samples: {samples}", true );
-		Log.Info( $"", true );
-		Log.Info( $"", true );
 
 		// Unknown
 		_ = memoryStream.ReadInt32();
@@ -108,7 +94,5 @@ public class MP2Reader : BaseFormat
 		byte[] data = memoryStream.ReadBytes( dataSize );
 		
 		return new MP2File( headerSize, fileName, soundData, sampleRate, bitsPerSample, soundType, samples, data );
-
-
 	}
 }
