@@ -19,7 +19,7 @@ public class FileSystem
 	{
 		var path = Path.Combine( this.BasePath, relativePath );
 
-		if ( !File.Exists( path ) && !Directory.Exists( path ) && !ignorePathNotFound && !IsWad( path ) )
+		if ( !File.Exists( path ) && !Directory.Exists( path ) && !ignorePathNotFound && !IsWad( path ) && !IsSdt( path ) )
 			Log.Warning( $"Path not found: {path}. Continuing anyway." );
 
 		return path;
@@ -61,7 +61,7 @@ public class FileSystem
 	{
 		var dirs = InternalGetFiles( GetAbsolutePath( relativePath ) );
 
-		return dirs.Where( x => !x.EndsWith( ".wad" ) ).ToArray();
+		return dirs.Where( x => !x.EndsWith( ".wad" ) || !x.EndsWith(".sdt" ) ).ToArray();
 	}
 
 	/// <summary>
@@ -130,19 +130,19 @@ public class FileSystem
 		return (archivePath, internalPath);
 	}
 
-	private (string SdtPath, string InternalPath) DissectSdtPath( string relativePath )
+	private (string SdtPath, string FileName) DissectSdtPath( string relativePath )
 	{
 		if ( !relativePath.Contains( ".sdt" ) )
 			return ("", "");
 
 		// Find archive in path
-		var archivePath = relativePath[..(relativePath.IndexOf( ".wad" ) + 4)];
+		var archivePath = relativePath[..(relativePath.IndexOf( ".sdt" ) + 4)];
 
 		if ( relativePath.EndsWith( ".sdt" ) )
 			return (archivePath, "");
 
 		// Find file in path
-		var internalPath = relativePath[(relativePath.IndexOf( ".wad" ) + 5)..];
+		var internalPath = relativePath[(relativePath.IndexOf( ".sdt" ) + 5)..];
 
 		return (archivePath, internalPath);
 	}
@@ -161,7 +161,7 @@ public class FileSystem
 		}
 		else if ( IsSdt (relativePath) )
 		{
-			return new string[0];
+			return null;
 		}
 		else
 		{
@@ -182,8 +182,9 @@ public class FileSystem
 			return archive.GetFiles( internalPath ).Select( x => relativePath + "\\" + x ).ToArray();
 		}
 		else if ( IsSdt( relativePath ) )
-		{ 
-			var archive = GetSdtArchive( relativePath );
+		{
+			var (archivePath, fileName) = DissectSdtPath( relativePath );
+			var archive = GetSdtArchive( archivePath );
 			return archive.GetFiles( relativePath ).Select( x => relativePath + "\\" + x ).ToArray();
 	
 		}
@@ -209,15 +210,10 @@ public class FileSystem
 		}
 		else if ( IsMP2( relativePath ) )
 		{
-			int lastSlash = relativePath.LastIndexOf( '\\' );
-			string internalPath = relativePath.Substring( 0, lastSlash );
-			int length = relativePath.Length;
-			string name = relativePath.Substring( internalPath.Length + 1 , relativePath.Length - internalPath.Length - 1 );  // +1 on index so we start after the '\' and -1 so we account for the index change prior
-			
-			var archive = GetSdtArchive( internalPath );
+			var (archivePath, fileName) = DissectSdtPath( relativePath );
+			var archive = GetSdtArchive( archivePath );
 
-			
-			var file = archive.GetFile( name );
+			var file = archive.GetFile( fileName );
 			
 			return new MemoryStream( file.Data );
 		}
