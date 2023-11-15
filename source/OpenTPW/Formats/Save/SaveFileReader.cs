@@ -1,12 +1,8 @@
-﻿using OpenTPW.Formats.String;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using System.IO.Compression;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace OpenTPW.Formats.Save;
+namespace OpenTPW;
 public class SaveFileReader : BaseFormat
 {
 	private SaveFileStream memoryStream;
@@ -43,11 +39,35 @@ public class SaveFileReader : BaseFormat
 		if( magicNumber != "F4010000" )
 			throw new Exception( $"Magic number did not match: {magicNumber}" );
 
-		ReadFromFile();
+		ReadFile();
 	}
 
-	private void ReadFromFile()
+	private void ReadFile()
 	{
+		/*
+			
+		Header
+			4 bytes: Magic number - F4 01 00 00
+			Copyright notice - 0x0004 to 0x033B
+			Padding - 0x033C to 0x0603
+			
+		File info
+			4 bytes: File type (00 01 22 19)
+			1 byte: File version (85)
+			1 byte: Online flag (00 = offline save, 01 = upload.LAYS)
+			2 bytes: Padding
+			If online flag set: 	Unknown data - 0x060C to 0x0846
+			
+		Data	
+			## ZLIB Header ##
+			4 bytes: Magic number - BILZ
+			4 bytes: Unknown
+			4 bytes: Compressed length
+			16 bytes: Unknown
+			2 bytes: ZLIB Compression Header
+			ZLIB stream begins after this point, continues to end of file
+		*/
+
 		int copyrightSize = 824; //Character count with spaces adds to 824
 
 		var copyrightCharacters = memoryStream.ReadChars( copyrightSize );
@@ -57,9 +77,58 @@ public class SaveFileReader : BaseFormat
 			copyright += c;
 		}
 
-		if ( memoryStream.ReadByte() != 0 )
-			_ = memoryStream.ReadByte();
+		memoryStream.Seek( 0x0604 , SeekOrigin.Begin );
 
+		var fileType = memoryStream.ReadInt32();
 
+		var fileVersion = memoryStream.ReadByte();
+		if ( fileVersion != 133 )
+			throw new Exception( $"File version is not 133." );
+
+		// File flag
+		bool isOnline = memoryStream.ReadByte() != 0 ? true : false;
+
+		// Padding
+		_ = memoryStream.ReadBytes( 2 );
+
+		if( isOnline )
+			throw new Exception( "File is online, no compatibility for this yet." );
+
+		// Padding
+		_ = memoryStream.ReadByte();
+
+		// Start of Data
+		var magicNumber = memoryStream.ReadString( 4 );
+
+		if ( magicNumber != "BILZ" )
+			throw new Exception( $"Magic number did not match: {magicNumber}" );
+
+		// Unknown
+		_ = memoryStream.ReadInt32();
+
+		var compressedLength = memoryStream.ReadInt32();
+
+		// Unknown - 16 bytes
+		_ = memoryStream.ReadBytes( 16 );
+		
+		// get bytes before ZLIB Header
+		var initialPos = memoryStream.Position;
+
+		// Compression header
+		//var compressionHeader = memoryStream.ReadBytes( 2 );
+
+		byte[] output = new byte[compressedLength];
+		using ( MemoryStream uncompressedStream = new MemoryStream() )
+		//using ( DeflateStream compressedFile = new DeflateStream( memoryStream, CompressionMode.Decompress ) )
+		//{
+		//	compressedFile.CopyTo( uncompressedStream );
+		//	output = uncompressedStream.ToArray();
+		//	Log.Info( $"{Encoding.ASCII.GetString( output )}", true );
+		//}
+		using ( InflaterInputStream compressed = new InflaterInputStream( memoryStream ) )
+		{
+			compressed.CopyTo(uncompressedStream);
+			output = uncompressedStream.ToArray();
+		}
 	}
 }
