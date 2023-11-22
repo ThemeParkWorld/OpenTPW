@@ -3,11 +3,10 @@ using System.Text;
 using System.Xml;
 
 namespace OpenTPW;
-[FileHandler( @"\.TPWS" )]
+[FileHandler( @"\.(TPWS|INTS|LAYS)" )]
 public class SaveFileHandler : BaseFileHandler
 {
 	private SaveFileReader reader;
-	private char[] output;
 	private string text;
 
 	public SaveFileHandler( byte[] fileData ) : base( fileData )
