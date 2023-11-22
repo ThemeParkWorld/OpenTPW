@@ -1,6 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using System.IO.Compression;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OpenTPW;
 public class SaveFileReader : BaseFormat
@@ -33,17 +33,12 @@ public class SaveFileReader : BaseFormat
 		tempStreamReader.BaseStream.Read( buffer, 0, fileLength );
 		tempStreamReader.Close();
 		memoryStream = new SaveFileStream( buffer );
-
-		var magicNumber = memoryStream.ReadHex( 4 );
-
-		if( magicNumber != "F4010000" )
-			throw new Exception( $"Magic number did not match: {magicNumber}" );
-
-		ReadFile();
 	}
 
-	private void ReadFile()
+	public byte[] ReadFile()
 	{
+		memoryStream.Seek ( 0 , SeekOrigin.Begin );
+
 		/*
 			
 		Header
@@ -67,6 +62,11 @@ public class SaveFileReader : BaseFormat
 			2 bytes: ZLIB Compression Header
 			ZLIB stream begins after this point, continues to end of file
 		*/
+
+		var magicNumber = memoryStream.ReadHex( 4 );
+
+		if ( magicNumber != "F4010000" )
+			throw new Exception( $"Magic number did not match: {magicNumber}" );
 
 		int copyrightSize = 824; //Character count with spaces adds to 824
 
@@ -98,10 +98,10 @@ public class SaveFileReader : BaseFormat
 		_ = memoryStream.ReadByte();
 
 		// Start of Data
-		var magicNumber = memoryStream.ReadString( 4 );
+		var dataMagicNumber = memoryStream.ReadString( 4 );
 
-		if ( magicNumber != "BILZ" )
-			throw new Exception( $"Magic number did not match: {magicNumber}" );
+		if ( dataMagicNumber != "BILZ" )
+			throw new Exception( $"Magic number did not match: {dataMagicNumber}" );
 
 		// Unknown
 		_ = memoryStream.ReadInt32();
@@ -119,16 +119,21 @@ public class SaveFileReader : BaseFormat
 
 		byte[] output = new byte[compressedLength];
 		using ( MemoryStream uncompressedStream = new MemoryStream() )
-		//using ( DeflateStream compressedFile = new DeflateStream( memoryStream, CompressionMode.Decompress ) )
-		//{
-		//	compressedFile.CopyTo( uncompressedStream );
-		//	output = uncompressedStream.ToArray();
-		//	Log.Info( $"{Encoding.ASCII.GetString( output )}", true );
-		//}
 		using ( InflaterInputStream compressed = new InflaterInputStream( memoryStream ) )
 		{
 			compressed.CopyTo(uncompressedStream);
-			output = uncompressedStream.ToArray();
+			return uncompressedStream.ToArray();
 		}
+	}
+
+	/// <summary>
+	/// Converts the save file from byte array to a "readable" string
+	/// (removes all null entries after string conversion)
+	/// </summary>
+	/// <returns></returns>
+	public string FileToString()
+	{
+		var output = ReadFile();
+		return Encoding.ASCII.GetString( output ).Replace( "\0", string.Empty );
 	}
 }
