@@ -42,7 +42,7 @@ Contributions to this project are greatly appreciated; please follow these steps
 
 ## License
 
-This project is licensed under the MPL-2.0 license; a copy of this license is available at [LICENSE.md](https://github.com/ThemeParkWorld/OpenTPW/blob/main/LICENSE.md).
+This project is licensed under the MIT license; a copy of this license is available at [LICENSE.md](https://github.com/ThemeParkWorld/OpenTPW/blob/main/LICENSE.md).
 
 ## Acknowledgements
 * [Badges](https://shields.io)
