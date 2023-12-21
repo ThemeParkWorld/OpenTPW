@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenTPW;
-[FileHandler( @"\.str" )]
+[FileHandler( @"\.str", "content/icons/strings.png" )]
 public class StringFileHandler : BaseFileHandler
 {
 	private BFSTReader reader;

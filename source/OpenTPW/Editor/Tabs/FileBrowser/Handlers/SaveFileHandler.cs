@@ -3,7 +3,7 @@ using System.Text;
 using System.Xml;
 
 namespace OpenTPW;
-[FileHandler( @"\.(TPWS|INTS|LAYS)" )]
+[FileHandler( @"\.(TPWS|INTS|LAYS)", "content/icons/save.png" )]
 public class SaveFileHandler : BaseFileHandler
 {
 	private SaveFileReader reader;

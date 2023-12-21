@@ -2,7 +2,7 @@
 
 namespace OpenTPW;
 
-[FileHandler( @"\.mp2" )]
+[FileHandler( @"\.mp2", "content/icons/sound.png" )]
 public class SoundFileHandler : BaseFileHandler
 {
 	private MP2Reader mp2Reader;

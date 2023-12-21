@@ -2,7 +2,7 @@
 
 namespace OpenTPW;
 
-[FileHandler( @"\.sam" )]
+[FileHandler( @"\.sam", "content/icons/settings.png" )]
 public class SettingsFileHandler : BaseFileHandler
 {
 	private SettingsFile settingsFile;
