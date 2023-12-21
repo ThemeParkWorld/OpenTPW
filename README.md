@@ -23,6 +23,31 @@
 
 OpenTPW is a re-implementation of [Sim Theme Park / Theme Park World](https://en.wikipedia.org/wiki/Theme_Park_World), requiring an installation the original game and its assets in order to run. OpenTPW aims to re-create the same experience as the original game. While OpenTPW was initially created as it is quite difficult to get Sim Theme Park to run on modern hardware and on a modern operating system, it also aims to somewhat re-introduce the original online aspect of the game - the servers of which have since been shut down.
 
+## Status
+
+OpenTPW is currently in a very early stage of development, and is not yet playable.
+
+### File Formats
+
+- ❌ - Not Implemented
+- ⚠️ - Partially Implemented
+- ✅ - Implemented
+
+| Format                                                  | Status |
+|---------------------------------------------------------|--------|
+| Fonts ([.BF4](https://opentpw.gu3.me/formats/bf4.html))                      | ❌     |
+| Strings ([.BFMU](https://opentpw.gu3.me/formats/bfmu.html), [.BFST](https://opentpw.gu3.me/formats/bfst.html), [.BFUM](https://opentpw.gu3.me/formats/bfum.html)) | ✅     |
+| Lip Sync ([.LIPS](https://opentpw.gu3.me/formats/lips.html))                  | ❌     |
+| Models ([.MD2](https://opentpw.gu3.me/formats/m3d2.html))                      | ❌     |
+| Map Data ([.MAP](https://opentpw.gu3.me/formats/map.html))                    | ⚠️     |
+| Materials ([.MTR](https://opentpw.gu3.me/formats/mtr.html))                   | ❌     |
+| Ride Scripts ([.RSE](https://opentpw.gu3.me/formats/rsse.html))                | ⚠️     |
+| Settings ([.SAM](https://opentpw.gu3.me/formats/sam.html))                    | ✅     |
+| Sounds ([.SDT](https://opentpw.gu3.me/formats/sdt.html), .MP2)         | ✅     |
+| Save Files ([.TPWS](https://opentpw.gu3.me/formats/tpws-ints-lays.html))                | ⚠️     |
+| Video ([.TQI](https://opentpw.gu3.me/formats/tqi.html))                       | ❌     |
+| Textures ([.WCT](https://opentpw.gu3.me/formats/wct.html))                    | ⚠️     |
+
 ## Prerequisites
 
 - A copy of the original game (either Theme Park World or Sim Theme Park)
