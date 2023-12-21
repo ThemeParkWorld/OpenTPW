@@ -44,10 +44,21 @@ public class FileSystem
 		return InternalOpenFile( GetAbsolutePath( relativePath ) );
 	}
 
+	private bool HasExtension( string name, string extension )
+	{
+		if ( name.EndsWith( extension, StringComparison.OrdinalIgnoreCase ) )
+			return true;
+
+		if ( name.EndsWith($".{extension}", StringComparison.OrdinalIgnoreCase ) )
+			return true;
+
+		return false;
+	}
+
 	public string[] GetDirectories( string relativePath )
 	{
 		var dirs = InternalGetDirectories( GetAbsolutePath( relativePath ) );
-		var archives = InternalGetFiles( GetAbsolutePath( relativePath ) ).Where( x => x.EndsWith( ".wad" ) || x.EndsWith( ".sdt" ));
+		var archives = InternalGetFiles( GetAbsolutePath( relativePath ) ).Where( x => HasExtension( x, ".wad" ) || HasExtension( x, ".sdt" ));
 		
 		if( dirs == null )
 		{
@@ -61,7 +72,7 @@ public class FileSystem
 	{
 		var dirs = InternalGetFiles( GetAbsolutePath( relativePath ) );
 
-		return dirs.Where( x => !x.EndsWith( ".wad" ) || !x.EndsWith(".sdt" ) ).ToArray();
+		return dirs.Where( x => !HasExtension( x, ".wad" ) && !HasExtension( x, ".sdt" ) ).ToArray();
 	}
 
 	/// <summary>
@@ -94,7 +105,7 @@ public class FileSystem
 	/// </summary>
 	private bool IsWad( string relativePath )
 	{
-		return relativePath.Contains( ".wad" );
+		return relativePath.Contains( ".wad", StringComparison.OrdinalIgnoreCase );
 	}
 
 	/// <summary>
@@ -102,47 +113,47 @@ public class FileSystem
 	/// </summary>
 	private bool IsSdt( string relativePath )
 	{
-		return relativePath.Contains( ".sdt" );
-	}
-	private bool IsMP2( string relativePath )
-	{
-		return relativePath.Contains( ".m" ) && relativePath.Contains( ".sdt" );
+		return relativePath.Contains( ".sdt", StringComparison.OrdinalIgnoreCase );
 	}
 
+	private bool IsMP2( string relativePath )
+	{
+		return relativePath.Contains( ".m", StringComparison.OrdinalIgnoreCase ) && relativePath.Contains( ".sdt", StringComparison.OrdinalIgnoreCase );
+	}
 
 	/// <summary>
 	/// Gets the archive path and internal path for a particular path
 	/// </summary>
 	private (string WadPath, string InternalPath) DissectPath( string relativePath )
 	{
-		if ( !relativePath.Contains( ".wad" ) )
+		if ( !relativePath.Contains( ".wad", StringComparison.OrdinalIgnoreCase ) )
 			return ("", "");
 
 		// Find archive in path
-		var archivePath = relativePath[..(relativePath.IndexOf( ".wad" ) + 4)];
+		var archivePath = relativePath[..(relativePath.IndexOf( ".wad", StringComparison.OrdinalIgnoreCase ) + 4)];
 
-		if ( relativePath.EndsWith( ".wad" ) )
+		if ( HasExtension( relativePath, ".wad" ) )
 			return (archivePath, "");
 
 		// Find file in path
-		var internalPath = relativePath[(relativePath.IndexOf( ".wad" ) + 5)..];
+		var internalPath = relativePath[(relativePath.IndexOf( ".wad", StringComparison.OrdinalIgnoreCase ) + 5)..];
 
 		return (archivePath, internalPath);
 	}
 
 	private (string SdtPath, string FileName) DissectSdtPath( string relativePath )
 	{
-		if ( !relativePath.Contains( ".sdt" ) )
+		if ( !relativePath.Contains( ".sdt", StringComparison.OrdinalIgnoreCase ) )
 			return ("", "");
 
 		// Find archive in path
-		var archivePath = relativePath[..(relativePath.IndexOf( ".sdt" ) + 4)];
+		var archivePath = relativePath[..(relativePath.IndexOf( ".sdt", StringComparison.OrdinalIgnoreCase ) + 4)];
 
-		if ( relativePath.EndsWith( ".sdt" ) )
+		if ( HasExtension( relativePath, ".sdt" ) )
 			return (archivePath, "");
 
 		// Find file in path
-		var internalPath = relativePath[(relativePath.IndexOf( ".sdt" ) + 5)..];
+		var internalPath = relativePath[(relativePath.IndexOf( ".sdt", StringComparison.OrdinalIgnoreCase ) + 5)..];
 
 		return (archivePath, internalPath);
 	}
