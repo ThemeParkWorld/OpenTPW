@@ -42,6 +42,8 @@ public class SAMParser : BaseParser
 		var key = ConsumeWhile( c => !char.IsWhiteSpace( c ) );
 		ConsumeWhitespace();
 		var value = ConsumeWhile( c => !char.IsWhiteSpace( c ) && c != '#' );
+		ConsumeWhile( c => c != '\r' && c != '\n' );
+
 		return new SettingsPair { Key = key.Trim(), Value = value.Trim() };
 	}
 }
