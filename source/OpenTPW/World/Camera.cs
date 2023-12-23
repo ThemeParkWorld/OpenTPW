@@ -2,31 +2,36 @@
 
 namespace OpenTPW;
 
-public class Camera : Entity
+public static class Camera
 {
-	public Matrix4x4 ViewMatrix { get; set; }
-	public Matrix4x4 ProjMatrix { get; set; }
+	public static Matrix4x4 ViewMatrix { get; set; }
+	public static Matrix4x4 ProjMatrix { get; set; }
 
-	public Vector3 Forward => ViewMatrix.Forward();
-	public Vector3 Right => ViewMatrix.Right();
-	public Vector3 Up => ViewMatrix.Up();
+	public static Vector3 Forward => ViewMatrix.Forward();
+	public static Vector3 Right => ViewMatrix.Right();
+	public static Vector3 Up => ViewMatrix.Up();
 
-	private Vector3 velocity = new();
-	private Vector3 wishVelocity = new();
+	private static Vector3 velocity = new();
+	private static Vector3 wishVelocity = new();
 
-	private float wishYaw = 0f;
-	private float yaw = 0f;
-	private float wishHeight = 8f;
-	private float cameraSpeed = 128f;
+	private static float wishYaw = 0f;
+	private static float yaw = 0f;
+	private static float wishHeight = 8f;
+	private static float cameraSpeed = 128f;
 
-	private void CalcViewProjMatrix()
+	private static Vector2 mouseAnchor;
+	private static bool wasPressed = false;
+
+	public static Vector3 Position;
+
+	private static void CalcViewProjMatrix()
 	{
-		var lookAt = new Vector3( position.X, position.Y, 0 );
+		var lookAt = new Vector3( Position.X, Position.Y, 0 );
 
 		var cameraPos = lookAt + new Vector3(
-			MathF.Cos( yaw.DegreesToRadians() ) * position.Z,
-			MathF.Sin( yaw.DegreesToRadians() ) * position.Z,
-			position.Z
+			MathF.Cos( yaw.DegreesToRadians() ) * Position.Z,
+			MathF.Sin( yaw.DegreesToRadians() ) * Position.Z,
+			Position.Z
 		);
 
 		var cameraUp = new Vector3( 0, 0, 1 );
@@ -40,17 +45,11 @@ public class Camera : Entity
 		);
 	}
 
-	private Vector2 mouseAnchor;
-	private bool wasPressed = false;
-
-	public override void Update()
+	public static void Update()
 	{
-		base.Update();
-
 		//
 		// Get user input
 		//
-
 		var wishDir = new Vector3( Input.Forward, Input.Right, 0 ).Normal;
 
 		if ( Input.Mouse.Right && !wasPressed )
@@ -92,8 +91,8 @@ public class Camera : Entity
 		yaw = yaw.LerpTo( wishYaw, 10f * Time.Delta );
 
 		// Move camera
-		position += velocity;
-		position.Z = position.Z.LerpTo( wishHeight, 10f * Time.Delta );
+		Position += velocity;
+		Position.Z = Position.Z.LerpTo( wishHeight, 10f * Time.Delta );
 
 		// Run view/proj matrix calculations
 		CalcViewProjMatrix();

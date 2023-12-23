@@ -6,9 +6,7 @@ namespace OpenTPW;
 public class World
 {
 	public static World Current { get; set; }
-
 	public RootPanel Hud { get; set; }
-	public Camera Camera { get; set; }
 
 	public Sun Sun { get; set; }
 
@@ -25,7 +23,6 @@ public class World
 
 	private void SetupEntities()
 	{
-		Camera = new Camera();
 		Sun = new Sun() { position = new( 0, 10, 10 ) };
 		_ = new Terrain();
 		_ = new Sky();
@@ -45,6 +42,8 @@ public class World
 
 	public void Render( CommandList commandList )
 	{
+		Camera.Update();
+
 		Entity.All.ForEach( entity => entity.Render( commandList ) );
 	}
 
