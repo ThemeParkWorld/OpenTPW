@@ -12,8 +12,11 @@ public partial class Image : Panel
 		public Matrix4x4 g_mModel;
 	}
 
-	public Image( Texture texture )
+	public Image( string relativePath )
 	{
+		var textureFile = new TextureFile( relativePath );
+		var texture = new Texture( textureFile.Data.Data, textureFile.Data.Width, textureFile.Data.Height );
+
 		var material = new Material(
 			texture,
 			ShaderBuilder.Default.WithVertex( "content/shaders/test.vert" )

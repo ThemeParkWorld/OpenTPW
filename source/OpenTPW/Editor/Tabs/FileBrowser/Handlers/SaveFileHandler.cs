@@ -6,13 +6,13 @@ namespace OpenTPW;
 [FileHandler( @"\.(TPWS|INTS|LAYS)", "content/icons/save.png" )]
 public class SaveFileHandler : BaseFileHandler
 {
-	private SaveFileReader reader;
+	private SaveReader reader;
 	private string text;
 
 	public SaveFileHandler( byte[] fileData ) : base( fileData )
 	{
-		using var stream = new SaveFileStream( fileData );
-		reader = new SaveFileReader( stream );
+		using var stream = new ExpandedMemoryStream( fileData );
+		reader = new SaveReader( stream );
 		text = reader.FileToString();
 	}
 

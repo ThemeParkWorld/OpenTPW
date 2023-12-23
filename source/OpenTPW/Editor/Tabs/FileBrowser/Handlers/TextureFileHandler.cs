@@ -20,13 +20,13 @@ public class TextureFileHandler : BaseFileHandler
 		ImGui.Text( $"File type: Texture" );
 
 		var windowWidth = ImGui.GetWindowSize().X;
-		float ratio = textureFile.Texture.Height / (float)textureFile.Texture.Width;
+		float ratio = textureFile.Data.Height / (float)textureFile.Data.Width;
 
 		if ( ratio is float.NaN )
 			ratio = 1f;
 
 		ImGui.Text( textureFile.FileHeader.ToString() );
 
-		EditorHelpers.Image( textureFile.Texture, new Vector2( windowWidth, windowWidth * ratio ) );
+		// EditorHelpers.Image( textureFile.Texture, new Vector2( windowWidth, windowWidth * ratio ) );
 	}
 }

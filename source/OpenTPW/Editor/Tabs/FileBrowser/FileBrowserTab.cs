@@ -145,13 +145,13 @@ internal class FileBrowserTab : BaseTab
 
 	private void CacheDirectory( string rootPath, string directory )
 	{
-		foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )
+		foreach ( var subDir in FileSystem.GetDirectories( directory ) )
 		{
 			var icon = subDir.EndsWith( ".wad" ) || subDir.EndsWith( ".sdt" ) ? ArchiveIcon : FolderIcon;
 			IconCache.Add( (icon, subDir, true) );
 		}
 
-		foreach ( var file in FileSystem.Game.GetFiles( directory ) )
+		foreach ( var file in FileSystem.GetFiles( directory ) )
 		{
 			var fileHandler = FindFileHandler( Path.GetExtension( file ) );
 			var icon = fileHandler.Icon;
@@ -177,7 +177,7 @@ internal class FileBrowserTab : BaseTab
 				{
 					// Open the registered file handler for the selected file
 					var fileHandler = FindFileHandler( Path.GetExtension( icon.Path ) );
-					var fileData = FileSystem.Game.ReadAllBytes( icon.Path );
+					var fileData = FileSystem.ReadAllBytes( icon.Path );
 
 					var args = new object[] { fileData };
 					selectedFileHandler = Activator.CreateInstance( fileHandler.Type, args ) as BaseFileHandler;

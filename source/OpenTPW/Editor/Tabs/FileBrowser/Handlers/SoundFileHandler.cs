@@ -10,23 +10,22 @@ public class SoundFileHandler : BaseFileHandler
 
 	public SoundFileHandler( byte[] fileData ) : base( fileData )
 	{
-		using var stream = new MP2Stream( fileData );
+		using var stream = new ExpandedMemoryStream( fileData );
 		mp2Reader = new MP2Reader( stream );
 		mp2File = mp2Reader.GetFile( stream );
 	}
 
 	public override void Draw()
 	{
-		base.Draw();
-
 		ImGui.Text( $"File type: MP2" );
 		ImGui.Text( $"File Name: {mp2File.Name}" );
 		ImGui.PushStyleColor( ImGuiCol.FrameBg, OneDark.Background );
 		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
 		ImGui.PushFont( Editor.MonospaceFont );
+
 		if ( ImGui.Button( "Play" ) )
 		{
-			AudioPlayer.PlaySound( new MemoryStream( mp2File.Data ) );
+			// Sound.Play( new MemoryStream( mp2File.Data ) );
 		}
 
 		if ( ImGui.Button( "Stop" ) )

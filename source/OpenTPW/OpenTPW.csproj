@@ -34,6 +34,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\OpenTPW.Common\OpenTPW.Common.csproj" />
+	  <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Update="Settings.Designer.cs">
 			<DesignTimeSharedInput>True</DesignTimeSharedInput>
 			<AutoGen>True</AutoGen>

@@ -63,7 +63,15 @@ public class MapFileHandler : BaseFileHandler
 		foreach ( var b in data )
 		{
 			ImGui.PushStyleColor( ImGuiCol.Text, GetRandomColor( b ) );
-			ImGui.Text( "-" );
+			ImGui.Button( "-" );
+
+			if ( ImGui.IsItemHovered() )
+			{
+				ImGui.BeginTooltip();
+				ImGui.Text( $"Value: {b}" );
+				ImGui.EndTooltip();
+			}
+
 			ImGui.PopStyleColor( 1 );
 
 			i++;

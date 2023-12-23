@@ -1,20 +1,16 @@
 ﻿using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenTPW;
+
 [FileHandler( @"\.str", "content/icons/strings.png" )]
 public class StringFileHandler : BaseFileHandler
 {
-	private BFSTReader reader;
+	private StringFile stringFile;
 
 	public StringFileHandler( byte[] fileData ) : base( fileData )
 	{
-		using var stream = new BFSTStream( fileData );
-		reader = new BFSTReader( stream );
+		using var stream = new MemoryStream( fileData );
+		stringFile = new StringFile( stream );
 	}
 
 	public override void Draw()
@@ -26,15 +22,12 @@ public class StringFileHandler : BaseFileHandler
 		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
 		ImGui.PushFont( Editor.MonospaceFont );
 
-		var bfstOutput = reader.ReadFile();
-
-		foreach( var output in  bfstOutput )
+		foreach ( var entry in stringFile.Entries )
 		{
-			ImGui.Text( output );
+			ImGui.Text( entry );
 		}
 
 		ImGui.PopFont();
 		ImGui.PopStyleColor( 2 );
 	}
-
 }
