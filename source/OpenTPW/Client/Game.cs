@@ -4,15 +4,45 @@
 /// Handles the creation and management of various systems, including the game
 /// window.
 /// </summary>
-internal class Game
+internal static class Game
 {
 	public static Renderer renderer;
 
-	public Game()
+	[Flags]
+	public enum InitFlags
 	{
-		Log.Trace( "Initializing game" );
-		renderer = new();
+		None,
+		NoVid
+	}
 
+	private static InitFlags ParseInitFlagsFromArgs( string[] args )
+	{
+		var initFlags = InitFlags.None;
+
+		foreach ( var arg in args )
+		{
+			if ( arg.StartsWith( "-" ) )
+			{
+				var flag = arg[1..];
+				if ( Enum.TryParse<InitFlags>( flag, true, out var flagBit ) )
+				{
+					initFlags |= flagBit;
+				}
+			}
+		}
+
+		return initFlags;
+	}
+
+	public static void Run( string[] args )
+	{
+		var initFlags = ParseInitFlagsFromArgs( args );
+		Run( initFlags );
+	}
+
+	public static void Run( InitFlags initFlags = InitFlags.None )
+	{
+		renderer = new();
 		renderer.Run();
 	}
 }

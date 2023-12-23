@@ -7,7 +7,7 @@ namespace OpenTPW;
 
 public class Entity
 {
-	public Scene Scene { get; set; }
+	public Level Level { get; set; }
 	public static List<Entity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<Entity>().ToList();
 
 	/// <summary>
@@ -42,7 +42,7 @@ public class Entity
 
 	public Entity()
 	{
-		Scene = Scene.Current;
+		Level = Level.Current;
 		All.Add( this );
 		Name = $"{this.GetType().Name} {All.Count}";
 	}

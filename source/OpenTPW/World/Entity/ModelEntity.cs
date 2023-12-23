@@ -28,8 +28,8 @@ public partial class ModelEntity : Entity
 			g_mModel = ModelMatrix,
 			g_mView = Camera.ViewMatrix,
 			g_mProj = Camera.ProjMatrix,
-			g_vLightPos = Scene.SunLight.Position,
-			g_vLightColor = Scene.SunLight.Color,
+			g_vLightPos = Level.SunLight.Position,
+			g_vLightColor = Level.SunLight.Color,
 			g_vCameraPos = Camera.Position,
 
 			_padding0 = 0,

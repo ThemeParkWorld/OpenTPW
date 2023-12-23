@@ -3,21 +3,18 @@ using Veldrid;
 
 namespace OpenTPW;
 
-public class Scene
+public class Level
 {
-	internal static Scene Current { get; set; }
+	internal static Level Current { get; set; }
 
 	public RootPanel Hud { get; set; }
 	public Sun SunLight { get; set; }
 
-	public static Scene InitFromLevel( string levelName )
-	{
-		// todo: load info from levelName sam files
-		return new Scene();
-	}
+	public SettingsFile Global { get; private init; }
 
-	private Scene()
+	public Level( string levelName )
 	{
+		Global = new SettingsFile( $"data/levels/{levelName}/global.sam" );
 		Current = this;
 
 		SetupEntities();

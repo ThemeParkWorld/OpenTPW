@@ -1,5 +1,7 @@
 ﻿using Veldrid;
 using Veldrid.StartupUtilities;
+using static OpenTPW.Game;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace OpenTPW;
 
@@ -42,7 +44,8 @@ internal class Renderer
 
 		editor = new Editor( imguiRenderer );
 
-		Scene.InitFromLevel( "fantasy" );
+		var level = new Level( "fantasy" );
+		Log.Info( $"This level costs {level.Global["Keys.CostToEnter"]} keys to enter." );
 	}
 
 	private void MainLoop()
@@ -74,7 +77,7 @@ internal class Renderer
 
 	private void Render()
 	{
-		Scene.Current.Render( commandList );
+		Level.Current.Render( commandList );
 		imguiRenderer?.Render( Device, commandList );
 	}
 
@@ -88,7 +91,7 @@ internal class Renderer
 		Time.UpdateFrom( deltaTime );
 		Input.UpdateFrom( inputSnapshot );
 
-		Scene.Current.Update();
+		Level.Current.Update();
 		editor?.UpdateFrom( inputSnapshot );
 	}
 

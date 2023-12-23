@@ -14,6 +14,12 @@ internal class SceneTab : BaseTab
 		public string Name { get; set; }
 		public object? Value { get; set; }
 
+		public ReflectedThing( object o, string name )
+		{
+			Name = name;
+			Value = o;
+		}
+
 		public ReflectedThing( object o, FieldInfo fieldInfo )
 		{
 			Name = fieldInfo.Name;
@@ -55,6 +61,17 @@ internal class SceneTab : BaseTab
 		{
 			ImGui.SetNextItemWidth( -1 );
 			ImGui.SliderFloat( $"##thing_{thing.GetHashCode()}", ref f, 0.0f, 1.0f );
+		}
+		else if ( thing.Value is System.Collections.IList list )
+		{
+			EditorHelpers.DrawColoredText( $"List: [", OneDark.Info );
+
+			foreach ( var item in list )
+			{
+				DrawElement( new ReflectedThing( item, $"{item}" ) );
+			}
+
+			EditorHelpers.DrawColoredText( $"]", OneDark.Info );
 		}
 		else
 		{
