@@ -6,7 +6,7 @@ public class Sky : ModelEntity
 	{
 		base.Spawn();
 
-		var texture = new Texture( new byte[4] { 42, 205, 244, 255 }, 1, 1 );
+		var texture = new Texture( [42, 205, 244, 255], 1, 1 );
 
 		var shader = ShaderBuilder.Default.WithVertex( "content/shaders/3d/3d.vert" )
 								.WithFragment( "content/shaders/unlit/unlit.frag" )
@@ -17,6 +17,6 @@ public class Sky : ModelEntity
 		var material = new Material( texture, shader, uniformBufferType );
 
 		Model = Primitives.Cube.GenerateModel( material );
-		scale = new Vector3( -100f );
+		Scale = new Vector3( -100f );
 	}
 }

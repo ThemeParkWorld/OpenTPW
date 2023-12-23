@@ -10,7 +10,6 @@ internal class Renderer
 	private Editor? editor;
 
 	private ImGuiRenderer imguiRenderer;
-	private World world;
 	private DateTime lastFrame;
 
 	private CommandList commandList;
@@ -42,7 +41,8 @@ internal class Renderer
 			  window.SdlWindow.Height );
 
 		editor = new Editor( imguiRenderer );
-		world = new();
+
+		Scene.InitFromLevel( "fantasy" );
 	}
 
 	private void MainLoop()
@@ -74,7 +74,7 @@ internal class Renderer
 
 	private void Render()
 	{
-		world.Render( commandList );
+		Scene.Current.Render( commandList );
 		imguiRenderer?.Render( Device, commandList );
 	}
 
@@ -88,7 +88,7 @@ internal class Renderer
 		Time.UpdateFrom( deltaTime );
 		Input.UpdateFrom( inputSnapshot );
 
-		world.Update();
+		Scene.Current.Update();
 		editor?.UpdateFrom( inputSnapshot );
 	}
 

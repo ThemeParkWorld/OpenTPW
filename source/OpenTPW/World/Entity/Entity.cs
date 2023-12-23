@@ -7,23 +7,20 @@ namespace OpenTPW;
 
 public class Entity
 {
+	public Scene Scene { get; set; }
 	public static List<Entity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<Entity>().ToList();
-
-	//
-	// Transform
-	// These aren't properties because we want to be able to add to them
-	//
 
 	/// <summary>
 	/// Right, Up, Forward (FLU)
 	/// </summary>
-	public Vector3 position;
+	public Vector3 Position;
 
 	/// <summary>
 	/// Pitch, Yaw, Roll (PYR)
 	/// </summary>
-	public Vector3 rotation;
-	public Vector3 scale = Vector3.One;
+	public Vector3 Rotation;
+
+	public Vector3 Scale = Vector3.One;
 
 	public string Name { get; set; }
 
@@ -31,12 +28,13 @@ public class Entity
 	{
 		get
 		{
-			var matrix = Matrix4x4.CreateScale( scale );
-			matrix *= Matrix4x4.CreateTranslation( position );
+			var matrix = Matrix4x4.CreateScale( Scale );
+			matrix *= Matrix4x4.CreateTranslation( Position );
 			matrix *= Matrix4x4.CreateFromYawPitchRoll(
-				rotation.Y.DegreesToRadians(),
-				rotation.X.DegreesToRadians(),
-				rotation.Z.DegreesToRadians() );
+				Rotation.Y.DegreesToRadians(),
+				Rotation.X.DegreesToRadians(),
+				Rotation.Z.DegreesToRadians()
+			);
 
 			return matrix;
 		}
@@ -44,6 +42,7 @@ public class Entity
 
 	public Entity()
 	{
+		Scene = Scene.Current;
 		All.Add( this );
 		Name = $"{this.GetType().Name} {All.Count}";
 	}

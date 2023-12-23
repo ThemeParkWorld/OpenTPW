@@ -3,14 +3,20 @@ using Veldrid;
 
 namespace OpenTPW;
 
-public class World
+public class Scene
 {
-	public static World Current { get; set; }
+	internal static Scene Current { get; set; }
+
 	public RootPanel Hud { get; set; }
+	public Sun SunLight { get; set; }
 
-	public Sun Sun { get; set; }
+	public static Scene InitFromLevel( string levelName )
+	{
+		// todo: load info from levelName sam files
+		return new Scene();
+	}
 
-	public World()
+	private Scene()
 	{
 		Current = this;
 
@@ -23,10 +29,10 @@ public class World
 
 	private void SetupEntities()
 	{
-		Sun = new Sun() { position = new( 0, 10, 10 ) };
+		SunLight = new Sun() { Position = new( 0, 10, 10 ) };
+
 		_ = new Terrain();
 		_ = new Sky();
-		_ = new Ride( GameDir.GetPath( "/data/levels/jungle/rides/bouncy.wad" ) );
 	}
 
 	private void SetupHud()
