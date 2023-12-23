@@ -1,6 +1,6 @@
 ﻿namespace OpenTPW;
 
-public interface IArchive : IFileFormat
+public interface IArchive : IFileFormat, IDisposable
 {
 	/// <summary>
 	/// Disposes of the resources used by the archive
@@ -27,4 +27,11 @@ public interface IArchive : IFileFormat
 	/// <param name="internalPath"></param>
 	/// <returns></returns>
 	ArchiveFile GetFile( string internalPath );
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="internalPath"></param>
+	/// <returns></returns>
+	byte[] GetData( int offset, int length );
 }

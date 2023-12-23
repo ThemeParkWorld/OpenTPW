@@ -1,6 +1,6 @@
-﻿
-namespace OpenTPW;
-public class SDTArchive
+﻿namespace OpenTPW;
+
+public class SdtArchive : IArchive
 {
 	private ExpandedMemoryStream memoryStream;
 	private MP2Reader mp2Reader;
@@ -8,24 +8,25 @@ public class SDTArchive
 	public byte[] buffer;
 	public List<MP2File> soundFiles;
 
-	public SDTArchive( string path )
+	public SdtArchive( string path )
 	{
 		soundFiles = new List<MP2File>();
 		using var fileStream = File.OpenRead( path );
 		ReadFromStream( fileStream );
 	}
 
-	public SDTArchive( Stream stream )
+	public SdtArchive( Stream stream )
 	{
 		soundFiles = new List<MP2File>();
 		ReadFromStream( stream );
 	}
+
 	public void Dispose()
 	{
 		memoryStream.Dispose();
 	}
 
-	protected void ReadFromStream( Stream stream )
+	public void ReadFromStream( Stream stream )
 	{
 		// Set up read buffer
 		var tempStreamReader = new StreamReader( stream );
@@ -64,26 +65,11 @@ public class SDTArchive
 		*/
 
 		var fileCount = memoryStream.ReadInt32();
-		Log.Info( $"File Count: {fileCount}", true );
-		Log.Info( $"", true );
-		Log.Info( $"", true );
 
-		List<int> offsets = new List<int>();
-
-		// Gather Offsets
 		for ( int i = 0; i < fileCount; i++ ) 
 		{
-			offsets.Add( memoryStream.ReadInt32() );
-			Log.Info( $"Offset Found at: {offsets[i] }", true );
-		}
-
-		Log.Info( $"", true );
-		Log.Info( $"", true );
-
-		foreach ( int offset in offsets )
-		{
-			MP2File mp2File = mp2Reader.GetFile( memoryStream, offset );
-			soundFiles.Add( mp2File );
+			var file = mp2Reader.GetFile( memoryStream, memoryStream.ReadInt32() );
+			soundFiles.Add( file );
 		}
 	}
 
@@ -91,15 +77,22 @@ public class SDTArchive
 	{
 		return soundFiles.Select( x => x.Name ).ToArray();
 	}
+
 	public string[] GetDirectories( string internalPath )
 	{
-		return soundFiles.Select( x => x.Name ).ToArray();
+		// No directories in SDT files
+		return Array.Empty<string>();
 	}
 
-	public MP2File GetFile( string name )
+	public ArchiveFile GetFile( string name )
 	{
 		int index = soundFiles.FindIndex( x => x.Name.StartsWith( name ) );
 		return soundFiles[index];
 	}
 
+	public byte[] GetData( int offset, int length )
+	{
+		memoryStream.Seek( offset, SeekOrigin.Begin );
+		return memoryStream.ReadBytes( length );
+	}
 }

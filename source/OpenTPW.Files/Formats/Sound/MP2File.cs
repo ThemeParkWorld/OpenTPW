@@ -1,13 +1,8 @@
 ﻿namespace OpenTPW;
-public sealed class MP2File
+
+public sealed class MP2File : ArchiveFile
 {
-	public string Name { get; set; }
-	public int Header { get; set; }
-	public byte[] SoundData { get; set; }
-	public byte[] Data { get; set; }
-	public int SampleRate { get; set; }
-	public int BitsPerSample { get; set; }
-	public enum SoundType
+	public enum SoundTypes
 	{
 		NONE = 0, //  on blanks
 		WAV = 2, // on wav
@@ -15,20 +10,31 @@ public sealed class MP2File
 		MP2_MONO = 36, // on mp2 (64kbit/s mono)
 		MP2_STEREO = 37 // on mp2 (112kbit/s stereo)
 	}
-	public SoundType _SoundType;
+
+	public string Name { get; set; }
+	public int Header { get; set; }
+	public byte[] SoundData { get; set; }
+	public byte[] Data { get; set; }
+	public int SampleRate { get; set; }
+	public int BitsPerSample { get; set; }
+
+	public SoundTypes SoundType { get; set; }
 	public int Samples { get; set; }
-
-
 
 	public MP2File( int header, string name, byte[] soundData, int sampleRate, int bitsPerSample, int soundType, int samples, byte[] data )
 	{
-		this.Header = header;
-		this.Name = name;
-		this.SoundData = soundData;
-		this.SampleRate = 22050;
-		this.BitsPerSample = 16;
-		this._SoundType = (SoundType)soundType;
-		this.Samples = samples;
-		this.Data = data;
+		Header = header;
+		Name = name;
+		SoundData = soundData;
+		SampleRate = 22050;
+		BitsPerSample = 16;
+		SoundType = (SoundTypes)soundType;
+		Samples = samples;
+		Data = data;
+	}
+
+	public override byte[] GetData()
+	{
+		return Data;
 	}
 }

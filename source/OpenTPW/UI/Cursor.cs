@@ -47,7 +47,7 @@ public class Cursor : Panel
 
 	private void LoadTexture()
 	{
-		var cursorPath = $"data/ui/cursors/{GetImageName( cursorType )}.tga";
+		var cursorPath = $"/data/ui/cursors/{GetImageName( cursorType )}.tga";
 		var texture = new Texture( GameDir.GetPath( cursorPath ) );
 		var shader = ShaderBuilder.Default
 							.WithVertex( "content/shaders/cursor/cursor.vert" )

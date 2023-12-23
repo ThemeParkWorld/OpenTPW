@@ -6,6 +6,40 @@
  * and Rhys: https://github.com/riperiperi/FreeSO/blob/master/TSOClient/tso.files/FAR3/Decompresser.cs.
  */
 
+public sealed class WadArchiveFile : ArchiveFile
+{
+	internal bool Compressed { get; set; }
+	internal int SizeInArchive { get; set; }
+	internal int OffsetInArchive { get; set; } 
+
+	internal byte[]? CachedData { get; set; }
+
+	public override byte[] GetData()
+	{
+		if ( CachedData != null )
+			return CachedData;
+
+		var data = Archive.GetData( OffsetInArchive, SizeInArchive );
+
+		// Decompress file if necessary
+		if ( Compressed )
+		{
+			var refpack = new Refpack( data );
+			data = refpack.Decompress().ToArray();
+		}
+
+		// Save off data so we can use it again quickly if we need to
+		CachedData = data;
+
+		return data;
+	}
+
+	public void Free()
+	{
+		CachedData = null;
+	}
+}
+
 public sealed class WadArchive : IArchive
 {
 	private ExpandedMemoryStream memoryStream;
@@ -98,10 +132,13 @@ public sealed class WadArchive : IArchive
 			// Save the current position so that we can go back to it later
 			var initialPos = memoryStream.Position;
 
-			var newFile = new ArchiveFile();
-
 			// Unused / unknown
 			memoryStream.Seek( 4, SeekOrigin.Current );
+
+			var newFile = new WadArchiveFile
+			{
+				Archive = this
+			};
 
 			// Filename offset
 			var filenameOffset = memoryStream.ReadUInt32();
@@ -110,16 +147,16 @@ public sealed class WadArchive : IArchive
 			var filenameLength = memoryStream.ReadUInt32();
 
 			// Data offset
-			var dataOffset = memoryStream.ReadUInt32();
+			newFile.OffsetInArchive = (int)memoryStream.ReadUInt32();
 
 			// Data length
-			var dataLength = memoryStream.ReadUInt32();
+			newFile.SizeInArchive = (int)memoryStream.ReadUInt32();
 
 			// Compression type
 			newFile.Compressed = memoryStream.ReadUInt32() == 4;
 
 			// Decompressed size
-			newFile.DecompressedSize = memoryStream.ReadUInt32();
+			var decompressedSize = memoryStream.ReadUInt32();
 
 			// Set file's name name
 			memoryStream.Seek( filenameOffset, SeekOrigin.Begin );
@@ -131,51 +168,35 @@ public sealed class WadArchive : IArchive
 			//
 			ArchiveDirectory? subDirectory = Root;
 
+			if ( newFile.Name.Contains( '\\' ) )
 			{
-				if ( newFile.Name.Contains( "\\" ) )
-				{
-					currentSubdirectory = newFile.Name[..(newFile.Name.LastIndexOf( "\\" ))];
-					newFile.Name = newFile.Name[(newFile.Name.LastIndexOf( "\\" ) + 1)..];
-				}
+				currentSubdirectory = newFile.Name[..(newFile.Name.LastIndexOf( "\\" ))];
+				newFile.Name = newFile.Name[(newFile.Name.LastIndexOf( "\\" ) + 1)..];
+			}
 
-				// Are we currently in the root directory?
-				if ( !string.IsNullOrEmpty( currentSubdirectory ) )
-				{
-					// Find a subdirectory object..
-					var splitPath = currentSubdirectory.Split( "\\" );
+			// Are we currently in the root directory?
+			if ( !string.IsNullOrEmpty( currentSubdirectory ) )
+			{
+				// Find a subdirectory object..
+				var splitPath = currentSubdirectory.Split( "\\" );
 
-					foreach ( string dir in splitPath )
+				foreach ( string dir in splitPath )
+				{
+					ArchiveDirectory newSubDir;
+
+					newSubDir = subDirectory.Children.OfType<ArchiveDirectory>().FirstOrDefault( x => x.Name == dir );
+
+					if ( newSubDir == null )
 					{
-						ArchiveDirectory newSubDir;
-
-						newSubDir = subDirectory.Children.OfType<ArchiveDirectory>().FirstOrDefault( x => x.Name == dir );
-
-						if ( newSubDir == null )
-						{
-							// ..or create one if it doesn't exist
-							newSubDir = new ArchiveDirectory( dir );
-							subDirectory.Children.Add( newSubDir );
-							subDirectory = newSubDir;
-						}
-
+						// ..or create one if it doesn't exist
+						newSubDir = new ArchiveDirectory( dir );
+						subDirectory.Children.Add( newSubDir );
 						subDirectory = newSubDir;
 					}
+
+					subDirectory = newSubDir;
 				}
 			}
-
-			// Get file's raw data
-			memoryStream.Seek( dataOffset, SeekOrigin.Begin );
-			newFile.Data = memoryStream.ReadBytes( (int)dataLength );
-
-			// Decompress file if necessary
-			if ( newFile.Compressed )
-			{
-				var refpack = new Refpack( newFile.Data );
-				newFile.Data = refpack.Decompress().ToArray();
-			}
-
-			newFile.ArchiveOffset = (int)dataOffset;
-			newFile.Archive = this;
 
 			// Add to selected subdirectory
 			subDirectory.Children.Add( newFile );
@@ -208,7 +229,7 @@ public sealed class WadArchive : IArchive
 		if ( internalPath == "" )
 			throw new Exception( $"Path was empty" );
 
-		var splitPath = internalPath.Split( "\\" );
+		var splitPath = internalPath.Split( "/" );
 
 		for ( int i = 0; i < splitPath.Length; i++ )
 		{
@@ -231,7 +252,7 @@ public sealed class WadArchive : IArchive
 
 		if ( internalPath != "" )
 		{
-			var splitPath = internalPath.Split( "\\" );
+			var splitPath = internalPath.Split( "/" );
 
 			foreach ( string dir in splitPath )
 			{
@@ -262,5 +283,11 @@ public sealed class WadArchive : IArchive
 	{
 		var files = EnumerateItems<ArchiveDirectory>( internalPath );
 		return files.Select( x => x.Name ).ToArray();
+	}
+
+	public byte[] GetData( int offset, int length )
+	{
+		memoryStream.Seek( offset, SeekOrigin.Begin );
+		return memoryStream.ReadBytes( length );
 	}
 }

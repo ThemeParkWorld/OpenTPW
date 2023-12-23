@@ -14,7 +14,7 @@ public class Level
 
 	public Level( string levelName )
 	{
-		Global = new SettingsFile( $"data/levels/{levelName}/global.sam" );
+		Global = new SettingsFile( $"/levels/{levelName}/global.sam" );
 		Current = this;
 
 		SetupEntities();

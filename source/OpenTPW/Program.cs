@@ -1,6 +1,4 @@
-﻿global using static Global;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 /// <summary>
 /// Program entry point

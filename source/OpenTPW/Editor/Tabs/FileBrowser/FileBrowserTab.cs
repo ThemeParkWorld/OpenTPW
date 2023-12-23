@@ -7,7 +7,7 @@ namespace OpenTPW;
 [EditorMenu( "Debug/File Tree" )]
 internal class FileBrowserTab : BaseTab
 {
-	private string selectedDirectory = "data";
+	private string selectedDirectory = "";
 
 	/// <summary>
 	/// Represents <see cref="selectedDirectory"/>, but clears and re-builds the current

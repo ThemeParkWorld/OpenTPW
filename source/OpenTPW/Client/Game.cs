@@ -42,6 +42,12 @@ internal static class Game
 
 	public static void Run( InitFlags initFlags = InitFlags.None )
 	{
+		Log = new();
+
+		FileSystem = new BaseFileSystem( $"{Settings.Default.GamePath}/data/" );
+		FileSystem.RegisterArchiveHandler<WadArchive>( ".wad" );
+		FileSystem.RegisterArchiveHandler<SdtArchive>( ".sdt" );
+
 		renderer = new();
 		renderer.Run();
 	}
