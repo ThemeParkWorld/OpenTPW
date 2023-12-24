@@ -6,9 +6,10 @@ public class Terrain : ModelEntity
 	{
 		base.Spawn();
 
-		var texture = new TextureFile( @"/levels/jungle/terrain/textures/jgr_bas1.wct" );
-		// var material = new Material( texture.Texture );
+		var textureFile = new TextureFile( @"/levels/jungle/terrain/textures/jgr_bas1.wct" ).Data;
+		var texture = new Texture( textureFile.Data, textureFile.Width, textureFile.Height );
 
-		// Model = Primitives.Plane.GenerateModel( material, new Point2( 32, 32 ) );
+		var material = new Material( texture );
+		Model = Primitives.Plane.GenerateModel( material, new Point2( 32, 32 ) );
 	}
 }
