@@ -276,13 +276,13 @@ public sealed class WadArchive : IArchive
 	public string[] GetFiles( string internalPath )
 	{
 		var files = EnumerateItems<ArchiveFile>( internalPath );
-		return files.Select( x => x.Name ).ToArray();
+		return (files.Select( x => x.Name ).ToArray() ?? Array.Empty<string>())!;
 	}
 
 	public string[] GetDirectories( string internalPath )
 	{
 		var files = EnumerateItems<ArchiveDirectory>( internalPath );
-		return files.Select( x => x.Name ).ToArray();
+		return (files.Select( x => x.Name ).ToArray() ?? Array.Empty<string>())!;
 	}
 
 	public byte[] GetData( int offset, int length )
