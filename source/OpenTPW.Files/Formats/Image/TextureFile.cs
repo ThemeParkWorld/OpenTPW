@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace OpenTPW;
 
@@ -20,7 +20,14 @@ public partial class TextureFile : BaseFormat
 
 	public TextureFile( string path )
 	{
-		ReadFromFile( path );
+		try
+		{
+			ReadFromFile( path );
+		}
+		catch ( Exception ex )
+		{
+			Log.Error( $"TextureFile failed: {ex}" );
+		}
 	}
 
 	protected override void ReadFromStream( Stream stream )
@@ -52,7 +59,6 @@ public partial class TextureFile : BaseFormat
 
 		if ( header.BlockSize1 > 0 )
 		{
-			_ = binaryReader.ReadInt16();
 			header.Block1 = binaryReader.ReadBytes( header.BlockSize1 );
 		}
 
@@ -66,37 +72,69 @@ public partial class TextureFile : BaseFormat
 			throw new Exception();
 
 		var blockData = header.Block0;
+		FileHeader = header;
 
-		if ( header.BlockSize1 > 0 )
-			blockData = blockData.Concat( header.Block1 ).ToArray();
-
-		sbyte[] Decompress()
+		byte[] DecompressLZSS( byte[] data )
 		{
 			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
 			using var outputStream = new MemoryStream( maxSize );
 			using var outputWriter = new BinaryWriter( outputStream );
 
-			var blockReader = new BitReader( blockData );
-			if ( header.CompressionType == CompressionType.LZSS )
+			var blockReader = new BitReader( data );
+			if ( !LZSS.Decompress( blockReader, outputWriter ) )
 			{
-				if ( !LZSS.Decompress( blockReader, outputWriter ) )
-				{
-					// throw new Exception();
-				}
-			}
-			else if ( header.CompressionType == CompressionType.ZLIB )
-			{
-				// HACK!!!
-				blockData = blockData[0x1E..];
-				using var inputStream = new MemoryStream( blockData );
-				using var decompressor = new DeflateStream( inputStream, CompressionMode.Decompress );
-				decompressor.CopyTo( outputStream );
+				throw new Exception( "LZSS failed to decompress" );
 			}
 
-			return outputStream.ToArray().Select( x => (sbyte)x ).ToArray();
+			return outputStream.ToArray();
 		}
 
-		var decompressedBlock0 = Decompress();
+		byte[] DecompressZLIB( byte[] data )
+		{
+			/*
+			 * Theme Park World uses ZLIB 1.1.3
+			 * We can therefore deduce that the custom ZLIB header is as follows:
+			 * - 4 bytes: "BILZ" magic number
+			 * - 4 bytes: decompressed size
+			 * - 4 bytes: stream size
+			 * - 4 bytes: Constant - MAX_WBITS (15) - from zlib
+			 * - 4 bytes: Constant - DEF_MEM_LEVEL (9) - from zlib
+			 * - 4 bytes: Unused
+			 * - 4 bytes: Unused 
+			 */
+
+			// We don't need to use any of this data - so we'll just skip it entirely
+			data = data[0x1C..]; // Unused data
+
+			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
+			using var outputStream = new MemoryStream( maxSize );
+			using var outputWriter = new BinaryWriter( outputStream );
+			{
+				using var inputStream = new MemoryStream( data );
+				using var compressed = new InflaterInputStream( inputStream );
+				compressed.CopyTo( outputStream );
+			}
+
+			return outputStream.ToArray();
+		}
+
+		sbyte[] decompressedBlock0 = Array.Empty<sbyte>();
+		sbyte[] decompressedBlock1 = Array.Empty<sbyte>();
+
+		if ( header.CompressionType == CompressionType.LZSS )
+		{
+			decompressedBlock0 = DecompressLZSS( blockData ).Select( x => (sbyte)x ).ToArray();
+
+			if ( header.BlockSize1 > 0 )
+				decompressedBlock1 = DecompressLZSS( header.Block1 ).Select( x => (sbyte)x ).ToArray();
+		}
+		else
+		{
+			decompressedBlock0 = DecompressZLIB( blockData ).Select( x => (sbyte)x ).ToArray();
+
+			if ( header.BlockSize1 > 0 )
+				decompressedBlock1 = DecompressZLIB( header.Block1 ).Select( x => (sbyte)x ).ToArray();
+		}
 
 		int size = (int)Math.Max( GetAlignedSize( (uint)Math.Max( header.Height, header.Width ) ), 8 );
 
@@ -106,16 +144,19 @@ public partial class TextureFile : BaseFormat
 		List<float> outputA = Enumerable.Repeat( 255f, size * size ).ToList();
 
 		ImageDecodeState state = new( size );
-		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, ComputeDequantizationScaleY( header.YChannelQuantizationScale ) );
-		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, ComputeDequantizationScaleCbCr( header.CbChannelQuantizationScale ) );
-		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, ComputeDequantizationScaleCbCr( header.CrChannelQuantizationScale ) );
-
-		if ( header.BitCount == 32 )
-		{
-			// DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputA, ComputeDequantizationScaleA( header.AChannelQuantizationScale ) );
-		}
 
 		List<float> output = Enumerable.Repeat( 0f, header.Width * header.Height * 4 ).ToList();
+
+		var decompressedBlockCopy = decompressedBlock0.ToArray();
+
+		bool isHalfScale = FileHeader.CompressionType == CompressionType.ZLIB;
+
+		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, ComputeDequantizationScaleY( header.YChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, ComputeDequantizationScaleCbCr( header.CbChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, ComputeDequantizationScaleCbCr( header.CrChannelQuantizationScale ), isHalfScale );
+
+		if ( header.BlockSize1 > 0 )
+			DecodeChannel( ref state, size, ref decompressedBlock1, ref outputA, ComputeDequantizationScaleA( header.AChannelQuantizationScale ), isHalfScale, true );
 
 		uint alignedWidth = GetAlignedSize( (uint)header.Width );
 		uint alignedHeight = GetAlignedSize( (uint)header.Height );
@@ -145,23 +186,9 @@ public partial class TextureFile : BaseFormat
 		List<byte> textureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
 		for ( int i = 0; i < output.Count; i++ )
 		{
-			textureData[i] = byte.Clamp( (byte)output[i], 0, 255 );
+			textureData[i] = (byte)output[i].Clamp( 0, 255 );
 		}
 
-		// Flip texture
-		List<byte> flippedTextureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
-		for ( int y = 0; y < header.Height; y++ )
-		{
-			for ( int x = 0; x < header.Width; x++ )
-			{
-				for ( int i = 0; i < 4; i++ )
-				{
-					flippedTextureData[((y * header.Width + x) * 4) + i] = textureData[(((header.Height - y - 1) * header.Width + x) * 4) + i];
-				}
-			}
-		}
-
-		Data = new TextureData( header.Width, header.Height, flippedTextureData.ToArray() );
-		FileHeader = header;
+		Data = new TextureData( header.Width, header.Height, textureData.ToArray() );
 	}
 }

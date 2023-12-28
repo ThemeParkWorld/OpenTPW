@@ -1,4 +1,7 @@
-﻿namespace OpenTPW;
+﻿using System;
+using static System.Formats.Asn1.AsnWriter;
+
+namespace OpenTPW;
 
 partial class TextureFile
 {
@@ -66,10 +69,9 @@ partial class TextureFile
 		}
 	}
 
-	private bool DecodeChannel( ref ImageDecodeState state, int size, ref sbyte[] pSrc, ref List<float> outputBuffer, float dequantizationScale )
+	private bool DecodeChannel( ref ImageDecodeState state, int size, ref sbyte[] pSrc, ref List<float> outputBuffer, float dequantizationScale, bool isHalfScale, bool isAlpha = false )
 	{
 		int count = size * (size / 2);
-
 		int pSrcIndex = 0;
 
 		//
@@ -103,6 +105,9 @@ partial class TextureFile
 		//
 		// Step 2: decode rows
 		//
+		if ( isHalfScale )
+			dequantizationScale *= MathF.PI * 1/6f;
+
 		D4Coefficients coefs = new( dequantizationScale );
 		for ( int i = 0; i < size; i++ )
 		{
@@ -111,7 +116,12 @@ partial class TextureFile
 			// Index lookup
 			( index, component ) =>
 			{
-				int baseIndex = index * 2;
+				int baseIndex;
+				if ( isHalfScale )
+					baseIndex = index / 2;
+				else
+					baseIndex = index * 2;
+
 				switch ( component )
 				{
 					case D4Component.Scale:
@@ -126,17 +136,23 @@ partial class TextureFile
 			// Output index lookup
 			( index, component ) =>
 			{
+				int baseIndex;
+				if ( isHalfScale )
+					baseIndex = index;
+				else
+					baseIndex = index * 2;
+
 				switch ( component )
 				{
 					case D4Component.Scale:
-						return index * 2 + 0;
+						return baseIndex + 0;
 					case D4Component.Wavelet:
-						return index * 2 + 1;
+						return baseIndex + 1;
 					default:
 						throw new NotImplementedException();
 				}
 			},
-			ref state.DequantizationBuffer, ref state.RowDecodeBuffer, i * size, size / 2, coefs );
+			ref state.DequantizationBuffer, ref state.RowDecodeBuffer, i * size, (isHalfScale) ? size : size / 2, coefs );
 		}
 
 		//
@@ -146,7 +162,7 @@ partial class TextureFile
 		for ( int i = 0; i < size; ++i )
 		{
 			int sOffset = 0;
-			int wOffset = size * (size / 2);
+			int wOffset = isAlpha && isHalfScale ? (size * size) : size * (size / 2);
 			int colOffset = i;
 			D4InverseTransform(
 
@@ -169,6 +185,7 @@ partial class TextureFile
 			( index, component ) =>
 			{
 				int baseIndex = index * 2 * size + colOffset;
+
 				switch ( component )
 				{
 					case D4Component.Scale:
