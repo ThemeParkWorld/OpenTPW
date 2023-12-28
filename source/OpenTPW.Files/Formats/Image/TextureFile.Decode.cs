@@ -1,7 +1,4 @@
-﻿using System;
-using static System.Formats.Asn1.AsnWriter;
-
-namespace OpenTPW;
+﻿namespace OpenTPW;
 
 partial class TextureFile
 {

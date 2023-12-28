@@ -32,7 +32,7 @@ public partial class TextureFile : BaseFormat
 		TextureFileData fileData = new()
 		{
 			Flags = (TextureFlags)binaryReader.ReadByte(),
-			HasAlpha = binaryReader.ReadByte() == 0x01,
+			HasAlphaChannel = binaryReader.ReadByte() == 0x01,
 			BitsPerPixel = binaryReader.ReadByte(),
 			Version = binaryReader.ReadByte(),
 			Width = binaryReader.ReadInt16(),
@@ -42,8 +42,8 @@ public partial class TextureFile : BaseFormat
 			CrChannelQuantizationScale = binaryReader.ReadInt16(),
 			AChannelQuantizationScale = binaryReader.ReadInt16(),
 
-			ColorBlockSize = binaryReader.ReadInt32(),
-			AlphaBlockSize = binaryReader.ReadInt32(),
+			ColorChunkSize = binaryReader.ReadInt32(),
+			AlphaChunkSize = binaryReader.ReadInt32(),
 
 			Checksum = binaryReader.ReadInt32()
 		};
@@ -51,20 +51,32 @@ public partial class TextureFile : BaseFormat
 		//
 		// Read blocks
 		//
-		fileData.ColorBlock = binaryReader.ReadBytes( fileData.ColorBlockSize );
 
-		if ( fileData.AlphaBlockSize > 0 )
-			fileData.AlphaBlock = binaryReader.ReadBytes( fileData.AlphaBlockSize );
+		// Color
+		if ( fileData.ColorChunkSize == 0 )
+			throw new InvalidDataException( "Texture does not have color data" );
+
+		fileData.ColorChunk = binaryReader.ReadBytes( fileData.ColorChunkSize );
+
+		// Alpha
+		if ( fileData.AlphaChunkSize > 0 )
+			fileData.AlphaChunk = binaryReader.ReadBytes( fileData.AlphaChunkSize );
+
+		if ( fileData.AlphaChunkSize > 0 && !fileData.HasAlphaChannel )
+			throw new InvalidDataException( $"Expected alpha chunk size to be 0, but alpha block size was actually {fileData.AlphaChunkSize}" );
 
 		//
 		// Decompress blocks
 		//
-		var alphaBlockDecompressed = Array.Empty<byte>();
-		var colorBlockDecompressed = Decompress( fileData.ColorBlock );
+		var alphaData = Array.Empty<byte>();
+		var colorData = Decompress( fileData.ColorChunk );
 
-		if ( fileData.AlphaBlockSize > 0 )
-			alphaBlockDecompressed = Decompress( fileData.AlphaBlock );
+		if ( fileData.HasAlphaChannel )
+			alphaData = Decompress( fileData.AlphaChunk );
 
+		//
+		// Decode image
+		//
 		var size = (int)Math.Max( GetAlignedSize( (uint)Math.Max( fileData.Height, fileData.Width ) ), 8 );
 
 		var outputY = Enumerable.Repeat( 0f, size * size ).ToList();
@@ -72,19 +84,14 @@ public partial class TextureFile : BaseFormat
 		var outputCr = Enumerable.Repeat( 0f, size * size ).ToList();
 		var outputA = Enumerable.Repeat( 255f, size * size ).ToList();
 
-		var decompressedBlockCopy = colorBlockDecompressed.ToArray();
-
-		//
-		// Decode image
-		//
 		var isHalfScale = !fileData.Flags.HasFlag( TextureFlags.FullScale );
 		var state = new ImageDecodeState( size );
-		DecodeChannel( ref state, size, ref colorBlockDecompressed, ref outputY, ComputeDequantizationScaleY( fileData.YChannelQuantizationScale ), isHalfScale );
-		DecodeChannel( ref state, size / 2, ref colorBlockDecompressed, ref outputCb, ComputeDequantizationScaleCbCr( fileData.CbChannelQuantizationScale ), isHalfScale );
-		DecodeChannel( ref state, size / 2, ref colorBlockDecompressed, ref outputCr, ComputeDequantizationScaleCbCr( fileData.CrChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size, ref colorData, ref outputY, ComputeDequantizationScaleY( fileData.YChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size / 2, ref colorData, ref outputCb, ComputeDequantizationScaleCbCr( fileData.CbChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size / 2, ref colorData, ref outputCr, ComputeDequantizationScaleCbCr( fileData.CrChannelQuantizationScale ), isHalfScale );
 
-		if ( fileData.AlphaBlockSize > 0 )
-			DecodeChannel( ref state, size, ref alphaBlockDecompressed, ref outputA, ComputeDequantizationScaleA( fileData.AChannelQuantizationScale ), isHalfScale, true );
+		if ( fileData.AlphaChunkSize > 0 )
+			DecodeChannel( ref state, size, ref alphaData, ref outputA, ComputeDequantizationScaleA( fileData.AChannelQuantizationScale ), isHalfScale, true );
 
 		uint alignedWidth = GetAlignedSize( (uint)fileData.Width );
 		uint alignedHeight = GetAlignedSize( (uint)fileData.Height );
@@ -123,9 +130,12 @@ public partial class TextureFile : BaseFormat
 
 	private static byte[] Decompress( byte[] data )
 	{
+		// Check if the file contains 'BILZ' as the first 4 bytes - if so then it is a zlib
+		// compressed chunk
 		if ( data[0] == 0x42 && data[1] == 0x49 && data[2] == 0x4C && data[3] == 0x5A )
 			return DecompressZLIB( data );
 
+		// Not zlib, so must be data compressed with LZSS
 		return DecompressLZSS( data );
 	}
 
