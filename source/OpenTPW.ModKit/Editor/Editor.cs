@@ -2,6 +2,7 @@
 using OpenTPW.ModKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System.Reflection;
 using Veldrid;
 
@@ -144,6 +145,7 @@ public partial class Editor
 
 			using var img = Image.LoadPixelData<Rgba32>( pixelData, t.Width, t.Height );
 			using var writeStream = CacheFileSystem.OpenWrite( thumbnailPath );
+			img.Mutate( x => x.Resize( 16, 16 ) );
 			img.SaveAsPng( writeStream );
 
 			Log.Info( $"Cached to {thumbnailPath}" );
