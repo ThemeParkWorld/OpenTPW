@@ -69,17 +69,16 @@ partial class TextureFile
 		}
 	}
 
-	private bool DecodeChannel( ref ImageDecodeState state, int size, ref sbyte[] pSrc, ref List<float> outputBuffer, float dequantizationScale, bool isHalfScale, bool isAlpha = false )
+	private bool DecodeChannel( ref ImageDecodeState state, int size, ref byte[] pSrc, ref List<float> outputBuffer, float dequantizationScale, bool isHalfScale, bool isAlpha = false )
 	{
 		int count = size * (size / 2);
-		int pSrcIndex = 0;
 
 		//
 		// Step 1: Dequantize
 		//
 		for ( int i = 0; i < count; ++i )
 		{
-			int val = pSrc[0];
+			int val = (sbyte)pSrc[0];
 			Array.Copy( pSrc, 1, pSrc, 0, pSrc.Length - 1 );
 
 			if ( val == sbyte.MinValue )
@@ -88,9 +87,9 @@ partial class TextureFile
 				Array.Copy( pSrc, 2, pSrc, 0, pSrc.Length - 2 );
 			}
 
-			state.DequantizationBuffer[i * 2] = (float)val;
+			state.DequantizationBuffer[i * 2] = ((float)val).Clamp( -255, 255 );
 
-			val = pSrc[0];
+			val = (sbyte)pSrc[0];
 			Array.Copy( pSrc, 1, pSrc, 0, pSrc.Length - 1 );
 
 			if ( val == sbyte.MinValue )
@@ -99,7 +98,7 @@ partial class TextureFile
 				Array.Copy( pSrc, 2, pSrc, 0, pSrc.Length - 2 );
 			}
 
-			state.DequantizationBuffer[i * 2 + 1] = (float)val;
+			state.DequantizationBuffer[i * 2 + 1] = ((float)val).Clamp( -255, 255 );
 		}
 
 		//

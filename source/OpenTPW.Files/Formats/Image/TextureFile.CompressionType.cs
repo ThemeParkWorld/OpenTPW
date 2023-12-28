@@ -2,9 +2,13 @@
 
 public partial class TextureFile
 {
-	public enum CompressionType
+	[Flags]
+	public enum TextureFlags
 	{
-		ZLIB = 0x12,
-		LZSS = 0x13
-	};
+		None = 0,
+
+		Compressed = 0b10000,
+		Unknown    = 0b00010,
+		FullScale   = 0b00001
+	}
 }

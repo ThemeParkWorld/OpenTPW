@@ -7,7 +7,6 @@ namespace OpenTPW.ModKit;
 internal interface IFileViewer
 {
 	void DrawPreview();
-	void DrawInfo();
 }
 
 [System.AttributeUsage( AttributeTargets.Class, Inherited = false, AllowMultiple = false )]
@@ -96,10 +95,5 @@ internal class TextureViewer : IFileViewer
 
 		var size = ImGui.GetWindowWidth() - 16; /* Padding approx. */
 		ImGui.Image( imguiPtr, new Vector2( size ) );
-	}
-
-	public void DrawInfo()
-	{
-		ImGui.Text( $"{textureFile.FileHeader}" );
 	}
 }

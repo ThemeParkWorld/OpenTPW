@@ -7,7 +7,6 @@ public record struct TextureData( int Width, int Height, byte[] Data );
 public partial class TextureFile : BaseFormat
 {
 	public TextureData Data { get; set; }
-	public Header FileHeader { get; private set; }
 
 	static float ComputeDequantizationScaleY( int n ) => 1.0f - ((float)n * -0.5f);
 	static float ComputeDequantizationScaleCbCr( int n ) => 1.0f - ((float)n * -0.25f);
@@ -20,14 +19,7 @@ public partial class TextureFile : BaseFormat
 
 	public TextureFile( string path )
 	{
-		try
-		{
-			ReadFromFile( path );
-		}
-		catch ( Exception ex )
-		{
-			Log.Error( $"TextureFile failed: {ex}" );
-		}
+		ReadFromFile( path );
 	}
 
 	protected override void ReadFromStream( Stream stream )
@@ -37,158 +29,148 @@ public partial class TextureFile : BaseFormat
 		//
 		// Read header
 		//
-		Header header = new();
-
-		header.CompressionType = (CompressionType)binaryReader.ReadByte();
-		header.Version = binaryReader.ReadByte();
-		header.BitCount = binaryReader.ReadByte();
-		header.Unknown0 = binaryReader.ReadByte();
-		header.Width = binaryReader.ReadInt16();
-		header.Height = binaryReader.ReadInt16();
-		header.YChannelQuantizationScale = binaryReader.ReadInt16();
-		header.CbChannelQuantizationScale = binaryReader.ReadInt16();
-		header.CrChannelQuantizationScale = binaryReader.ReadInt16();
-		header.AChannelQuantizationScale = binaryReader.ReadInt16();
-
-		header.BlockSize0 = binaryReader.ReadInt32();
-		header.BlockSize1 = binaryReader.ReadInt32();
-
-		header.Unknown1 = binaryReader.ReadInt32();
-
-		header.Block0 = binaryReader.ReadBytes( header.BlockSize0 );
-
-		if ( header.BlockSize1 > 0 )
+		TextureFileData fileData = new()
 		{
-			header.Block1 = binaryReader.ReadBytes( header.BlockSize1 );
-		}
+			Flags = (TextureFlags)binaryReader.ReadByte(),
+			HasAlpha = binaryReader.ReadByte() == 0x01,
+			BitsPerPixel = binaryReader.ReadByte(),
+			Version = binaryReader.ReadByte(),
+			Width = binaryReader.ReadInt16(),
+			Height = binaryReader.ReadInt16(),
+			YChannelQuantizationScale = binaryReader.ReadInt16(),
+			CbChannelQuantizationScale = binaryReader.ReadInt16(),
+			CrChannelQuantizationScale = binaryReader.ReadInt16(),
+			AChannelQuantizationScale = binaryReader.ReadInt16(),
+
+			ColorBlockSize = binaryReader.ReadInt32(),
+			AlphaBlockSize = binaryReader.ReadInt32(),
+
+			Checksum = binaryReader.ReadInt32()
+		};
+
+		//
+		// Read blocks
+		//
+		fileData.ColorBlock = binaryReader.ReadBytes( fileData.ColorBlockSize );
+
+		if ( fileData.AlphaBlockSize > 0 )
+			fileData.AlphaBlock = binaryReader.ReadBytes( fileData.AlphaBlockSize );
+
+		//
+		// Decompress blocks
+		//
+		var alphaBlockDecompressed = Array.Empty<byte>();
+		var colorBlockDecompressed = Decompress( fileData.ColorBlock );
+
+		if ( fileData.AlphaBlockSize > 0 )
+			alphaBlockDecompressed = Decompress( fileData.AlphaBlock );
+
+		var size = (int)Math.Max( GetAlignedSize( (uint)Math.Max( fileData.Height, fileData.Width ) ), 8 );
+
+		var outputY = Enumerable.Repeat( 0f, size * size ).ToList();
+		var outputCb = Enumerable.Repeat( 0f, size * size ).ToList();
+		var outputCr = Enumerable.Repeat( 0f, size * size ).ToList();
+		var outputA = Enumerable.Repeat( 255f, size * size ).ToList();
+
+		var decompressedBlockCopy = colorBlockDecompressed.ToArray();
 
 		//
 		// Decode image
 		//
-		if ( header.CompressionType != CompressionType.LZSS && header.CompressionType != CompressionType.ZLIB )
-			throw new Exception();
+		var isHalfScale = !fileData.Flags.HasFlag( TextureFlags.FullScale );
+		var state = new ImageDecodeState( size );
+		DecodeChannel( ref state, size, ref colorBlockDecompressed, ref outputY, ComputeDequantizationScaleY( fileData.YChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size / 2, ref colorBlockDecompressed, ref outputCb, ComputeDequantizationScaleCbCr( fileData.CbChannelQuantizationScale ), isHalfScale );
+		DecodeChannel( ref state, size / 2, ref colorBlockDecompressed, ref outputCr, ComputeDequantizationScaleCbCr( fileData.CrChannelQuantizationScale ), isHalfScale );
 
-		if ( header.BlockSize0 == 0 )
-			throw new Exception();
+		if ( fileData.AlphaBlockSize > 0 )
+			DecodeChannel( ref state, size, ref alphaBlockDecompressed, ref outputA, ComputeDequantizationScaleA( fileData.AChannelQuantizationScale ), isHalfScale, true );
 
-		var blockData = header.Block0;
-		FileHeader = header;
+		uint alignedWidth = GetAlignedSize( (uint)fileData.Width );
+		uint alignedHeight = GetAlignedSize( (uint)fileData.Height );
 
-		byte[] DecompressLZSS( byte[] data )
+		var outputBytes = Enumerable.Repeat( 0f, fileData.Width * fileData.Height * 4 ).ToList();
+
+		for ( int y = 0; y < fileData.Height; y++ )
 		{
-			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
-			using var outputStream = new MemoryStream( maxSize );
-			using var outputWriter = new BinaryWriter( outputStream );
-
-			var blockReader = new BitReader( data );
-			if ( !LZSS.Decompress( blockReader, outputWriter ) )
+			for ( int x = 0; x < fileData.Width; x++ )
 			{
-				throw new Exception( "LZSS failed to decompress" );
-			}
-
-			return outputStream.ToArray();
-		}
-
-		byte[] DecompressZLIB( byte[] data )
-		{
-			/*
-			 * Theme Park World uses ZLIB 1.1.3
-			 * We can therefore deduce that the custom ZLIB header is as follows:
-			 * - 4 bytes: "BILZ" magic number
-			 * - 4 bytes: decompressed size
-			 * - 4 bytes: stream size
-			 * - 4 bytes: Constant - MAX_WBITS (15) - from zlib
-			 * - 4 bytes: Constant - DEF_MEM_LEVEL (9) - from zlib
-			 * - 4 bytes: Unused
-			 * - 4 bytes: Unused 
-			 */
-
-			// We don't need to use any of this data - so we'll just skip it entirely
-			data = data[0x1C..]; // Unused data
-
-			const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
-			using var outputStream = new MemoryStream( maxSize );
-			using var outputWriter = new BinaryWriter( outputStream );
-			{
-				using var inputStream = new MemoryStream( data );
-				using var compressed = new InflaterInputStream( inputStream );
-				compressed.CopyTo( outputStream );
-			}
-
-			return outputStream.ToArray();
-		}
-
-		sbyte[] decompressedBlock0 = Array.Empty<sbyte>();
-		sbyte[] decompressedBlock1 = Array.Empty<sbyte>();
-
-		if ( header.CompressionType == CompressionType.LZSS )
-		{
-			decompressedBlock0 = DecompressLZSS( blockData ).Select( x => (sbyte)x ).ToArray();
-
-			if ( header.BlockSize1 > 0 )
-				decompressedBlock1 = DecompressLZSS( header.Block1 ).Select( x => (sbyte)x ).ToArray();
-		}
-		else
-		{
-			decompressedBlock0 = DecompressZLIB( blockData ).Select( x => (sbyte)x ).ToArray();
-
-			if ( header.BlockSize1 > 0 )
-				decompressedBlock1 = DecompressZLIB( header.Block1 ).Select( x => (sbyte)x ).ToArray();
-		}
-
-		int size = (int)Math.Max( GetAlignedSize( (uint)Math.Max( header.Height, header.Width ) ), 8 );
-
-		List<float> outputY = Enumerable.Repeat( 0f, size * size ).ToList();
-		List<float> outputCb = Enumerable.Repeat( 0f, size * size ).ToList();
-		List<float> outputCr = Enumerable.Repeat( 0f, size * size ).ToList();
-		List<float> outputA = Enumerable.Repeat( 255f, size * size ).ToList();
-
-		ImageDecodeState state = new( size );
-
-		List<float> output = Enumerable.Repeat( 0f, header.Width * header.Height * 4 ).ToList();
-
-		var decompressedBlockCopy = decompressedBlock0.ToArray();
-
-		bool isHalfScale = FileHeader.CompressionType == CompressionType.ZLIB;
-
-		DecodeChannel( ref state, size, ref decompressedBlock0, ref outputY, ComputeDequantizationScaleY( header.YChannelQuantizationScale ), isHalfScale );
-		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCb, ComputeDequantizationScaleCbCr( header.CbChannelQuantizationScale ), isHalfScale );
-		DecodeChannel( ref state, size / 2, ref decompressedBlock0, ref outputCr, ComputeDequantizationScaleCbCr( header.CrChannelQuantizationScale ), isHalfScale );
-
-		if ( header.BlockSize1 > 0 )
-			DecodeChannel( ref state, size, ref decompressedBlock1, ref outputA, ComputeDequantizationScaleA( header.AChannelQuantizationScale ), isHalfScale, true );
-
-		uint alignedWidth = GetAlignedSize( (uint)header.Width );
-		uint alignedHeight = GetAlignedSize( (uint)header.Height );
-
-		int maxSize = (int)(alignedWidth < alignedHeight ? alignedHeight : alignedWidth);
-		for ( int y = 0; y < header.Height; y++ )
-		{
-			for ( int x = 0; x < header.Width; x++ )
-			{
-				float cy = outputY[y * maxSize + x];
-				float cb = outputCb[((y / 2) * (maxSize / 2) + (x / 2))];
-				float cr = outputCr[((y / 2) * (maxSize / 2) + (x / 2))];
+				float cy = outputY[y * size + x];
+				float cb = outputCb[((y / 2) * (size / 2) + (x / 2))];
+				float cr = outputCr[((y / 2) * (size / 2) + (x / 2))];
 
 				float r = cy + 1.402f * (cr);
 				float g = cy - 0.344136f * (cb) - 0.714136f * (cr);
 				float b = cy + 1.772f * (cb);
-				float a = outputA[y * maxSize + x];
+				float a = outputA[y * size + x];
 
-				output[((y * header.Width + x) * 4)] = r;
-				output[((y * header.Width + x) * 4) + 1] = g;
-				output[((y * header.Width + x) * 4) + 2] = b;
+				outputBytes[((y * fileData.Width + x) * 4)] = r;
+				outputBytes[((y * fileData.Width + x) * 4) + 1] = g;
+				outputBytes[((y * fileData.Width + x) * 4) + 2] = b;
 
-				output[((y * header.Width + x) * 4) + 3] = a;
+				outputBytes[((y * fileData.Width + x) * 4) + 3] = a;
 			}
 		}
 
-		List<byte> textureData = Enumerable.Repeat( (byte)0, header.Width * header.Height * 4 ).ToList();
-		for ( int i = 0; i < output.Count; i++ )
+		List<byte> textureData = Enumerable.Repeat( (byte)0, fileData.Width * fileData.Height * 4 ).ToList();
+		for ( int i = 0; i < outputBytes.Count; i++ )
 		{
-			textureData[i] = (byte)output[i].Clamp( 0, 255 );
+			textureData[i] = (byte)outputBytes[i].Clamp( 0, 255 );
 		}
 
-		Data = new TextureData( header.Width, header.Height, textureData.ToArray() );
+		Data = new TextureData( fileData.Width, fileData.Height, textureData.ToArray() );
+	}
+
+	private static byte[] Decompress( byte[] data )
+	{
+		if ( data[0] == 0x42 && data[1] == 0x49 && data[2] == 0x4C && data[3] == 0x5A )
+			return DecompressZLIB( data );
+
+		return DecompressLZSS( data );
+	}
+
+	private static byte[] DecompressZLIB( byte[] data )
+	{
+		/*
+		 * Theme Park World uses ZLIB 1.1.3
+		 * We can therefore deduce that the custom ZLIB header is as follows:
+		 * - 4 bytes: "BILZ" magic number
+		 * - 4 bytes: decompressed size
+		 * - 4 bytes: stream size
+		 * - 4 bytes: Constant - MAX_WBITS (15) - from zlib
+		 * - 4 bytes: Constant - DEF_MEM_LEVEL (9) - from zlib
+		 * - 4 bytes: Unused
+		 * - 4 bytes: Unused 
+		 */
+
+		// We don't need to use any of this data - so we'll just skip it entirely
+		data = data[0x1C..]; // Unused data
+
+		const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
+		using var outputStream = new MemoryStream( maxSize );
+		using var outputWriter = new BinaryWriter( outputStream );
+		{
+			using var inputStream = new MemoryStream( data );
+			using var compressed = new InflaterInputStream( inputStream );
+			compressed.CopyTo( outputStream );
+		}
+
+		return outputStream.ToArray();
+	}
+
+	private static byte[] DecompressLZSS( byte[] data )
+	{
+		/*					Y (full)      + Cb (half)     + Cr (half)     + Alpha (full) */
+		const int maxSize = 256 * 256 * 3 + 128 * 128 * 3 + 128 * 128 * 3 + 256 * 256 * 3;
+		using var outputStream = new MemoryStream( maxSize );
+		using var outputWriter = new BinaryWriter( outputStream );
+
+		var blockReader = new BitReader( data );
+		if ( !LZSS.Decompress( blockReader, outputWriter ) )
+		{
+			throw new Exception( "LZSS failed to decompress" );
+		}
+
+		return outputStream.ToArray();
 	}
 }

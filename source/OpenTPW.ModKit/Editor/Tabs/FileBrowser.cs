@@ -29,12 +29,6 @@ internal sealed class FileBrowser : BaseTab
 		CurrentFileViewer?.DrawPreview();
 	}
 
-	private void DrawInfoForFile( string file )
-	{
-		CreateFileViewer( file );
-		CurrentFileViewer?.DrawInfo();
-	}
-
 	private void CollectFileHandlers()
 	{
 		foreach ( var type in Assembly.GetAssembly( typeof( FileBrowser ) )!.GetTypes() )
@@ -369,7 +363,6 @@ internal sealed class FileBrowser : BaseTab
 					}
 
 					ImGui.EndTable();
-					DrawInfoForFile( CurrentFile.Name );
 					ImGui.EndChild();
 				}
 			}

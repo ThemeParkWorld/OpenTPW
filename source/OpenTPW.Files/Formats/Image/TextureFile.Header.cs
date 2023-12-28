@@ -2,12 +2,12 @@
 
 public partial class TextureFile
 {
-	public struct Header
+	public struct TextureFileData
 	{
-		public CompressionType CompressionType { get; set; }
+		public TextureFlags Flags { get; set; }
+		public bool HasAlpha { get; set; }
+		public byte BitsPerPixel { get; set; }
 		public byte Version { get; set; }
-		public byte BitCount { get; set; }
-		public byte Unknown0 { get; set; }
 
 		public short Width { get; set; }
 		public short Height { get; set; }
@@ -16,19 +16,19 @@ public partial class TextureFile
 		public short CrChannelQuantizationScale { get; set; }
 		public short AChannelQuantizationScale { get; set; }
 
-		public int BlockSize0 { get; set; }
-		public int BlockSize1 { get; set; }
+		public int ColorBlockSize { get; set; }
+		public int AlphaBlockSize { get; set; }
 
-		public int Unknown1 { get; set; }
+		public int Checksum { get; set; }
 
-		public byte[] Block0 { get; set; }
-		public byte[] Block1 { get; set; }
+		public byte[] ColorBlock { get; set; }
+		public byte[] AlphaBlock { get; set; }
 
 		public override string ToString()
 		{
 			var str = "";
 
-			foreach ( var prop in typeof( Header ).GetProperties() )
+			foreach ( var prop in typeof( TextureFileData ).GetProperties() )
 			{
 				if ( prop.PropertyType == typeof( byte[] ) )
 				{
