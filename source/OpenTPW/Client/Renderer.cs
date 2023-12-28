@@ -1,7 +1,5 @@
 ﻿using Veldrid;
 using Veldrid.StartupUtilities;
-using static OpenTPW.Game;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace OpenTPW;
 
@@ -31,7 +29,7 @@ internal class Renderer
 
 	private void Init()
 	{
-		window = new();
+		window = new( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y, "Theme Park World (OpenTPW)", true );
 
 		CreateGraphicsDevice();
 
@@ -42,10 +40,12 @@ internal class Renderer
 			  window.SdlWindow.Width,
 			  window.SdlWindow.Height );
 
-		editor = new Editor( imguiRenderer );
+		// editor = new Editor( imguiRenderer, Device );
 
 		var level = new Level( "fantasy" );
 		Log.Info( $"This level costs {level.Global["Keys.CostToEnter"]} keys to enter." );
+
+		window.Visible = true;
 	}
 
 	private void MainLoop()
@@ -118,9 +118,6 @@ internal class Renderer
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
 		Device.SyncToVerticalBlank = true;
-
-		var windowTitle = $"OpenTPW | {Device.BackendType}";
-		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
 	[Event.Window.Resized]

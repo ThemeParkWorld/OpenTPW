@@ -12,12 +12,14 @@ public class Level
 
 	public SettingsFile Global { get; private init; }
 
+	private int fCount = 0;
+	private Image loadingTexture;
+
 	public Level( string levelName )
 	{
 		Global = new SettingsFile( $"/levels/{levelName}/global.sam" );
 		Current = this;
 
-		SetupEntities();
 		SetupHud();
 
 		Event.Register( this );
@@ -36,6 +38,9 @@ public class Level
 	{
 		Hud = new();
 		Hud.AddChild( new Cursor() );
+
+		var texture = new TextureFile( GameDir.GetPath( "/data/ui/textures/text_grad.wct" ) );
+		loadingTexture = Hud.AddChild( new Image( new Texture( texture ) ) );
 	}
 
 	public void Update()
@@ -45,9 +50,17 @@ public class Level
 
 	public void Render( CommandList commandList )
 	{
+		if ( fCount == 1 )
+		{
+			SetupEntities();
+			loadingTexture.Delete();
+		}
+
 		Camera.Update();
 
 		Entity.All.ForEach( entity => entity.Render( commandList ) );
+
+		fCount++;
 	}
 
 	[Event.Game.Load]

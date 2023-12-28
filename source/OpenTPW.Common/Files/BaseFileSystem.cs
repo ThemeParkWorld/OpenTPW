@@ -1,219 +1,203 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
+﻿using System.Text;
 
 namespace OpenTPW;
 
 public class BaseFileSystem
 {
-	private string BasePath { get; }
-	private Dictionary<string, IArchive> ArchiveCache { get; } = new();
-	private Dictionary<string, Type> ArchiveHandlers { get; } = new();
-
-	public void RegisterArchiveHandler<T>( string extension ) where T : IArchive
-	{
-		ArchiveHandlers.Add( extension, typeof( T ) );
-	}
+	private readonly string basePath;
+	private readonly Dictionary<string, Type> archiveHandlers = new();
+	private readonly Dictionary<string, IArchive> archiveCache = new();
 
 	public BaseFileSystem( string relativePath )
 	{
-		BasePath = Path.GetFullPath( relativePath, Directory.GetCurrentDirectory() );
+		if ( !Directory.Exists( relativePath ) )
+			Directory.CreateDirectory( relativePath );
+
+		basePath = Path.GetFullPath( relativePath, Directory.GetCurrentDirectory() );
 	}
 
-	public string GetRelativePath( string absolutePath )
+	public void RegisterArchiveHandler<T>( string extension ) where T : IArchive
 	{
-		var path = Path.GetRelativePath( BasePath, absolutePath ).Replace( "\\", "/" );
-		return $"/{path}";
-	}
-
-	public string GetAbsolutePath( string relativePath )
-	{
-		if ( relativePath.StartsWith( "/" ) )
-			relativePath = relativePath[1..];
-
-		var path = Path.Combine( BasePath, relativePath ).Replace( "/", "\\" );
-		return path;
+		archiveHandlers[extension] = typeof( T );
 	}
 
 	public string ReadAllText( string relativePath )
 	{
-		return Encoding.ASCII.GetString( ReadAllBytes( relativePath ) );
+		using var stream = OpenRead( relativePath );
+		using var reader = new StreamReader( stream, Encoding.ASCII );
+		return reader.ReadToEnd();
 	}
 
 	public byte[] ReadAllBytes( string relativePath )
 	{
-		var stream = InternalOpenFile( GetAbsolutePath( relativePath ) );
-		var bytes = new byte[stream.Length];
-		stream.Read( bytes, 0, (int)stream.Length );
+		using var stream = OpenRead( relativePath );
+		using var ms = new MemoryStream();
+		stream.CopyTo( ms );
+		return ms.ToArray();
+	}
 
-		return bytes;
+	public Stream OpenWrite( string relativePath )
+	{
+		var absolutePath = GetAbsolutePath( relativePath );
+		var (archivePath, _) = FindArchivePath( absolutePath );
+
+		if ( !string.IsNullOrEmpty( archivePath ) )
+		{
+			throw new NotImplementedException( "Can't write to archives" );
+		}
+
+		string? directoryName = Path.GetDirectoryName( absolutePath );
+		if ( !Directory.Exists( directoryName ) )
+			Directory.CreateDirectory( directoryName );
+
+		return File.OpenWrite( absolutePath );
 	}
 
 	public Stream OpenRead( string relativePath )
 	{
-		return InternalOpenFile( GetAbsolutePath( relativePath ) );
-	}
-
-	private bool HasExtension( string name, string extension )
-	{
-		if ( name.EndsWith( extension, StringComparison.OrdinalIgnoreCase ) )
-			return true;
-
-		if ( name.EndsWith( $".{extension}", StringComparison.OrdinalIgnoreCase ) )
-			return true;
-
-		return false;
-	}
-
-	public string[] GetDirectories( string relativePath )
-	{
 		var absolutePath = GetAbsolutePath( relativePath );
-		var directories = InternalGetDirectories( absolutePath );
+		var (archivePath, internalPath) = FindArchivePath( absolutePath );
 
-		// Add archives
+		if ( !string.IsNullOrEmpty( archivePath ) )
 		{
-			var archives = InternalGetFiles( absolutePath ).Where( x => HasExtension( x, ".wad" ) || HasExtension( x, ".sdt" ) );
-			directories = directories.Concat( archives ).ToArray();
+			var archive = GetArchive( archivePath );
+			return archive?.OpenFile( internalPath );
 		}
 
-		var relativeDirectories = directories.Select( GetRelativePath );
-		return relativeDirectories.ToArray();
+		return File.Open( absolutePath, FileMode.Open, FileAccess.Read, FileShare.Read );
+	}
+
+	public long GetSize( string relativePath )
+	{
+		var absolutePath = GetAbsolutePath( relativePath );
+		var (archivePath, internalPath) = FindArchivePath( absolutePath );
+
+		if ( !string.IsNullOrEmpty( archivePath ) )
+		{
+			var archive = GetArchive( archivePath );
+			return archive?.GetFileSize( internalPath ) ?? 0L;
+		}
+
+		return new FileInfo( absolutePath ).Length;
+	}
+
+	public DateTime GetModifiedTime( string relativePath )
+	{
+		var absolutePath = GetAbsolutePath( relativePath );
+		var (archivePath, internalPath) = FindArchivePath( absolutePath );
+
+		if ( !string.IsNullOrEmpty( archivePath ) )
+		{
+			var archive = GetArchive( archivePath );
+			return archive?.GetModifiedTime() ?? DateTime.UnixEpoch;
+		}
+
+		return new FileInfo( absolutePath ).LastWriteTime;
 	}
 
 	public string[] GetFiles( string relativePath )
 	{
-		var files = InternalGetFiles( GetAbsolutePath( relativePath ) );
-		var filteredFiles = files.Where( x => !HasExtension( x, ".wad" ) && !HasExtension( x, ".sdt" ) );
-		var relativeFiles = filteredFiles.Select( GetRelativePath );
-
-		return relativeFiles.ToArray();
+		return GetFileSystemEntries( relativePath, false );
 	}
 
-	/// <summary>
-	/// Retrieves an archive from, or adds an archive to, the archive cache.
-	/// </summary>
-	private IArchive? GetArchive( string relativePath )
+	public string[] GetDirectories( string relativePath )
 	{
-		if ( !TryGetArchiveType( relativePath, out var archiveType ) )
-			return null;
+		return GetFileSystemEntries( relativePath, true );
+	}
 
-		if ( !ArchiveCache.TryGetValue( relativePath, out var archive ) )
+	private string[] GetFileSystemEntries( string relativePath, bool directories )
+	{
+		var absolutePath = GetAbsolutePath( relativePath );
+		var (archivePath, internalPath) = FindArchivePath( absolutePath );
+
+		if ( !string.IsNullOrEmpty( archivePath ) )
 		{
-			archive = (Activator.CreateInstance( archiveType, new[] { relativePath } ) as IArchive)!;
-			ArchiveCache[relativePath] = archive;
+			var archive = GetArchive( archivePath );
+			var entries = directories ? archive.GetDirectories( internalPath ) : archive.GetFiles( internalPath );
+			return entries.Select( entry => Path.Combine( relativePath, entry ) ).ToArray();
 		}
 
-		return archive;
+		if ( directories )
+		{
+			var fileSystemDirectories = Directory.GetDirectories( absolutePath );
+			var fileSystemArchives = Directory.GetFiles( absolutePath ).Where( x => archiveHandlers.Keys.Contains( Path.GetExtension( x ) ) ).Select( x => x[..x.LastIndexOf( "." )] );
+
+			return fileSystemDirectories.Concat( fileSystemArchives ).ToArray();
+		}
+		else
+		{
+			return Directory.GetFiles( absolutePath ).Where( x => !archiveHandlers.Keys.Contains( Path.GetExtension( x ) ) ).ToArray();
+		}
 	}
 
-	private bool TryGetArchiveType( string path, [NotNullWhen( true )] out Type? archiveType )
+	private IArchive GetArchive( string archivePath )
 	{
-		return ArchiveHandlers.TryGetValue( Path.GetExtension( path ), out archiveType );
+		if ( archiveCache.TryGetValue( archivePath, out var archive ) )
+		{
+			return archive;
+		}
+
+		var extension = Path.GetExtension( archivePath );
+		if ( archiveHandlers.TryGetValue( extension, out var handlerType ) )
+		{
+			archive = (IArchive)Activator.CreateInstance( handlerType, new[] { archivePath } );
+			archiveCache[archivePath] = archive;
+			return archive;
+		}
+
+		return null;
 	}
 
-	/// <summary>
-	/// Gets the archive path and internal path for a particular path, checking each part for registered archive extensions.
-	/// </summary>
-	private (string ArchivePath, string InternalPath) DissectPath( string path )
+	private (string ArchivePath, string InternalPath) FindArchivePath( string path )
 	{
 		var parts = path.Split( Path.DirectorySeparatorChar );
-		var archivePath = new StringBuilder();
-		var internalPath = new StringBuilder();
-
-		bool archiveFound = false;
+		var currentPath = new StringBuilder();
 
 		foreach ( var part in parts )
 		{
-			if ( !archiveFound )
+			if ( currentPath.Length > 0 )
 			{
-				// Construct the current path segment
-				if ( archivePath.Length > 0 )
+				currentPath.Append( Path.DirectorySeparatorChar );
+			}
+
+			currentPath.Append( part );
+
+			foreach ( var handler in archiveHandlers )
+			{
+				var extension = handler.Key;
+				var potentialArchivePath = $"{currentPath}{extension}";
+
+				if ( archiveHandlers.ContainsKey( extension ) && File.Exists( potentialArchivePath ) )
 				{
-					archivePath.Append( "/" );
-				}
-
-				archivePath.Append( part );
-
-				foreach ( var handler in ArchiveHandlers )
-				{
-					var extension = handler.Key;
-					var archiveFilePath = $"{archivePath}{extension}";
-
-					// Check if an archive file exists with the current handler's extension
-					if ( File.Exists( archiveFilePath ) )
-					{
-						archiveFound = true;
-						archivePath.Append( $"{extension}" );
-					}
+					var remainingPath = path.Substring( currentPath.Length );
+					return (potentialArchivePath, remainingPath.TrimStart( Path.DirectorySeparatorChar ));
 				}
 			}
-			else
-			{
-				// Once an archive is found, the rest of the path is considered internal.
-				if ( internalPath.Length > 0 )
-				{
-					internalPath.Append( "/" );
-				}
 
-				internalPath.Append( part );
+			if ( Directory.Exists( currentPath.ToString() ) )
+			{
+				continue;
 			}
 		}
 
-		return archiveFound ? (archivePath.ToString(), internalPath.ToString()) : ("", "");
+		return (string.Empty, path);
 	}
 
-	/// <summary>
-	/// Handles enumerating through directories based on whether they're part of a WAD or not
-	/// </summary>
-	private string[] InternalGetDirectories( string absolutePath )
+	public string GetAbsolutePath( string relativePath )
 	{
-		if ( TryGetArchiveType( absolutePath, out _ ) )
-		{
-			var (archivePath, internalPath) = DissectPath( absolutePath );
-			var archive = GetArchive( archivePath );
-
-			return archive.GetDirectories( internalPath ).Select( x => absolutePath + "\\" + x ).ToArray();
-		}
-		else
-		{
-			return Directory.GetDirectories( absolutePath );
-		}
+		return Path.Combine( basePath, relativePath.TrimStart( '/' ) ).Replace( "/", "\\" );
 	}
 
-	/// <summary>
-	/// Handles enumerating through files based on whether they're part of a WAD or not
-	/// </summary>
-	private string[] InternalGetFiles( string absolutePath )
+	public string GetRelativePath( string absolutePath )
 	{
-		var (archivePath, internalPath) = DissectPath( absolutePath );
-
-		if ( string.IsNullOrEmpty( archivePath ) )
-		{
-			return Directory.GetFiles( absolutePath );
-		}
-		else
-		{
-			var archive = GetArchive( archivePath );
-			return archive.GetFiles( internalPath ).Select( x => absolutePath + "\\" + x ).ToArray();
-		}
+		var path = Path.GetRelativePath( basePath, absolutePath ).Replace( "\\", "/" );
+		return $"/{path}";
 	}
 
-	/// <summary>
-	/// Handles opening a file based on whether it's part of a WAD or not
-	/// </summary>
-	private Stream InternalOpenFile( string absolutePath )
+	public bool IsArchive( string path )
 	{
-		var (archivePath, internalPath) = DissectPath( absolutePath );
+		var (archivePath, internalPath) = FindArchivePath( path );
 
-		if ( string.IsNullOrEmpty( archivePath ) )
-		{
-			return File.OpenRead( absolutePath );
-		}
-		else
-		{
-			var archive = GetArchive( archivePath );
-			var file = archive.GetFile( internalPath );
-
-			return new MemoryStream( file.GetData() );
-		}
+		return !string.IsNullOrEmpty( archivePath );
 	}
 }

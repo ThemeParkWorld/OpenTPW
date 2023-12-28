@@ -1,45 +1,40 @@
 ﻿using ImGuiNET;
+using OpenTPW.ModKit;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Veldrid;
 
 namespace OpenTPW;
-internal partial class Editor
+public partial class Editor
 {
 	public static Editor Instance { get; private set; }
 
-	public ImGuiRenderer ImGuiRenderer { get; private set; }
-	private Texture defaultFontTexture;
+	public ImGuiRenderer imguiRenderer { get; private set; }
+	public GraphicsDevice graphicsDevice { get; private set; }
 
 	private List<BaseTab> tabs = new();
 
-	private bool shouldRender;
+	private bool shouldRender = true;
 
 	public static ImFontPtr MonospaceFont { get; private set; }
 	public static ImFontPtr SansSerifFont { get; private set; }
 
-	public Editor( ImGuiRenderer imGuiController )
+	public Editor( ImGuiRenderer imguiRenderer, GraphicsDevice graphicsDevice )
 	{
 		Instance ??= this;
 
-		ImGuiRenderer = imGuiController;
+		this.imguiRenderer = imguiRenderer;
+		this.graphicsDevice = graphicsDevice;
 
 		InitIO();
-		SetTheme();
 
 		tabs.AddRange( new BaseTab[] {
-			new TexturesTab(),
-			new ConsoleTab(),
-			new InputTab(),
-			new RidesTab(),
-			new FileBrowserTab(),
 			new DemoWindow(),
-			new CursorTab(),
-			new SceneTab(),
-			new ThemerTab()
+			new FileBrowser()
 		} );
 
-		tabs.ForEach( x => x.ImGuiRenderer = ImGuiRenderer );
+		tabs.ForEach( x => x.ImGuiRenderer = this.imguiRenderer );
 	}
 
 	private static void SetKeyMappings( ImGuiIOPtr io )
@@ -72,74 +67,17 @@ internal partial class Editor
 		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB;
 		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
 
-		io.Fonts.Clear();
-
-		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
-		MonospaceFont = io.Fonts.AddFontDefault();
-
-		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
-
-		int size = width * height * bpp;
-		byte[] data = new byte[size];
-		Marshal.Copy( pixels, data, 0, size );
-		defaultFontTexture = new Texture( data, width, height );
-
-		var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, defaultFontTexture.NativeTextureView );
-		io.Fonts.SetTexID( texPtr );
-		io.Fonts.ClearTexData();
+		// io.Fonts.Clear();
+		// io.Fonts.AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16f );
+		// io.Fonts.Build();
+		// imguiRenderer.RecreateFontDeviceTexture( graphicsDevice );
 
 		SetKeyMappings( io );
-	}
-
-	private void DrawPerfOverlay()
-	{
-		var io = ImGui.GetIO();
-		var window_flags = ImGuiWindowFlags.NoDecoration |
-			ImGuiWindowFlags.AlwaysAutoResize |
-			ImGuiWindowFlags.NoSavedSettings |
-			ImGuiWindowFlags.NoFocusOnAppearing |
-			ImGuiWindowFlags.NoNav |
-			ImGuiWindowFlags.NoInputs |
-			ImGuiWindowFlags.NoMove;
-
-		const float padding = 8.0f;
-
-		var viewport = ImGui.GetMainViewport();
-		var workPos = viewport.WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
-
-		System.Numerics.Vector2 windowPos, windowPivot;
-
-		windowPos.X = workPos.X + padding;
-		windowPos.Y = workPos.Y + padding;
-		windowPivot.X = 0.0f;
-		windowPivot.Y = 0.0f;
-
-		ImGui.SetNextWindowPos( windowPos, ImGuiCond.Always, windowPivot );
-
-		ImGui.SetNextWindowBgAlpha( 0.5f );
-
-		if ( ImGui.Begin( $"##overlay", window_flags ) )
-		{
-			string total = GC.GetTotalMemory( false ).ToSize( MathExtensions.SizeUnits.MB );
-
-			ImGui.Text( $"{io.Framerate.CeilToInt()}fps" );
-			ImGui.Separator();
-			ImGui.Text( $"{total} total" );
-		}
-
-		ImGui.End();
 	}
 
 	private void DrawMenuBar()
 	{
 		ImGui.BeginMainMenuBar();
-
-		ImGui.Dummy( new( 4, 0 ) );
-		ImGui.Text( "OpenTPW" );
-		ImGui.Dummy( new( 4, 0 ) );
-
-		ImGui.Separator();
-		ImGui.Dummy( new( 4, 0 ) );
 
 		foreach ( var tab in tabs )
 		{
@@ -169,16 +107,7 @@ internal partial class Editor
 
 	public void UpdateFrom( InputSnapshot inputSnapshot )
 	{
-		ImGuiRenderer.Update( Time.Delta, inputSnapshot );
-
-		if ( Input.Pressed( InputButton.ConsoleToggle ) )
-			shouldRender = !shouldRender;
-
-		if ( !shouldRender )
-		{
-			DrawPerfOverlay();
-			return;
-		}
+		imguiRenderer.Update( 1 / 60f, inputSnapshot );
 
 		DrawMenuBar();
 
@@ -189,6 +118,38 @@ internal partial class Editor
 			if ( tab.visible )
 				tab.Draw();
 		} );
+	}
+
+	public async Task<string> CacheThumbnailAsync( string path )
+	{
+		if ( !path.EndsWith( ".wct" ) )
+			return "";
+
+		var thumbnailPath = FileSystem.GetRelativePath( path );
+		thumbnailPath = Path.ChangeExtension( thumbnailPath, ".png" );
+		thumbnailPath = "/thumbcache" + thumbnailPath;
+
+		await Task.Run( () =>
+		{
+			var textureFile = new TextureFile( path );
+			var t = textureFile.Data;
+
+			var pixelData = new Rgba32[t.Width * t.Height];
+
+			for ( int i = 0; i < t.Width * t.Height; ++i )
+			{
+				var tInd = i * 4;
+				pixelData[i] = new Rgba32( t.Data[tInd], t.Data[tInd + 1], t.Data[tInd + 2], t.Data[tInd + 3] );
+			}
+
+			using var img = Image.LoadPixelData<Rgba32>( pixelData, t.Width, t.Height );
+			using var writeStream = CacheFileSystem.OpenWrite( thumbnailPath );
+			img.SaveAsPng( writeStream );
+
+			Log.Info( $"Cached to {thumbnailPath}" );
+		} );
+
+		return thumbnailPath;
 	}
 }
 

@@ -22,12 +22,4 @@ internal static class EditorHelpers
 		var padding = new System.Numerics.Vector2( 4, 2 );
 		ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
 	}
-
-	public static void Image( Texture texture, Vector2 size )
-	{
-		var texPtr = Editor.Instance.ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.NativeTextureView );
-
-		ImGui.Image( texPtr, size,
-			new System.Numerics.Vector2( 0, 1 ), new System.Numerics.Vector2( 1, 0 ) );
-	}
 }

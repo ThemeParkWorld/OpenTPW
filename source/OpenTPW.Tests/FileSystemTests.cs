@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿global using static OpenTPW.Common.GlobalNamespace;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-
-using static GlobalNamespace;
 
 namespace OpenTPW.Tests;
 
@@ -56,7 +56,7 @@ public class FileSystemTests
 	}
 
 	[TestMethod]
-	public void EnumerateFilesArchive()
+	public void EnumerateFilesWADArchive()
 	{
 		var files = FileSystem.GetFiles( "/fonts" );
 
@@ -75,5 +75,19 @@ public class FileSystemTests
 		var file = FileSystem.ReadAllBytes( "/levels/jungle/terrain/textures/jgr_bas1.wct" );
 
 		Assert.IsTrue( file.Length > 0 );
+	}
+
+	[TestMethod]
+	public void EnumerateFilesSDTArchive()
+	{
+		var files = FileSystem.GetFiles( "/global/sound/AmbientHD" );
+
+		foreach ( var item in files )
+		{
+			Console.WriteLine( $"{item}" );
+		}
+
+		Assert.IsTrue( files.Length > 0 );
+		Assert.IsTrue( files.Any( x => x.EndsWith( "mp2" ) ) );
 	}
 }

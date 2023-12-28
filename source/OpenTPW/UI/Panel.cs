@@ -43,4 +43,9 @@ public class Panel
 		modelMatrix = Matrix4x4.CreateScale( sizeNDC.X, sizeNDC.Y, 1 ) *
 			Matrix4x4.CreateTranslation( positionNDC.X, positionNDC.Y, 1 );
 	}
+
+	public virtual void Delete()
+	{
+		Level.Current.Hud.Children.Remove( this );
+	}
 }

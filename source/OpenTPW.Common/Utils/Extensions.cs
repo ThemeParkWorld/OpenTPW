@@ -95,10 +95,34 @@ public static class MathExtensions
 	// https://stackoverflow.com/a/22733709/8176082
 	public enum SizeUnits
 	{
-		Byte, KB, MB, GB, TB, PB, EB, ZB, YB
+		B, KB, MB, GB, TB, PB, EB, ZB, YB
 	}
 
 	public static string ToSize( this long value, SizeUnits unit ) => (value / (double)Math.Pow( 1024, (long)unit )).ToString( "0.00" ) + unit.ToString();
+
+	public static string ToSize( this long value )
+	{
+		SizeUnits unit = SizeUnits.B;
+
+		if ( value >= Math.Pow( 1024, (long)SizeUnits.YB ) )
+			unit = SizeUnits.YB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.ZB ) )
+			unit = SizeUnits.ZB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.EB ) )
+			unit = SizeUnits.EB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.PB ) )
+			unit = SizeUnits.PB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.TB ) )
+			unit = SizeUnits.TB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.GB ) )
+			unit = SizeUnits.GB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.MB ) )
+			unit = SizeUnits.MB;
+		else if ( value >= Math.Pow( 1024, (long)SizeUnits.KB ) )
+			unit = SizeUnits.KB;
+
+		return ToSize( value, unit );
+	}
 }
 
 public static class ListExtension

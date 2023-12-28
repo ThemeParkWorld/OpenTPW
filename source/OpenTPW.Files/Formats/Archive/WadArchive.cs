@@ -229,7 +229,7 @@ public sealed class WadArchive : IArchive
 		if ( internalPath == "" )
 			throw new Exception( $"Path was empty" );
 
-		var splitPath = internalPath.Split( "/" );
+		var splitPath = internalPath.Split( Path.DirectorySeparatorChar );
 
 		for ( int i = 0; i < splitPath.Length; i++ )
 		{
@@ -252,15 +252,15 @@ public sealed class WadArchive : IArchive
 
 		if ( internalPath != "" )
 		{
-			var splitPath = internalPath.Split( "/" );
+			var splitPath = internalPath.Split( Path.DirectorySeparatorChar );
 
 			foreach ( string dir in splitPath )
 			{
-				internalDirectory = internalDirectory.Children.OfType<ArchiveDirectory>().First( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
+				internalDirectory = internalDirectory.Children.OfType<ArchiveDirectory>().FirstOrDefault( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
 			}
 		}
 
-		return internalDirectory.Children.OfType<T>().ToList();
+		return internalDirectory?.Children.OfType<T>().ToList() ?? null;
 	}
 
 	public ArchiveFile GetFile( string internalPath )
@@ -276,18 +276,33 @@ public sealed class WadArchive : IArchive
 	public string[] GetFiles( string internalPath )
 	{
 		var files = EnumerateItems<ArchiveFile>( internalPath );
-		return (files.Select( x => x.Name ).ToArray() ?? Array.Empty<string>())!;
+		return (files?.Select( x => x.Name ).ToArray() ?? Array.Empty<string>())!;
 	}
 
 	public string[] GetDirectories( string internalPath )
 	{
 		var files = EnumerateItems<ArchiveDirectory>( internalPath );
-		return (files.Select( x => x.Name ).ToArray() ?? Array.Empty<string>())!;
+		return (files?.Select( x => x.Name ).ToArray() ?? Array.Empty<string>())!;
 	}
 
 	public byte[] GetData( int offset, int length )
 	{
 		memoryStream.Seek( offset, SeekOrigin.Begin );
 		return memoryStream.ReadBytes( length );
+	}
+
+	public Stream OpenFile( string path )
+	{
+		return new MemoryStream( GetFile( path ).GetData() );
+	}
+
+	public long GetFileSize( string path )
+	{
+		return GetFile( path ).GetData().Length;
+	}
+
+	public DateTime GetModifiedTime()
+	{
+		return DateTime.UnixEpoch;
 	}
 }

@@ -35,6 +35,15 @@ public partial class Texture : Asset
 	}
 
 	/// <summary>
+	/// From game resource
+	/// </summary>
+	public Texture( TextureFile textureFile )
+	{
+		var textureData = textureFile.Data;
+		CreateTexture( "", textureData.Data, (uint)textureData.Width, (uint)textureData.Height );
+	}
+
+	/// <summary>
 	/// From data as bytes
 	/// </summary>
 	public Texture( byte[] data, int width, int height )

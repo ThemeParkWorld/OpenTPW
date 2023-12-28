@@ -12,11 +12,8 @@ public partial class Image : Panel
 		public Matrix4x4 g_mModel;
 	}
 
-	public Image( string relativePath )
+	public Image( Texture texture )
 	{
-		var textureFile = new TextureFile( relativePath );
-		var texture = new Texture( textureFile.Data.Data, textureFile.Data.Width, textureFile.Data.Height );
-
 		var material = new Material(
 			texture,
 			ShaderBuilder.Default.WithVertex( "content/shaders/test.vert" )
@@ -32,9 +29,8 @@ public partial class Image : Panel
 	{
 		base.Update();
 
-		var aspect = 4f / 3f;
 		position = new Vector2( Screen.Size.X / 2, Screen.Size.Y / 2 );
-		size = new Vector2( Screen.Size.Y * aspect, Screen.Size.Y );
+		size = new Vector2( Screen.Size.X, Screen.Size.Y );
 	}
 
 	public override void Draw( CommandList commandList )

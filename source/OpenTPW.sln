@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTPW.Tests", "OpenTPW.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTPW.Files", "OpenTPW.Files\OpenTPW.Files.csproj", "{42D3A6E7-2013-4684-BA98-43461D82D35F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTPW.Common", "OpenTPW.Common\OpenTPW.Common.csproj", "{23857BBA-5680-4871-9C35-8A4699461B51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenTPW.Common", "OpenTPW.Common\OpenTPW.Common.csproj", "{23857BBA-5680-4871-9C35-8A4699461B51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTPW.ModKit", "OpenTPW.ModKit\OpenTPW.ModKit.csproj", "{5C8022A2-4124-496A-9DA6-C55421EAFBB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{23857BBA-5680-4871-9C35-8A4699461B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23857BBA-5680-4871-9C35-8A4699461B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23857BBA-5680-4871-9C35-8A4699461B51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C8022A2-4124-496A-9DA6-C55421EAFBB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C8022A2-4124-496A-9DA6-C55421EAFBB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C8022A2-4124-496A-9DA6-C55421EAFBB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C8022A2-4124-496A-9DA6-C55421EAFBB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

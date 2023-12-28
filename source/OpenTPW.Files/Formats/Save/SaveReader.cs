@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace OpenTPW;
 
@@ -118,8 +119,8 @@ public class SaveReader : BaseFormat
 
 		byte[] output = new byte[compressedLength];
 
-		using ( ExpandedMemoryStream compressed = new ExpandedMemoryStream( output ) )
 		using ( MemoryStream uncompressedStream = new MemoryStream() )
+		using ( InflaterInputStream compressed = new InflaterInputStream( memoryStream ) )
 		{
 			compressed.CopyTo( uncompressedStream );
 			return uncompressedStream.ToArray();

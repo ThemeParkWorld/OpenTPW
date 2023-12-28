@@ -22,11 +22,13 @@ public class RootPanel : Entity
 		Children.ForEach( child => child.Update() );
 	}
 
-	public void AddChild<T>( T? obj = null ) where T : Panel
+	public T AddChild<T>( T? obj = null ) where T : Panel
 	{
 		if ( obj is null )
 			obj = Activator.CreateInstance( typeof( T ) ) as T;
 
 		Children.Add( obj );
+
+		return obj;
 	}
 }

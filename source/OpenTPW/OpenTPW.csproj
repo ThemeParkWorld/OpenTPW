@@ -36,6 +36,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\OpenTPW.Common\OpenTPW.Common.csproj" />
 	  <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj" />
+	  <ProjectReference Include="..\OpenTPW.ModKit\OpenTPW.ModKit.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

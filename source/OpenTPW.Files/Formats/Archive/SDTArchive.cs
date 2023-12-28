@@ -95,4 +95,19 @@ public class SdtArchive : IArchive
 		memoryStream.Seek( offset, SeekOrigin.Begin );
 		return memoryStream.ReadBytes( length );
 	}
+
+	public Stream OpenFile( string path )
+	{
+		return new MemoryStream( GetFile( path ).GetData() );
+	}
+
+	public long GetFileSize( string path )
+	{
+		return GetFile( path ).GetData().Length;
+	}
+
+	public DateTime GetModifiedTime()
+	{
+		return DateTime.UnixEpoch;
+	}
 }

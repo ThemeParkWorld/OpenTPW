@@ -34,4 +34,15 @@ public interface IArchive : IFileFormat, IDisposable
 	/// <param name="internalPath"></param>
 	/// <returns></returns>
 	byte[] GetData( int offset, int length );
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
+	Stream OpenFile( string path );
+
+	long GetFileSize( string path );
+
+	DateTime GetModifiedTime();
 }
