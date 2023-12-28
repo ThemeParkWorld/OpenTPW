@@ -72,34 +72,35 @@ partial class TextureFile
 	private bool DecodeChannel( ref ImageDecodeState state, int size, ref byte[] pSrc, ref List<float> outputBuffer, float dequantizationScale, bool isHalfScale, bool isAlpha = false )
 	{
 		int count = size * (size / 2);
+		int index = 0;
 
 		//
 		// Step 1: Dequantize
 		//
-		for ( int i = 0; i < count; ++i )
+		for ( int i = 0; i < count; i++ )
 		{
-			int val = (sbyte)pSrc[0];
-			Array.Copy( pSrc, 1, pSrc, 0, pSrc.Length - 1 );
+			int val = (sbyte)pSrc[index++];
 
 			if ( val == sbyte.MinValue )
 			{
-				val = pSrc[0] | (pSrc[1] << 8);
-				Array.Copy( pSrc, 2, pSrc, 0, pSrc.Length - 2 );
+				val = BitConverter.ToInt16( pSrc, index );
+				index += sizeof( short );
 			}
 
-			state.DequantizationBuffer[i * 2] = ((float)val).Clamp( -255, 255 );
+			state.DequantizationBuffer[i * 2] = (float)val;
 
-			val = (sbyte)pSrc[0];
-			Array.Copy( pSrc, 1, pSrc, 0, pSrc.Length - 1 );
+			val = (sbyte)pSrc[index++];
 
 			if ( val == sbyte.MinValue )
 			{
-				val = pSrc[0] | (pSrc[1] << 8);
-				Array.Copy( pSrc, 2, pSrc, 0, pSrc.Length - 2 );
+				val = BitConverter.ToInt16( pSrc, index );
+				index += sizeof( short );
 			}
 
-			state.DequantizationBuffer[i * 2 + 1] = ((float)val).Clamp( -255, 255 );
+			state.DequantizationBuffer[i * 2 + 1] = (float)val;
 		}
+
+		Array.Copy( pSrc, index, pSrc, 0, pSrc.Length - index );
 
 		//
 		// Step 2: decode rows
@@ -121,15 +122,12 @@ partial class TextureFile
 				else
 					baseIndex = index * 2;
 
-				switch ( component )
+				return component switch
 				{
-					case D4Component.Scale:
-						return baseIndex + 0;
-					case D4Component.Wavelet:
-						return baseIndex + 1;
-					default:
-						throw new NotImplementedException();
-				}
+					D4Component.Scale => baseIndex + 0,
+					D4Component.Wavelet => baseIndex + 1,
+					_ => throw new NotImplementedException(),
+				};
 			},
 
 			// Output index lookup
@@ -141,15 +139,12 @@ partial class TextureFile
 				else
 					baseIndex = index * 2;
 
-				switch ( component )
+				return component switch
 				{
-					case D4Component.Scale:
-						return baseIndex + 0;
-					case D4Component.Wavelet:
-						return baseIndex + 1;
-					default:
-						throw new NotImplementedException();
-				}
+					D4Component.Scale => baseIndex + 0,
+					D4Component.Wavelet => baseIndex + 1,
+					_ => throw new NotImplementedException(),
+				};
 			},
 			ref state.DequantizationBuffer, ref state.RowDecodeBuffer, i * size, (isHalfScale) ? size : size / 2, coefs );
 		}
@@ -169,15 +164,12 @@ partial class TextureFile
 			( index, component ) =>
 			{
 				int baseIndex = index * size;
-				switch ( component )
+				return component switch
 				{
-					case D4Component.Scale:
-						return baseIndex + colOffset + sOffset;
-					case D4Component.Wavelet:
-						return baseIndex + colOffset + wOffset;
-					default:
-						throw new NotImplementedException();
-				}
+					D4Component.Scale => baseIndex + colOffset + sOffset,
+					D4Component.Wavelet => baseIndex + colOffset + wOffset,
+					_ => throw new NotImplementedException(),
+				};
 			},
 
 			// Output index lookup
@@ -185,15 +177,12 @@ partial class TextureFile
 			{
 				int baseIndex = index * 2 * size + colOffset;
 
-				switch ( component )
+				return component switch
 				{
-					case D4Component.Scale:
-						return baseIndex;
-					case D4Component.Wavelet:
-						return baseIndex + size;
-					default:
-						throw new NotImplementedException();
-				}
+					D4Component.Scale => baseIndex,
+					D4Component.Wavelet => baseIndex + size,
+					_ => throw new NotImplementedException(),
+				};
 			},
 			ref state.RowDecodeBuffer, ref outputBuffer, 0, size / 2, coefs );
 		}
