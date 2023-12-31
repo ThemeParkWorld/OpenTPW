@@ -2,21 +2,21 @@
 
 // BIG SHOUT TO Toksisitee - https://github.com/Toksisitee/PopSoundEditor
 
-public class MP2Reader : BaseFormat
+public class SoundFile : BaseFormat
 {
 	private ExpandedMemoryStream memoryStream;
 	public byte[] buffer;
 
-	public MP2Reader( string path )
+	public SoundFile( string path )
 	{
-		using var fileStream = File.OpenRead( path );
-		ReadFromStream( fileStream );
+		ReadFromFile( path );
 	}
 
-	public MP2Reader( Stream stream )
+	public SoundFile( Stream stream )
 	{
 		ReadFromStream( stream );
 	}
+
 	public void Dispose()
 	{
 		memoryStream.Dispose();

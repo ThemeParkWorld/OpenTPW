@@ -29,7 +29,7 @@ public partial class TextureFile : BaseFormat
 		//
 		// Read header
 		//
-		TextureFileData fileData = new()
+		var fileData = new TextureFileData()
 		{
 			Flags = (TextureFlags)binaryReader.ReadByte(),
 			HasAlphaChannel = binaryReader.ReadByte() == 0x01,
@@ -62,9 +62,6 @@ public partial class TextureFile : BaseFormat
 		if ( fileData.AlphaChunkSize > 0 )
 			fileData.AlphaChunk = binaryReader.ReadBytes( fileData.AlphaChunkSize );
 
-		if ( fileData.AlphaChunkSize > 0 && !fileData.HasAlphaChannel )
-			throw new InvalidDataException( $"Expected alpha chunk size to be 0, but alpha block size was actually {fileData.AlphaChunkSize}" );
-
 		//
 		// Decompress blocks
 		//
@@ -90,7 +87,7 @@ public partial class TextureFile : BaseFormat
 		DecodeChannel( ref state, size / 2, ref colorData, ref outputCb, ComputeDequantizationScaleCbCr( fileData.CbChannelQuantizationScale ), isHalfScale );
 		DecodeChannel( ref state, size / 2, ref colorData, ref outputCr, ComputeDequantizationScaleCbCr( fileData.CrChannelQuantizationScale ), isHalfScale );
 
-		if ( fileData.AlphaChunkSize > 0 )
+		if ( fileData.HasAlphaChannel )
 			DecodeChannel( ref state, size, ref alphaData, ref outputA, ComputeDequantizationScaleA( fileData.AChannelQuantizationScale ), isHalfScale, true );
 
 		uint alignedWidth = GetAlignedSize( (uint)fileData.Width );
@@ -102,6 +99,7 @@ public partial class TextureFile : BaseFormat
 		{
 			for ( int x = 0; x < fileData.Width; x++ )
 			{
+				// Convert from ycbcr to rgb
 				float cy = outputY[y * size + x];
 				float cb = outputCb[((y / 2) * (size / 2) + (x / 2))];
 				float cr = outputCr[((y / 2) * (size / 2) + (x / 2))];
@@ -109,12 +107,13 @@ public partial class TextureFile : BaseFormat
 				float r = cy + 1.402f * (cr);
 				float g = cy - 0.344136f * (cb) - 0.714136f * (cr);
 				float b = cy + 1.772f * (cb);
+
+				// Alpha channel remains untouched..
 				float a = outputA[y * size + x];
 
 				outputBytes[((y * fileData.Width + x) * 4)] = r;
 				outputBytes[((y * fileData.Width + x) * 4) + 1] = g;
 				outputBytes[((y * fileData.Width + x) * 4) + 2] = b;
-
 				outputBytes[((y * fileData.Width + x) * 4) + 3] = a;
 			}
 		}

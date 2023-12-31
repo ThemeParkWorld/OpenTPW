@@ -23,6 +23,7 @@ internal class Application
 		Log = new();
 
 		var window = new Window( 1280, 720, "OpenTPW ModKit" );
+
 		gd = VeldridStartup.CreateGraphicsDevice( window.SdlWindow, GraphicsBackend.Vulkan );
 
 		ImGuiManager = new ImGuiRenderer(

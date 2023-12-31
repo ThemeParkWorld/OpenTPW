@@ -4,22 +4,6 @@ using Veldrid;
 
 namespace OpenTPW.ModKit;
 
-internal interface IFileViewer
-{
-	void DrawPreview();
-}
-
-[System.AttributeUsage( AttributeTargets.Class, Inherited = false, AllowMultiple = false )]
-internal sealed class HandlesExtensionAttribute : Attribute
-{
-	public readonly string Extension;
-
-	public HandlesExtensionAttribute( string extension )
-	{
-		Extension = extension;
-	}
-}
-
 [HandlesExtension( ".wct" )]
 internal class TextureViewer : IFileViewer
 {
@@ -34,6 +18,7 @@ internal class TextureViewer : IFileViewer
 		textureFile = new TextureFile( fileName );
 		CreateVeldridTexture();
 	}
+
 	private int CalculateMipLevels( int width, int height, int depth )
 	{
 		int maxDimension = Math.Max( width, Math.Max( height, depth ) );
@@ -85,15 +70,17 @@ internal class TextureViewer : IFileViewer
 
 	public void DrawPreview()
 	{
-		var Device = Editor.Instance.graphicsDevice;
-
 		if ( imguiPtr == IntPtr.Zero )
 		{
 			ImGui.Text( $"No imguiPtr?" );
 			return;
 		}
 
-		var size = ImGui.GetWindowWidth() - 16; /* Padding approx. */
-		ImGui.Image( imguiPtr, new Vector2( size ) );
+		ImGui.Image( imguiPtr, new Vector2( textureFile.Data.Width, textureFile.Data.Height ) );
+	}
+
+	public TextureView GetIcon()
+	{
+		return textureView;
 	}
 }

@@ -3,7 +3,7 @@
 public class SdtArchive : IArchive
 {
 	private ExpandedMemoryStream memoryStream;
-	private MP2Reader mp2Reader;
+	private SoundFile mp2Reader;
 
 	public byte[] buffer;
 	public List<MP2File> soundFiles;
@@ -36,7 +36,7 @@ public class SdtArchive : IArchive
 		tempStreamReader.BaseStream.Read( buffer, 0, fileLength );
 		tempStreamReader.Close();
 		memoryStream = new ExpandedMemoryStream( buffer );
-		mp2Reader = new MP2Reader( new MemoryStream(buffer) );
+		mp2Reader = new SoundFile( new MemoryStream(buffer) );
 
 		ReadArchive();
 	}

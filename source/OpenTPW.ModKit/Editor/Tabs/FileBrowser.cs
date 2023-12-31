@@ -308,22 +308,18 @@ internal sealed class FileBrowser : BaseTab
 			var windowWidth = ImGui.GetWindowWidth() - margin;
 			var fileViewWidth = windowWidth - previewWidth;
 
-			if ( ImGui.BeginChild( "##FileView", new Vector2( fileViewWidth, -1 ), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse ) )
+			if ( ImGui.BeginTable( "##FileView", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY, new Vector2( fileViewWidth, -1 ) ) )
 			{
-				if ( ImGui.BeginTable( "##FileView", 4, ImGuiTableFlags.BordersV | ImGuiTableFlags.BordersOuter | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.ScrollY, new Vector2( -1, -1 ) ) )
-				{
-					ImGui.TableSetupColumn( $"File", ImGuiTableColumnFlags.DefaultSort, 0.5f );
-					ImGui.TableSetupColumn( $"Type", ImGuiTableColumnFlags.DefaultSort, 0.2f );
-					ImGui.TableSetupColumn( $"Modified", ImGuiTableColumnFlags.DefaultSort, 0.2f );
-					ImGui.TableSetupColumn( $"Size", ImGuiTableColumnFlags.DefaultSort, 0.1f );
-					ImGui.TableHeadersRow();
+				ImGui.TableSetupColumn( $"File", ImGuiTableColumnFlags.DefaultSort, 0.5f );
+				ImGui.TableSetupColumn( $"Type", ImGuiTableColumnFlags.DefaultSort, 0.2f );
+				ImGui.TableSetupColumn( $"Modified", ImGuiTableColumnFlags.DefaultSort, 0.2f );
+				ImGui.TableSetupColumn( $"Size", ImGuiTableColumnFlags.DefaultSort, 0.1f );
+				ImGui.TableHeadersRow();
 
-					DrawFiles();
-				}
-
-				ImGui.EndTable();
-				ImGui.EndChild();
+				DrawFiles();
 			}
+
+			ImGui.EndTable();
 
 			if ( CurrentFile != null )
 			{
@@ -333,11 +329,7 @@ internal sealed class FileBrowser : BaseTab
 				{
 					var fileName = Path.GetFileName( CurrentFile.Name );
 
-					if ( ImGui.BeginChild( "##PreviewInner", new System.Numerics.Vector2( previewWidth, previewWidth ), true ) )
-					{
-						DrawPreviewForFile( CurrentFile.Name );
-						ImGui.EndChild();
-					}
+					DrawPreviewForFile( CurrentFile.Name );
 
 					if ( ImGui.BeginTable( "##PreviewInfo", 2, ImGuiTableFlags.None, new Vector2( 325, 0 ) ) )
 					{

@@ -12,8 +12,8 @@ public class Level
 
 	public SettingsFile Global { get; private init; }
 
-	private int fCount = 0;
-	private Image loadingTexture;
+	// private int fCount = 0;
+	// private Image loadingTexture;
 
 	public Level( string levelName )
 	{
@@ -21,6 +21,7 @@ public class Level
 		Current = this;
 
 		SetupHud();
+		// SetupEntities();
 
 		Event.Register( this );
 		Event.Run( Event.Game.LoadAttribute.Name );
@@ -39,8 +40,7 @@ public class Level
 		Hud = new();
 		Hud.AddChild( new Cursor() );
 
-		var texture = new TextureFile( GameDir.GetPath( "/data/ui/textures/text_grad.wct" ) );
-		loadingTexture = Hud.AddChild( new Image( new Texture( texture ) ) );
+		Hud.AddChild( new Image( "/data/ui/textures/tpw_logo.wct" ) );
 	}
 
 	public void Update()
@@ -49,18 +49,10 @@ public class Level
 	}
 
 	public void Render( CommandList commandList )
-	{
-		if ( fCount == 1 )
-		{
-			SetupEntities();
-			loadingTexture.Delete();
-		}
-
+	{	
 		Camera.Update();
 
 		Entity.All.ForEach( entity => entity.Render( commandList ) );
-
-		fCount++;
 	}
 
 	[Event.Game.Load]

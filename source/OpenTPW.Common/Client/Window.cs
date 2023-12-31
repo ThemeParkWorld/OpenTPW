@@ -1,5 +1,7 @@
-﻿using Veldrid.Sdl2;
+﻿using System.Runtime.InteropServices;
+using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
+using Vulkan.Win32;
 
 namespace OpenTPW;
 
@@ -34,10 +36,8 @@ public class Window
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
-
-		Screen.UpdateFrom( Size );
-
 		SdlWindow.Resized += SdlWindow_Resized;
+		Screen.UpdateFrom( Size );
 	}
 
 	private void SdlWindow_Resized()
