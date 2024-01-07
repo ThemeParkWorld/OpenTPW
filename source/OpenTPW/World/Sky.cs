@@ -6,12 +6,12 @@ public class Sky : ModelEntity
 	{
 		base.Spawn();
 
-		var texture = new Texture( [42, 205, 244, 255], 1, 1 );
+		var texture = new Texture( [79, 214, 255, 255], 1, 1 );
 
 		var material = new Material<ObjectUniformBuffer>( "content/shaders/unlit.shader" );
 		material.Set( "Color", texture );
 
 		Model = Primitives.Cube.GenerateModel( material );
-		Scale = new Vector3( -100f );
+		Scale = new Vector3( -1000f );
 	}
 }

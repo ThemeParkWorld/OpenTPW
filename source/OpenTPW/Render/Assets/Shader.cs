@@ -7,7 +7,7 @@ public class Shader : Asset
 	private ShaderInfo shaderInfo;
 
 	public VertexElementDescription[] VertexElements => shaderInfo.Reflection.VertexElements;
-	public ResourceLayoutDescription ResourceLayout => shaderInfo.Reflection.ResourceLayouts[0];
+	public ResourceLayoutDescription[] ResourceLayouts => shaderInfo.Reflection.ResourceLayouts;
 	public Veldrid.Shader[] ShaderProgram => shaderInfo.ShaderProgram;
 
 	internal Shader( string path )

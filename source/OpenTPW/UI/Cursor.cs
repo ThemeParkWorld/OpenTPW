@@ -47,7 +47,7 @@ public class Cursor : Panel
 	private void LoadTexture()
 	{
 		var cursorPath = $"/data/ui/cursors/{GetImageName( cursorType )}.tga";
-		texture = new Texture( GameDir.GetPath( cursorPath ), TextureCreationFlags.PinkChromaKey );
+		texture = new Texture( GameDir.GetPath( cursorPath ), TextureFlags.PinkChromaKey );
 	}
 
 	protected override void OnRender()

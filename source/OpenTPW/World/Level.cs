@@ -20,8 +20,8 @@ public class Level
 		Global = new SettingsFile( $"/levels/{levelName}/global.sam" );
 		Current = this;
 
+		SetupEntities();
 		SetupHud();
-		// SetupEntities();
 
 		Event.Register( this );
 		Event.Run( Event.Game.LoadAttribute.Name );
@@ -31,7 +31,7 @@ public class Level
 	{
 		SunLight = new Sun() { Position = new( 0, 10, 10 ) };
 
-		_ = new Terrain();
+		_ = new Water();
 		_ = new Sky();
 	}
 
@@ -39,10 +39,10 @@ public class Level
 	{
 		Hud = new();
 
-		Hud.AddChild( new Cursor() );
-
 		var layout = new LobbyLayout() { Hud = Hud };
 		layout.OnInit();
+
+		Hud.AddChild( new Cursor() );
 	}
 
 	public void Update()

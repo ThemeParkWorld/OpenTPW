@@ -5,7 +5,7 @@ partial class Material
 	/// <summary>
 	/// Default shader for 2D UI objects
 	/// </summary>
-	public static Material UI = new( "content/shaders/ui.shader" );
+	public static Material UI = new( "content/shaders/ui.shader", MaterialFlags.DisableDepth );
 
 	/// <summary>
 	/// Default shader for 3D objects

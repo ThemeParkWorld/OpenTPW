@@ -12,7 +12,7 @@ internal sealed class LobbyLayout : Layout
 			Uv1 = new Vector2( 1, 1 ),
 
 			Position = new Vector2( 25 ),
-			Size = new Vector2( 200, 86 )
+			Size = new Vector2( 180f, 77.4f )
 		} );
 
 		var topRight = new Vector2( Screen.Width, Screen.Height );
@@ -29,7 +29,7 @@ internal sealed class LobbyLayout : Layout
 
 		Hud.AddChild( new PurpleButton( "Quit Game" )
 		{
-			position = topRight + new Vector2( 200, -400 )
+			position = topRight + new Vector2( 200, -425 )
 		} );
 	}
 }

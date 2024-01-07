@@ -85,8 +85,10 @@ internal static class ImDraw
 		cmd.SetVertexBuffer( 0, vertexBuffer );
 		cmd.SetPipeline( material.Pipeline );
 
-		material.CreateResources( out var resourceSet, out _ );
-		cmd.SetGraphicsResourceSet( 0, resourceSet );
+		material.CreateResources( out var resourceSets, out _ );
+
+		for ( uint i = 0; i < resourceSets.Length; ++i )
+			cmd.SetGraphicsResourceSet( i, resourceSets[i] );
 
 		cmd.DrawIndexed( (uint)indices.Count );
 	}

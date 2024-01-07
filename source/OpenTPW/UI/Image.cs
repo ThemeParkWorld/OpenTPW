@@ -1,6 +1,4 @@
-﻿using Veldrid;
-
-namespace OpenTPW.UI;
+﻿namespace OpenTPW.UI;
 
 public partial class Image : Panel
 {

@@ -18,6 +18,9 @@ internal class Renderer
 	//
 	public bool IsRendering { get; private set; }
 
+	private Editor Editor { get; set; }
+	private ImGuiRenderer ImGuiRenderer { get; set; }
+
 	public Renderer()
 	{
 		Event.Register( this );
@@ -42,6 +45,9 @@ internal class Renderer
 		Log.Info( $"This level costs {level.Global["Keys.CostToEnter"]} keys to enter." );
 
 		Window.Visible = true;
+
+		ImGuiRenderer = new ImGuiRenderer( Device, Device.MainSwapchain.Framebuffer.OutputDescription, Window.Size.X, Window.Size.Y );
+		Editor = new Editor( ImGuiRenderer, Device );
 	}
 
 	private void MainLoop()
@@ -70,6 +76,8 @@ internal class Renderer
 	{
 		IsRendering = false;
 
+		ImGuiRenderer.Render( Device, CommandList );
+
 		CommandList.End();
 		Device.SubmitCommands( CommandList );
 		Device.SwapBuffers();
@@ -89,6 +97,7 @@ internal class Renderer
 
 		Time.UpdateFrom( deltaTime );
 		Input.UpdateFrom( inputSnapshot );
+		Editor.UpdateFrom( inputSnapshot );
 
 		Level.Current.Update();
 	}

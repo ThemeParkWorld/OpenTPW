@@ -26,7 +26,7 @@ internal class PurpleButton : Panel
 
 		var uvs = new Rectangle( 0, 0, 1, 0.5f );
 		rect.Y -= 130;
-		rect.X += 30;
+		rect.X += 40;
 
 		//
 		// Start

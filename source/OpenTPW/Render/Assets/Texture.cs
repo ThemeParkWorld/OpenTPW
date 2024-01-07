@@ -1,12 +1,13 @@
 ﻿using StbImageSharp;
 using System.Runtime.InteropServices;
 using Veldrid;
-using static OpenTPW.Texture;
 
 namespace OpenTPW;
 
 public partial class Texture : Asset
 {
+	public SamplerType SamplerType { get; private set; }
+
 	public uint Width { get; private set; }
 	public uint Height { get; private set; }
 
@@ -18,23 +19,23 @@ public partial class Texture : Asset
 	/// <summary>
 	/// From path on disk, or from a game resource
 	/// </summary>
-	public Texture( string path, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None )
+	public Texture( string path, TextureFlags flags = TextureFlags.None )
 	{
 		if ( path.HasExtension( ".wct" ) )
-			UpdateFromWct( path, textureCreationFlags );
+			UpdateFromWct( path, flags );
 		else
-			UpdateFromStb( path, textureCreationFlags );
+			UpdateFromStb( path, flags );
 	}
 
 	/// <summary>
 	/// From data as bytes
 	/// </summary>
-	public Texture( byte[] data, int width, int height, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None )
+	public Texture( byte[] data, int width, int height, TextureFlags flags = TextureFlags.None )
 	{
-		CreateTexture( "", data, (uint)width, (uint)height, textureCreationFlags );
+		CreateTexture( "", data, (uint)width, (uint)height, flags );
 	}
 
-	public Texture( Stream stream, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None )
+	public Texture( Stream stream, TextureFlags flags = TextureFlags.None )
 	{
 		var fileData = new byte[stream.Length];
 		stream.Read( fileData, 0, fileData.Length );
@@ -46,13 +47,13 @@ public partial class Texture : Asset
 		var height = (uint)image.Height;
 		var debugName = $"Stream {stream.GetHashCode()}";
 
-		CreateTexture( debugName, data, width, height, textureCreationFlags );
+		CreateTexture( debugName, data, width, height, flags );
 	}
 
 	/// <summary>
 	/// Update from an image format supported by the STB library (jpg, png, gif, tga, etc.)
 	/// </summary>
-	private void UpdateFromStb( string path, TextureCreationFlags flags )
+	private void UpdateFromStb( string path, TextureFlags flags )
 	{
 		var fileData = File.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
@@ -67,7 +68,7 @@ public partial class Texture : Asset
 	/// <summary>
 	/// Update from a Bullfrog WCT file
 	/// </summary>
-	private void UpdateFromWct( string path, TextureCreationFlags flags )
+	private void UpdateFromWct( string path, TextureFlags flags )
 	{
 		var textureFileData = new TextureFile( path ).Data;
 
@@ -82,12 +83,12 @@ public partial class Texture : Asset
 		return mipLevels;
 	}
 
-	private void PreprocessTextureData( ref byte[] data, ref uint width, ref uint height, TextureCreationFlags flags )
+	private void PreprocessTextureData( ref byte[] data, ref uint width, ref uint height, TextureFlags flags )
 	{
-		if ( flags == TextureCreationFlags.None )
+		if ( flags == TextureFlags.None )
 			return;
 
-		if ( flags.HasFlag( TextureCreationFlags.PinkChromaKey ) )
+		if ( flags.HasFlag( TextureFlags.PinkChromaKey ) )
 		{
 			for ( int i = 0; i < data.Length; i += 4 )
 			{
@@ -104,7 +105,7 @@ public partial class Texture : Asset
 		}
 	}
 
-	private void CreateTexture( string debugName, byte[] data, uint width, uint height, TextureCreationFlags flags )
+	private void CreateTexture( string debugName, byte[] data, uint width, uint height, TextureFlags flags )
 	{
 		if ( TryGetCachedTexture( debugName, out var cachedTexture ) )
 		{
@@ -115,6 +116,9 @@ public partial class Texture : Asset
 		}
 
 		PreprocessTextureData( ref data, ref width, ref height, flags );
+
+		if ( flags.HasFlag( TextureFlags.PointFilter ) )
+			SamplerType = SamplerType.Point;
 
 		uint mipLevels = (uint)CalculateMipLevels( (int)width, (int)height, 1 );
 

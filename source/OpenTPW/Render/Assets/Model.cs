@@ -11,8 +11,6 @@ public class Model : Asset
 	public Material Material { get; private set; }
 	public bool IsIndexed { get; private set; }
 
-	public DeviceBuffer UniformBuffer { get; private set; }
-
 	private uint indexCount;
 	private uint vertexCount;
 
@@ -78,10 +76,11 @@ public class Model : Asset
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.SetPipeline( Material.Pipeline );
 
-		Device.UpdateBuffer( UniformBuffer, 0, new[] { uniformBufferContents } );
+		Material.Set( "ObjectUniformBuffer", uniformBufferContents );
+		Material.CreateResources( out var resourceSets, out _ );
 
-		Material.CreateResources( out var resourceSet, out _ );
-		commandList.SetGraphicsResourceSet( 0, resourceSet );
+		for ( uint i = 0; i < resourceSets.Length; ++i )
+			commandList.SetGraphicsResourceSet( i, resourceSets[i] );
 
 		if ( IsIndexed )
 		{

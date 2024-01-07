@@ -3,6 +3,17 @@ using Veldrid;
 
 namespace OpenTPW;
 
+[Flags]
+public enum MaterialFlags
+{
+	None,
+
+	DisableDepthTest,
+	DisableDepthWrite,
+
+	DisableDepth = DisableDepthTest | DisableDepthWrite
+}
+
 public partial class Material : Asset
 {
 	public Shader Shader { get; set; }
@@ -12,15 +23,15 @@ public partial class Material : Asset
 
 	private Dictionary<string, BindableResource> _boundResources = new();
 
-	private ResourceLayout _resourceLayout;
-	private ResourceSet _resourceSet;
+	private ResourceLayout[] _resourceLayouts;
+	private ResourceSet[] _resourceSets;
 
-	public Material( string shaderPath )
+	public Material( string shaderPath, MaterialFlags flags = MaterialFlags.None )
 	{
 		Shader = new Shader( shaderPath );
 
 		All.Add( this );
-		SetupResources();
+		SetupResources( flags );
 	}
 
 	protected Material( string shaderPath, Type uniformBufferType )
@@ -29,10 +40,43 @@ public partial class Material : Asset
 		UniformBufferType = uniformBufferType;
 
 		All.Add( this );
-		SetupResources();
+		SetupResources( MaterialFlags.None );
 	}
 
 	private DeviceBuffer UniformBuffer;
+
+	private static readonly Sampler[] Samplers =
+	[
+		CreateSampler( SamplerType.Anisotropic ),
+		CreateSampler( SamplerType.Linear ),
+		CreateSampler( SamplerType.Point )
+	];
+
+	private static Sampler CreateSampler( SamplerType type )
+	{
+		var samplerFilter = type switch
+		{
+			SamplerType.Anisotropic => SamplerFilter.Anisotropic,
+			SamplerType.Linear => SamplerFilter.MinLinear_MagLinear_MipLinear,
+			SamplerType.Point => SamplerFilter.MinPoint_MagPoint_MipPoint,
+			_ => throw new NotImplementedException()
+		};
+
+		var samplerDescription = new SamplerDescription(
+			SamplerAddressMode.Clamp,
+			SamplerAddressMode.Clamp,
+			SamplerAddressMode.Clamp,
+			samplerFilter,
+			ComparisonKind.Always,
+			(type == SamplerType.Anisotropic) ? 16u : 0u,
+			0,
+			0,
+			0,
+			SamplerBorderColor.TransparentBlack
+		);
+
+		return Device.ResourceFactory.CreateSampler( samplerDescription );
+	}
 
 	public void Set<T>( string name, T obj ) where T : unmanaged
 	{
@@ -43,82 +87,70 @@ public partial class Material : Asset
 		} );
 	}
 
-	private static Sampler DefaultSampler = CreateSampler();
-
-	private static Sampler CreateSampler()
-	{
-		var samplerDescription = new SamplerDescription(
-			SamplerAddressMode.Clamp,
-			SamplerAddressMode.Clamp,
-			SamplerAddressMode.Clamp,
-			SamplerFilter.MinLinear_MagLinear_MipLinear,
-			ComparisonKind.Always,
-			0,
-			0,
-			0,
-			0,
-			SamplerBorderColor.TransparentBlack
-		);
-
-		return Device.ResourceFactory.CreateSampler( samplerDescription );
-	}
-
 	public void Set( string name, Texture texture )
 	{
 		_boundResources[name] = texture.NativeTexture;
-		_boundResources["s_" + name] = DefaultSampler;
+		_boundResources["s_" + name] = Samplers[(int)texture.SamplerType];
 	}
 
-	internal ResourceLayout CreateResourceLayout()
+	internal ResourceLayout[] CreateResourceLayouts()
 	{
-		return Device.ResourceFactory.CreateResourceLayout( Shader.ResourceLayout );
+		return Shader.ResourceLayouts.Select( x => Device.ResourceFactory.CreateResourceLayout( x ) ).ToArray();
 	}
 
-	internal ResourceSet CreateResourceSet()
+	internal ResourceSet[] CreateResourceSets()
 	{
-		Debug.Assert( _resourceLayout != null );
+		Debug.Assert( _resourceLayouts != null );
 
-		var sortedBoundResources = new List<BindableResource>();
+		List<ResourceSetDescription> resourceSetDescriptions = new();
 
-		foreach ( var resource in Shader.ResourceLayout.Elements )
+		for ( int i = 0; i < Shader.ResourceLayouts.Length; i++ )
 		{
-			if ( _boundResources.TryGetValue( resource.Name, out var boundResource ) )
+			ResourceLayoutDescription resourceLayout = Shader.ResourceLayouts[i];
+			var sortedBoundResources = new List<BindableResource>();
+
+			foreach ( var resource in resourceLayout.Elements )
 			{
-				sortedBoundResources.Add( boundResource );
+				if ( _boundResources.TryGetValue( resource.Name, out var boundResource ) )
+				{
+					sortedBoundResources.Add( boundResource );
+				}
+				else
+				{
+					throw new Exception( $"{resource.Name} wasn't bound at draw time!" );
+				}
 			}
-			else
+
+			var resourceSetDescription = new ResourceSetDescription()
 			{
-				throw new Exception( $"{resource.Name} wasn't bound at draw time!" );
-			}
+				Layout = _resourceLayouts[i],
+				BoundResources = [.. sortedBoundResources]
+			};
+
+			resourceSetDescriptions.Add( resourceSetDescription );
 		}
 
-		var resourceSetDescription = new ResourceSetDescription()
-		{
-			Layout = _resourceLayout,
-			BoundResources = [.. sortedBoundResources]
-		};
-
-		return Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
+		return resourceSetDescriptions.Select( x => Device.ResourceFactory.CreateResourceSet( x ) ).ToArray();
 	}
 
-	internal void CreateResources( out ResourceSet resourceSet, out ResourceLayout resourceLayout )
+	internal void CreateResources( out ResourceSet[] resourceSets, out ResourceLayout[] resourceLayouts )
 	{
 		// Resource layout doesn't change, but resource set does
-		_resourceLayout ??= CreateResourceLayout();
-		resourceLayout = _resourceLayout;
+		_resourceLayouts ??= CreateResourceLayouts();
+		resourceLayouts = _resourceLayouts;
 
-		_resourceSet = CreateResourceSet();
-		resourceSet = _resourceSet;
+		_resourceSets = CreateResourceSets();
+		resourceSets = _resourceSets;
 	}
 
-	private void SetupResources()
+	private void SetupResources( MaterialFlags flags )
 	{
 		var vertexLayout = new VertexLayoutDescription( Vertex.VertexElementDescriptions );
 
 		//
 		// Create resource layout - but only from what we're using/need
 		//
-		_resourceLayout ??= CreateResourceLayout();
+		_resourceLayouts ??= CreateResourceLayouts();
 
 		//
 		// Create pipeline
@@ -128,9 +160,9 @@ public partial class Material : Asset
 			BlendState = BlendStateDescription.SingleAlphaBlend,
 
 			DepthStencilState = new DepthStencilStateDescription(
-				true,
-				true,
-				ComparisonKind.Less
+				!flags.HasFlag( MaterialFlags.DisableDepthTest ),
+				!flags.HasFlag( MaterialFlags.DisableDepthWrite ),
+				flags.HasFlag( MaterialFlags.DisableDepthTest | MaterialFlags.DisableDepthWrite ) ? ComparisonKind.Always : ComparisonKind.Less
 			),
 
 			RasterizerState = new RasterizerStateDescription(
@@ -142,7 +174,7 @@ public partial class Material : Asset
 			),
 
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
-			ResourceLayouts = [_resourceLayout],
+			ResourceLayouts = [.. _resourceLayouts],
 			ShaderSet = new ShaderSetDescription( [vertexLayout], Shader.ShaderProgram ),
 			Outputs = Device.SwapchainFramebuffer.OutputDescription
 		};
