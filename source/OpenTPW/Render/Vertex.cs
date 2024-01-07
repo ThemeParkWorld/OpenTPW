@@ -16,4 +16,27 @@ public struct Vertex
 		new VertexElementDescription( "vNormal", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
 		new VertexElementDescription( "vTexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 )
 	};
+
+	public Vertex()
+	{
+		
+	}
+
+	public Vertex( Vector3 position, Vector3 normal, Vector2 texCoords )
+	{
+		Position = position;
+		Normal = normal;
+		TexCoords = texCoords;
+	}
+
+	public Vertex( Vector3 position, Vector2 texCoords ) : this()
+	{
+		Position = position;
+		TexCoords = texCoords;
+	}
+
+	public Vertex( Vector3 position ) : this()
+	{
+		Position = position;
+	}
 }

@@ -4,10 +4,11 @@ public class Terrain : ModelEntity
 {
 	public override void Spawn()
 	{
-		var textureFile = new TextureFile( @"/levels/jungle/terrain/textures/jgr_bas1.wct" );
-		var texture = new Texture( textureFile );
+		var texture = new Texture( "levels/jungle/terrain/textures/jgr_bas1.wct" );
 
-		var material = new Material( texture );
+		var material = Material.Default;
+		material.Set( "Color", texture );
+
 		Model = Primitives.Plane.GenerateModel( material, new Point2( 32, 32 ) );
 	}
 }

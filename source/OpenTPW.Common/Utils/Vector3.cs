@@ -53,6 +53,11 @@ public struct Vector3 : IEquatable<Vector3>
 		this = Normal;
 	}
 
+	public Vector3( Vector2 xy, float z = 0.0f ) : this( xy.X, xy.Y, z )
+	{
+
+	}
+
 	public Vector3( float x, float y, float z )
 	{
 		internalVector = new System.Numerics.Vector3( x, y, z );

@@ -16,10 +16,8 @@ public partial class ModelEntity : Entity
 
 	}
 
-	public override void Render( CommandList commandList )
+	protected override void OnRender()
 	{
-		base.Render( commandList );
-
 		if ( Model == null )
 			return;
 
@@ -37,6 +35,6 @@ public partial class ModelEntity : Entity
 			_padding2 = 0
 		};
 
-		Model.Draw( uniformBuffer, commandList );
+		Model.Draw( uniformBuffer );
 	}
 }

@@ -14,7 +14,7 @@ public class Ride : Entity
 		Log.Trace( $"Loaded ride {settingsFile.Entries.First( x => x.Key == "Info.Name" ).Value}" );
 	}
 
-	public override void Update()
+	protected override void OnUpdate()
 	{
 		VM.Update();
 	}

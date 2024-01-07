@@ -49,7 +49,7 @@ namespace OpenTPW {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Direct3D11")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Vulkan")]
         public string PreferredBackend {
             get {
                 return ((string)(this["PreferredBackend"]));

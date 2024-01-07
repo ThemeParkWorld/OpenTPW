@@ -139,3 +139,18 @@ public static class ListExtension
 		list.Add( item );
 	}
 }
+
+public static class StringExtensions
+{
+	/// <summary>
+	/// Check if <paramref name="path"/> has the given <paramref name="extension"/>, ignoring case.
+	/// Appends the dot ('.') character if not already at the beginning of <paramref name="extension"/>.
+	/// </summary>
+	public static bool HasExtension( this string path, string extension )
+	{
+		if ( !extension.StartsWith( "." ) )
+			extension = "." + extension;
+
+		return path.EndsWith( extension, StringComparison.OrdinalIgnoreCase );
+	}
+}

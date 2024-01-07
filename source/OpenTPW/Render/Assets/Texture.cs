@@ -1,8 +1,7 @@
 ﻿using StbImageSharp;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Xml.Linq;
 using Veldrid;
+using static OpenTPW.Texture;
 
 namespace OpenTPW;
 
@@ -11,64 +10,68 @@ public partial class Texture : Asset
 	public uint Width { get; private set; }
 	public uint Height { get; private set; }
 
+	public static Texture Missing => new Texture( [255, 255, 255], 1, 1 );
+
 	internal Veldrid.Texture NativeTexture;
 	internal TextureView NativeTextureView;
 
 	/// <summary>
-	/// From path on disk
+	/// From path on disk, or from a game resource
 	/// </summary>
-	public Texture( string path )
+	public Texture( string path, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None )
 	{
-		// shit-tier hack
-		StbImage.stbi_set_flip_vertically_on_load( 1 );
-
-		var fileData = File.ReadAllBytes( path );
-		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
-
-		StbImage.stbi_set_flip_vertically_on_load( 0 );
-
-		var data = image.Data;
-		var width = (uint)image.Width;
-		var height = (uint)image.Height;
-
-		CreateTexture( path, data, width, height );
-	}
-
-	/// <summary>
-	/// From game resource
-	/// </summary>
-	public Texture( TextureFile textureFile )
-	{
-		var textureData = textureFile.Data;
-		CreateTexture( "", textureData.Data, (uint)textureData.Width, (uint)textureData.Height );
+		if ( path.HasExtension( ".wct" ) )
+			UpdateFromWct( path, textureCreationFlags );
+		else
+			UpdateFromStb( path, textureCreationFlags );
 	}
 
 	/// <summary>
 	/// From data as bytes
 	/// </summary>
-	public Texture( byte[] data, int width, int height )
+	public Texture( byte[] data, int width, int height, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None )
 	{
-		CreateTexture( "", data, (uint)width, (uint)height );
+		CreateTexture( "", data, (uint)width, (uint)height, textureCreationFlags );
 	}
 
-	public Texture( Stream stream )
+	public Texture( Stream stream, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None )
 	{
-		// shit-tier hack
-		StbImage.stbi_set_flip_vertically_on_load( 1 );
-
 		var fileData = new byte[stream.Length];
 		stream.Read( fileData, 0, fileData.Length );
 
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
-
-		StbImage.stbi_set_flip_vertically_on_load( 0 );
 
 		var data = image.Data;
 		var width = (uint)image.Width;
 		var height = (uint)image.Height;
 		var debugName = $"Stream {stream.GetHashCode()}";
 
-		CreateTexture( debugName, data, width, height );
+		CreateTexture( debugName, data, width, height, textureCreationFlags );
+	}
+
+	/// <summary>
+	/// Update from an image format supported by the STB library (jpg, png, gif, tga, etc.)
+	/// </summary>
+	private void UpdateFromStb( string path, TextureCreationFlags flags )
+	{
+		var fileData = File.ReadAllBytes( path );
+		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
+
+		var data = image.Data;
+		var width = (uint)image.Width;
+		var height = (uint)image.Height;
+
+		CreateTexture( path, data, width, height, flags );
+	}
+
+	/// <summary>
+	/// Update from a Bullfrog WCT file
+	/// </summary>
+	private void UpdateFromWct( string path, TextureCreationFlags flags )
+	{
+		var textureFileData = new TextureFile( path ).Data;
+
+		CreateTexture( path, textureFileData.Data, (uint)textureFileData.Width, (uint)textureFileData.Height, flags );
 	}
 
 	private int CalculateMipLevels( int width, int height, int depth )
@@ -79,7 +82,29 @@ public partial class Texture : Asset
 		return mipLevels;
 	}
 
-	private void CreateTexture( string debugName, byte[] data, uint width, uint height )
+	private void PreprocessTextureData( ref byte[] data, ref uint width, ref uint height, TextureCreationFlags flags )
+	{
+		if ( flags == TextureCreationFlags.None )
+			return;
+
+		if ( flags.HasFlag( TextureCreationFlags.PinkChromaKey ) )
+		{
+			for ( int i = 0; i < data.Length; i += 4 )
+			{
+				var r = data[i];
+				var g = data[i + 1];
+				var b = data[i + 2];
+
+				if ( r == 255 && g == 0 && b == 255 )
+				{
+					// Set alpha to 0
+					data[i + 3] = 0;
+				}
+			}
+		}
+	}
+
+	private void CreateTexture( string debugName, byte[] data, uint width, uint height, TextureCreationFlags flags )
 	{
 		if ( TryGetCachedTexture( debugName, out var cachedTexture ) )
 		{
@@ -88,6 +113,8 @@ public partial class Texture : Asset
 
 			return;
 		}
+
+		PreprocessTextureData( ref data, ref width, ref height, flags );
 
 		uint mipLevels = (uint)CalculateMipLevels( (int)width, (int)height, 1 );
 
@@ -115,7 +142,7 @@ public partial class Texture : Asset
 		Width = width;
 		Height = height;
 
-		Game.renderer.ImmediateSubmit( cmd =>
+		Render.ImmediateSubmit( cmd =>
 		{
 			cmd.GenerateMipmaps( NativeTexture );
 		} );

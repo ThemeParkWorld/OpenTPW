@@ -12,12 +12,12 @@ public class RootPanel : Entity
 		Instance ??= this;
 	}
 
-	public override void Render( CommandList commandList )
+	protected override void OnRender()
 	{
-		Children.ForEach( child => child.Draw( commandList ) );
+		Children.ForEach( child => child.Draw() );
 	}
 
-	public override void Update()
+	protected override void OnUpdate()
 	{
 		Children.ForEach( child => child.Update() );
 	}

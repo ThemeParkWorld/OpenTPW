@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection;
-using Veldrid;
 
 namespace OpenTPW;
 
@@ -47,10 +46,23 @@ public class Entity
 		Name = $"{this.GetType().Name} {All.Count}";
 	}
 
-	public virtual void Render( CommandList commandList ) { }
-	public virtual void Update() { }
+	public void Render()
+	{
+		OnRender();
+	}
 
-	public virtual void Delete() { }
+	public void Update()
+	{
+		OnUpdate();
+	}
+	public void Delete()
+	{
+		OnDelete();
+	}
+
+	protected virtual void OnRender() { }
+	protected virtual void OnUpdate() { }
+	protected virtual void OnDelete() { }
 
 	public bool Equals( Entity x, Entity y ) => x.GetHashCode() == y.GetHashCode();
 	public int GetHashCode( [DisallowNull] Entity obj ) => base.GetHashCode();

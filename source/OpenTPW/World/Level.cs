@@ -38,9 +38,11 @@ public class Level
 	private void SetupHud()
 	{
 		Hud = new();
+
 		Hud.AddChild( new Cursor() );
 
-		Hud.AddChild( new Image( "/data/ui/textures/tpw_logo.wct" ) );
+		var layout = new LobbyLayout() { Hud = Hud };
+		layout.OnInit();
 	}
 
 	public void Update()
@@ -48,11 +50,11 @@ public class Level
 		Entity.All.ForEach( entity => entity.Update() );
 	}
 
-	public void Render( CommandList commandList )
+	public void Render()
 	{	
 		Camera.Update();
 
-		Entity.All.ForEach( entity => entity.Render( commandList ) );
+		Entity.All.ForEach( entity => entity.Render() );
 	}
 
 	[Event.Game.Load]
