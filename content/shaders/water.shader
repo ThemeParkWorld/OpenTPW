@@ -1,3 +1,5 @@
+vertex "content/shaders/includes/3d.vert"
+
 common {
   layout( set = 0, binding = 0 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
@@ -11,8 +13,6 @@ common {
     float g_fTime;
   } g_oUbo;
 }
-
-vertex "content/shaders/3d.vert.shader"
 
 fragment {
   //

@@ -1,3 +1,5 @@
+vertex "content/shaders/includes/3d.vert"
+
 common {
   layout( set = 0, binding = 0 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
@@ -9,8 +11,6 @@ common {
     vec3 g_vCameraPos;
   } g_oUbo;
 }
-
-vertex "content/shaders/3d.vert.shader"
 
 fragment {
   //
