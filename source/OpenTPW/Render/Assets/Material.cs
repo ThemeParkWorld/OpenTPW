@@ -24,7 +24,6 @@ public partial class Material : Asset
 	private Dictionary<string, BindableResource> _boundResources = new();
 
 	private ResourceLayout[] _resourceLayouts;
-	private ResourceSet[] _resourceSets;
 
 	public Material( string shaderPath, MaterialFlags flags = MaterialFlags.None )
 	{
@@ -34,41 +33,49 @@ public partial class Material : Asset
 		SetupResources( flags );
 	}
 
-	protected Material( string shaderPath, Type uniformBufferType )
+	protected Material( string shaderPath, Type uniformBufferType, MaterialFlags flags = MaterialFlags.None )
 	{
 		Shader = new Shader( shaderPath );
 		UniformBufferType = uniformBufferType;
 
 		All.Add( this );
-		SetupResources( MaterialFlags.None );
+		SetupResources( flags );
 	}
 
-	private DeviceBuffer UniformBuffer;
+	private DeviceBuffer ScratchBuffer;
 
 	private static readonly Sampler[] Samplers =
 	[
 		CreateSampler( SamplerType.Anisotropic ),
 		CreateSampler( SamplerType.Linear ),
-		CreateSampler( SamplerType.Point )
+		CreateSampler( SamplerType.Point ),
+		CreateSampler( SamplerType.AnisotropicWrap )
 	];
 
 	private static Sampler CreateSampler( SamplerType type )
 	{
 		var samplerFilter = type switch
 		{
-			SamplerType.Anisotropic => SamplerFilter.Anisotropic,
+			SamplerType.Anisotropic or SamplerType.AnisotropicWrap => SamplerFilter.Anisotropic,
 			SamplerType.Linear => SamplerFilter.MinLinear_MagLinear_MipLinear,
 			SamplerType.Point => SamplerFilter.MinPoint_MagPoint_MipPoint,
 			_ => throw new NotImplementedException()
 		};
 
+		var samplerAddressMode = type switch
+		{
+			SamplerType.Anisotropic or SamplerType.Linear or SamplerType.Point => SamplerAddressMode.Clamp,
+			SamplerType.AnisotropicWrap => SamplerAddressMode.Wrap,
+			_ => throw new NotImplementedException()
+		};
+
 		var samplerDescription = new SamplerDescription(
-			SamplerAddressMode.Clamp,
-			SamplerAddressMode.Clamp,
-			SamplerAddressMode.Clamp,
+			samplerAddressMode,
+			samplerAddressMode,
+			samplerAddressMode,
 			samplerFilter,
 			ComparisonKind.Always,
-			(type == SamplerType.Anisotropic) ? 16u : 0u,
+			(type == SamplerType.Anisotropic || type == SamplerType.AnisotropicWrap) ? 16u : 0u,
 			0,
 			0,
 			0,
@@ -78,19 +85,33 @@ public partial class Material : Asset
 		return Device.ResourceFactory.CreateSampler( samplerDescription );
 	}
 
+	private void ClearBoundResources()
+	{
+		return;
+
+		if ( _boundResources.Count > 0 )
+		{
+			_boundResources.Clear();
+		}
+	}
+
 	public void Set<T>( string name, T obj ) where T : unmanaged
 	{
 		Render.ImmediateSubmit( cmd =>
 		{
-			cmd.UpdateBuffer( UniformBuffer, 0, [obj] );
-			_boundResources[name] = UniformBuffer;
+			cmd.UpdateBuffer( ScratchBuffer, 0, [obj] );
+			_boundResources[name] = ScratchBuffer;
 		} );
+
+		Render.MarkForDeath( ClearBoundResources );
 	}
 
 	public void Set( string name, Texture texture )
 	{
 		_boundResources[name] = texture.NativeTexture;
 		_boundResources["s_" + name] = Samplers[(int)texture.SamplerType];
+
+		Render.MarkForDeath( ClearBoundResources );
 	}
 
 	internal ResourceLayout[] CreateResourceLayouts()
@@ -133,14 +154,28 @@ public partial class Material : Asset
 		return resourceSetDescriptions.Select( x => Device.ResourceFactory.CreateResourceSet( x ) ).ToArray();
 	}
 
-	internal void CreateResources( out ResourceSet[] resourceSets, out ResourceLayout[] resourceLayouts )
+	internal void CreateEphemeralResourceSet( out ResourceSet[] resourceSets )
 	{
-		// Resource layout doesn't change, but resource set does
-		_resourceLayouts ??= CreateResourceLayouts();
-		resourceLayouts = _resourceLayouts;
+		// Create a set
+		var newResourceSets = CreateResourceSets();
+		resourceSets = newResourceSets;
 
-		_resourceSets = CreateResourceSets();
-		resourceSets = _resourceSets;
+		// Mark set for death
+		Render.MarkForDeath( () => DestroyResourceSets( newResourceSets ) );
+	}
+
+	private static void DestroyResourceSets( ResourceSet[] resourceSets )
+	{
+		if ( resourceSets == null )
+		{
+			Log.Warning( $"Resource sets were marked for death, but are already dead - we can't kill what's already dead!" );
+			return;
+		}
+
+		foreach ( var item in resourceSets )
+		{
+			item.Dispose();
+		}
 	}
 
 	private void SetupResources( MaterialFlags flags )
@@ -181,13 +216,9 @@ public partial class Material : Asset
 
 		Pipeline = Device.ResourceFactory.CreateGraphicsPipeline( pipelineDescription );
 
-		//
-		// Create single uniform buffer
-		// TODO: dynamic 'scratch' buffer system
-		//
-		var bufferDescription = new BufferDescription( 16 * 200, BufferUsage.UniformBuffer | BufferUsage.Dynamic );
-		UniformBuffer = Device.ResourceFactory.CreateBuffer( bufferDescription );
+		var bufferDescription = new BufferDescription( 16 * 128, BufferUsage.UniformBuffer | BufferUsage.Dynamic );
+		ScratchBuffer = Device.ResourceFactory.CreateBuffer( bufferDescription );
 	}
 }
 
-public class Material<T>( string shaderPath ) : Material( shaderPath, typeof( T ) );
+public class Material<T>( string shaderPath, MaterialFlags flags = MaterialFlags.None ) : Material( shaderPath, typeof( T ), flags );

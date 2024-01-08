@@ -8,8 +8,7 @@ public sealed class BFMUReader : BaseFormat
 
 	public BFMUReader( string path )
 	{
-		using var fileStream = File.OpenRead( path );
-		ReadFromStream( fileStream );
+		ReadFromFile( path );
 	}
 
 	public BFMUReader( Stream stream )

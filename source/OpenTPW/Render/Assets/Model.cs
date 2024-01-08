@@ -61,23 +61,16 @@ public class Model : Asset
 		Device.UpdateBuffer( IndexBuffer, 0, indices );
 	}
 
-	internal void Draw<T>( T uniformBufferContents ) where T : unmanaged
+	internal void Draw()
 	{
 		ImDraw.AssertRenderState();
-
-		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
-		{
-			throw new Exception( $"Tried to set unmatching uniform buffer object" +
-				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
-		}
 
 		var commandList = Render.CommandList;
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.SetPipeline( Material.Pipeline );
 
-		Material.Set( "ObjectUniformBuffer", uniformBufferContents );
-		Material.CreateResources( out var resourceSets, out _ );
+		Material.CreateEphemeralResourceSet( out var resourceSets );
 
 		for ( uint i = 0; i < resourceSets.Length; ++i )
 			commandList.SetGraphicsResourceSet( i, resourceSets[i] );

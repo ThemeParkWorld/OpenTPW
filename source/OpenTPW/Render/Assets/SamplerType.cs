@@ -4,5 +4,7 @@ public enum SamplerType
 {
 	Anisotropic,
 	Linear,
-	Point
+	Point,
+
+	AnisotropicWrap
 }

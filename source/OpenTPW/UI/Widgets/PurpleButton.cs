@@ -15,7 +15,8 @@ internal class PurpleButton : Panel
 		ButtonText1 = new Texture( "ui/textures/button_text1.wct" );
 		ButtonText2 = new Texture( "ui/textures/button_text2.wct" );
 
-		Text = text;
+		Text = Localization.Parse( text );
+		Log.Info( $"Parsed '{text}' as '{Text}'" );
 	}
 
 	protected override void OnRender()

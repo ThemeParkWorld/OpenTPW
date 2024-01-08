@@ -120,6 +120,9 @@ public partial class Texture : Asset
 		if ( flags.HasFlag( TextureFlags.PointFilter ) )
 			SamplerType = SamplerType.Point;
 
+		if ( flags.HasFlag( TextureFlags.Wrap ) )
+			SamplerType = SamplerType.AnisotropicWrap;
+
 		uint mipLevels = (uint)CalculateMipLevels( (int)width, (int)height, 1 );
 
 		var textureDescription = TextureDescription.Texture2D(

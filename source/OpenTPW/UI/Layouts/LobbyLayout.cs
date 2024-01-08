@@ -17,17 +17,25 @@ internal sealed class LobbyLayout : Layout
 
 		var topRight = new Vector2( Screen.Width, Screen.Height );
 
+		var saves = Directory.EnumerateDirectories( GameDir.GetPath( "save/users" ) ).ToList();
+
 		for ( int i = 0; i < 4; ++i )
 		{
 			var offset = new Vector2( 0, i * 100 );
+			var buttonText = "#CreateNewPlayer";
 
-			Hud.AddChild( new PurpleButton( "Create New Player" )
+			if ( saves.Count > i )
+			{
+				buttonText = Path.GetFileName( saves[i] )[1..] ?? "#CreateNewPlayer";
+			}
+
+			Hud.AddChild( new PurpleButton( buttonText )
 			{
 				position = topRight - offset
 			} );
 		}
 
-		Hud.AddChild( new PurpleButton( "Quit Game" )
+		Hud.AddChild( new PurpleButton( "#QuitGame" )
 		{
 			position = topRight + new Vector2( 200, -425 )
 		} );

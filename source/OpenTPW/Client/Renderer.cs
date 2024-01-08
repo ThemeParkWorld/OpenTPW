@@ -1,4 +1,5 @@
-﻿using Veldrid;
+﻿using System.ComponentModel;
+using Veldrid;
 using Veldrid.StartupUtilities;
 
 namespace OpenTPW;
@@ -6,6 +7,7 @@ namespace OpenTPW;
 internal class Renderer
 {
 	private DateTime _lastFrame;
+	private List<Action> _markedForDeath = [];
 
 	//
 	// Objects
@@ -81,6 +83,15 @@ internal class Renderer
 		CommandList.End();
 		Device.SubmitCommands( CommandList );
 		Device.SwapBuffers();
+
+		Device.WaitForIdle();
+
+		foreach ( var item in _markedForDeath )
+		{
+			item.Invoke();
+		}
+
+		_markedForDeath.Clear();
 	}
 
 	private void Render()
@@ -142,5 +153,12 @@ internal class Renderer
 
 		commandList.End();
 		Device.SubmitCommands( commandList );
+
+		MarkForDeath( commandList.Dispose );
+	}
+
+	public void MarkForDeath( Action action )
+	{
+		_markedForDeath.Add( action );
 	}
 }

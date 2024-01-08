@@ -13,5 +13,10 @@ public enum TextureFlags
 	/// <summary>
 	/// Force point filtering for this texture's sampler
 	/// </summary>
-	PointFilter
+	PointFilter,
+
+	/// <summary>
+	/// Force wrap for this texture's sampler
+	/// </summary>
+	Wrap
 }

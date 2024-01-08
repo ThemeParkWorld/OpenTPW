@@ -26,8 +26,8 @@ public partial class ModelEntity : Entity
 			g_mModel = ModelMatrix,
 			g_mView = Camera.ViewMatrix,
 			g_mProj = Camera.ProjMatrix,
-			g_vLightPos = Level.SunLight.Position,
-			g_vLightColor = Level.SunLight.Color,
+			g_vLightPos = Level.SunLight?.Position ?? Vector3.Zero,
+			g_vLightColor = Level.SunLight?.Color ?? Vector3.One,
 			g_vCameraPos = Camera.Position,
 
 			_padding0 = 0,
@@ -35,6 +35,7 @@ public partial class ModelEntity : Entity
 			_padding2 = 0
 		};
 
-		Model.Draw( uniformBuffer );
+		Model.Material.Set( "ObjectUniformBuffer", uniformBuffer );
+		Model.Draw();
 	}
 }
