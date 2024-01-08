@@ -48,17 +48,36 @@ partial class ShaderPreprocessor
 				if ( EndOfFile() )
 					break;
 
-				var name = ConsumeWhile( x => x != '{' || EndOfFile() );
+				var name = ConsumeWhile( x => (x != '{' && x != '"') || EndOfFile() );
 				name = name.Trim();
 
-				var contents = ConsumeBlock();
-				contents = contents[1..^1].Trim(); // Remove '{' and '}' along with any whitespace
+				if ( NextChar() == '{' )
+				{
+					// Block
+					var contents = ConsumeBlock();
+					contents = contents[1..^1].Trim(); // Remove '{' and '}' along with any whitespace
 
-				blocks.Add( name, contents );
+					blocks.Add( name, contents );
+				}
+				else if ( NextChar() == '"' )
+				{
+					// Include path
+					ConsumeChar(); // "
+					var path = ConsumeWhile( x => x != '"' );
+					ConsumeChar(); // "
+
+					var contents = File.ReadAllText( path );
+
+					blocks.Add( name, contents );
+				}
+				else
+				{
+					throw new Exception( "Expected block or include path" );
+				}
 			}
 
 			if ( !blocks.TryGetValue( "vertex", out vertexShader ) )
-				throw new Exception("Vertex block is required, but wasn't found!");
+				throw new Exception( "Vertex block is required, but wasn't found!" );
 
 			if ( !blocks.TryGetValue( "fragment", out fragmentShader ) )
 				throw new Exception( "Fragment block is required, but wasn't found!" );
