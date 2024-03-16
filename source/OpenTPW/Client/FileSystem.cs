@@ -168,7 +168,7 @@ public class FileSystem
 			var (archivePath, internalPath) = DissectPath( relativePath );
 			var archive = GetArchive( archivePath );
 
-			return archive.GetDirectories( internalPath ).Select( x => relativePath + "\\" + x ).ToArray();
+			return archive.GetDirectories( internalPath ).Select( x => relativePath + "/" + x ).ToArray();
 		}
 		else if ( IsSdt (relativePath) )
 		{
@@ -190,13 +190,13 @@ public class FileSystem
 			var (archivePath, internalPath) = DissectPath( relativePath );
 			var archive = GetArchive( archivePath );
 
-			return archive.GetFiles( internalPath ).Select( x => relativePath + "\\" + x ).ToArray();
+			return archive.GetFiles( internalPath ).Select( x => relativePath + "/" + x ).ToArray();
 		}
 		else if ( IsSdt( relativePath ) )
 		{
 			var (archivePath, fileName) = DissectSdtPath( relativePath );
 			var archive = GetSdtArchive( archivePath );
-			return archive.GetFiles( relativePath ).Select( x => relativePath + "\\" + x ).ToArray();
+			return archive.GetFiles( relativePath ).Select( x => relativePath + "/" + x ).ToArray();
 	
 		}
 		else

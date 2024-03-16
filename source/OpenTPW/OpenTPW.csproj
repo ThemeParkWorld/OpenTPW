@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -29,7 +29,7 @@
 		<PackageReference Include="Veldrid" Version="4.9.0" />
 		<PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
 		<PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
-		<PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
+		<PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
 		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
 	</ItemGroup>
 

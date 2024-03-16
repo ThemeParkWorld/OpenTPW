@@ -207,6 +207,8 @@ public sealed class WadArchive
 
 	private T GetItem<T>( string internalPath ) where T : WadArchiveItem
 	{
+		internalPath = internalPath.Replace( "/", "\\" );
+		
 		var internalDirectory = Root;
 
 		if ( internalPath == "" )
@@ -235,7 +237,7 @@ public sealed class WadArchive
 
 		if ( internalPath != "" )
 		{
-			var splitPath = internalPath.Split( "\\" );
+			var splitPath = internalPath.Split( "/" );
 
 			foreach ( string dir in splitPath )
 			{

@@ -2,7 +2,10 @@
   "profiles": {
     "OpenTPW": {
       "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)\\.."
+      "workingDirectory": "$(SolutionDir)/..",
+      "environmentVariables": {
+        "DYLD_LIBRARY_PATH":"/opt/homebrew/lib"
+      }
     }
   }
 }
