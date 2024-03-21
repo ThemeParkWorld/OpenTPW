@@ -152,7 +152,7 @@ public class BaseFileSystem
 	{
 		var parts = path.Split( Path.DirectorySeparatorChar );
 		var currentPath = new StringBuilder();
-
+		
 		foreach ( var part in parts )
 		{
 			if ( currentPath.Length > 0 )
@@ -165,11 +165,11 @@ public class BaseFileSystem
 			foreach ( var handler in archiveHandlers )
 			{
 				var extension = handler.Key;
-				var potentialArchivePath = $"{currentPath}{extension}";
+				var potentialArchivePath = $"/{currentPath}{extension}";
 
 				if ( archiveHandlers.ContainsKey( extension ) && File.Exists( potentialArchivePath ) )
 				{
-					var remainingPath = path.Substring( currentPath.Length );
+					var remainingPath = path.Substring( currentPath.Length + 1 );
 					return (potentialArchivePath, remainingPath.TrimStart( Path.DirectorySeparatorChar ));
 				}
 			}
@@ -185,12 +185,12 @@ public class BaseFileSystem
 
 	public string GetAbsolutePath( string relativePath )
 	{
-		return Path.Combine( basePath, relativePath.TrimStart( '/' ) ).Replace( "/", "\\" );
+		return Path.Combine( basePath, relativePath.TrimStart( '/' ) ).Replace( '/', Path.DirectorySeparatorChar );
 	}
 
 	public string GetRelativePath( string absolutePath )
 	{
-		var path = Path.GetRelativePath( basePath, absolutePath ).Replace( "\\", "/" );
+		var path = Path.GetRelativePath( basePath, absolutePath ).Replace( '\\', '/' );
 		return $"/{path}";
 	}
 

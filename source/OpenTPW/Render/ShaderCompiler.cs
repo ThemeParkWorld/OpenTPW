@@ -50,7 +50,7 @@ internal static class ShaderCompiler
 
 	public static ShaderInfo CompileShader( string path )
 	{
-		var target = GetCrossCompileTarget();
+		var target = CrossCompileTarget.GLSL;
 
 		var preprocessedShader = ShaderPreprocessor.PreprocessShader( path );
 		var vertexSource = preprocessedShader.VertexShader;
@@ -59,21 +59,18 @@ internal static class ShaderCompiler
 		var vertexSourceBytes = GetBytes( vertexSource );
 		var fragmentSourceBytes = GetBytes( fragmentSource );
 		var compilationResult = SpirvCompilation.CompileVertexFragment( vertexSourceBytes, fragmentSourceBytes, target );
-
-		if ( Device.ResourceFactory.BackendType != GraphicsBackend.Vulkan )
-		{
-			vertexSource = compilationResult.VertexShader;
-			fragmentSource = compilationResult.FragmentShader;
-		}
-
+		
 		var vertexSpirv = SpirvCompilation.CompileGlslToSpirv( vertexSource, path, ShaderStages.Vertex, new() );
 		var fragmentSpirv = SpirvCompilation.CompileGlslToSpirv( fragmentSource, path, ShaderStages.Fragment, new() );
 
-		Debug.Assert( HasSpirvHeader( vertexSpirv.SpirvBytes ) );
-		Debug.Assert( HasSpirvHeader( fragmentSpirv.SpirvBytes ) );
+		var vertexCompiled = vertexSpirv.SpirvBytes;
+		var fragmentCompiled = fragmentSpirv.SpirvBytes;
+		
+		Debug.Assert( HasSpirvHeader( vertexCompiled ) );
+		Debug.Assert( HasSpirvHeader( fragmentCompiled ) );
 
-		var vertexShader = Device.ResourceFactory.CreateShader( new ShaderDescription( ShaderStages.Vertex, vertexSpirv.SpirvBytes, "main" ) );
-		var fragmentShader = Device.ResourceFactory.CreateShader( new ShaderDescription( ShaderStages.Fragment, fragmentSpirv.SpirvBytes, "main" ) );
+		var vertexShader = Device.ResourceFactory.CreateFromSpirv( new ShaderDescription( ShaderStages.Vertex, vertexCompiled, "main" ) );
+		var fragmentShader = Device.ResourceFactory.CreateFromSpirv( new ShaderDescription( ShaderStages.Fragment, fragmentCompiled, "main" ) );
 
 		return new ShaderInfo()
 		{

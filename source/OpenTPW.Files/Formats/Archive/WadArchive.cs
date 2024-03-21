@@ -224,12 +224,14 @@ public sealed class WadArchive : IArchive
 
 	private T GetItem<T>( string internalPath ) where T : ArchiveItem
 	{
+		internalPath = internalPath.Replace( "/", "\\" );
+		
 		var internalDirectory = Root;
 
 		if ( internalPath == "" )
 			throw new Exception( $"Path was empty" );
 
-		var splitPath = internalPath.Split( Path.DirectorySeparatorChar );
+		var splitPath = internalPath.Split( "\\" );
 
 		for ( int i = 0; i < splitPath.Length; i++ )
 		{
@@ -248,11 +250,13 @@ public sealed class WadArchive : IArchive
 
 	private List<T> EnumerateItems<T>( string internalPath ) where T : ArchiveItem
 	{
+		internalPath = internalPath.Replace( "/", "\\" );
+		
 		var internalDirectory = Root;
 
 		if ( internalPath != "" )
 		{
-			var splitPath = internalPath.Split( Path.DirectorySeparatorChar );
+			var splitPath = internalPath.Split( "\\" );
 
 			foreach ( string dir in splitPath )
 			{
