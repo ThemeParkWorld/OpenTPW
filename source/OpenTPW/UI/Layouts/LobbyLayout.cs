@@ -17,6 +17,12 @@ internal sealed class LobbyLayout : Layout
 
 		var topRight = new Vector2( Screen.Width, Screen.Height );
 
+
+		if ( !Directory.Exists( GameDir.GetPath( "save/users" ) ) )
+		{
+			Directory.CreateDirectory( GameDir.GetPath( "save/users" ) );
+		}
+
 		var saves = Directory.EnumerateDirectories( GameDir.GetPath( "save/users" ) ).ToList();
 
 		for ( int i = 0; i < 4; ++i )
