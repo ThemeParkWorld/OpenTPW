@@ -53,9 +53,14 @@ internal static class Game
 	{
 		Log = new();
 
+		if ( !Path.Exists( $"{Settings.Default.GamePath}/data/" ) )
+			throw new DirectoryNotFoundException( "Theme Park World not found" );
+
 		FileSystem = new BaseFileSystem( $"{Settings.Default.GamePath}/data/" );
 		FileSystem.RegisterArchiveHandler<WadArchive>( ".wad" );
 		FileSystem.RegisterArchiveHandler<SdtArchive>( ".sdt" );
+
+		CacheFileSystem = new BaseFileSystem( $"./.opentpw" );
 
 		Render = new();
 		Render.Run();

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Veldrid;
+﻿using Veldrid;
 using Veldrid.StartupUtilities;
 
 namespace OpenTPW;
@@ -49,6 +48,8 @@ internal class Renderer
 		Window.Visible = true;
 
 		ImGuiRenderer = new ImGuiRenderer( Device, Device.MainSwapchain.Framebuffer.OutputDescription, Window.Size.X, Window.Size.Y );
+		OpenTPW.ModKit.GlobalNamespace.ImGuiManager = ImGuiRenderer;
+
 		Editor = new Editor( ImGuiRenderer, Device );
 	}
 

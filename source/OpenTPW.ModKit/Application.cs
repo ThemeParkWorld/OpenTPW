@@ -14,6 +14,9 @@ internal class Application
 
 	public void Run()
 	{
+		if ( !Path.Exists( "C:\\Program Files (x86)\\Bullfrog\\Theme Park World\\Data" ) )
+			throw new DirectoryNotFoundException( "Theme Park World not found" );
+
 		FileSystem = new BaseFileSystem( "C:\\Program Files (x86)\\Bullfrog\\Theme Park World\\Data" );
 		FileSystem.RegisterArchiveHandler<WadArchive>( ".wad" );
 		FileSystem.RegisterArchiveHandler<SdtArchive>( ".sdt" );
