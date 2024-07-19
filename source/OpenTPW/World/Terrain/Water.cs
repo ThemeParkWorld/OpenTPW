@@ -34,7 +34,7 @@ public class Water : ModelEntity
 		var material = new Material<ObjectUniformBuffer>( "content/shaders/water.shader" );
 		material.Set( "Color", texture );
 
-		Model = Primitives.Plane.GenerateModel( material, new Point2( 128, 128 ) );
+		Model = Primitives.Plane.GenerateModel( material );
 	}
 
 	protected override void OnRender()

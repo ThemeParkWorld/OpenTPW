@@ -29,10 +29,11 @@ public partial class ModelEntity : Entity
 			g_vLightPos = Level.SunLight?.Position ?? Vector3.Zero,
 			g_vLightColor = Level.SunLight?.Color ?? Vector3.One,
 			g_vCameraPos = Camera.Position,
+			g_flTime = Time.Now,
 
 			_padding0 = 0,
 			_padding1 = 0,
-			_padding2 = 0
+			_padding2 = 0,
 		};
 
 		Model.Material.Set( "ObjectUniformBuffer", uniformBuffer );

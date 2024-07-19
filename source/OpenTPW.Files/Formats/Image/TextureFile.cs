@@ -24,6 +24,12 @@ public partial class TextureFile : BaseFormat
 
 	protected override void ReadFromStream( Stream stream )
 	{
+		if ( stream == null )
+		{
+			Data = new TextureData( 1, 1, new byte[] { 255, 0, 255, 255 } );
+			return;
+		}
+
 		using var binaryReader = new BinaryReader( stream );
 
 		//

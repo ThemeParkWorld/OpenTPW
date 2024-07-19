@@ -108,6 +108,18 @@ public partial class Material : Asset
 		Render.MarkForDeath( ClearBoundResources );
 	}
 
+	public void Set( string name, Texture[] texture )
+	{
+		for ( int i = 0; i < texture.Length; i++ )
+		{
+			_boundResources[name + $"{i}"] = texture[i].NativeTexture;
+		}
+
+		_boundResources["s_" + name] = Samplers[(int)SamplerType.AnisotropicWrap];
+
+		Render.MarkForDeath( ClearBoundResources );
+	}
+
 	public void Set( string name, Texture texture )
 	{
 		_boundResources[name] = texture.NativeTexture;

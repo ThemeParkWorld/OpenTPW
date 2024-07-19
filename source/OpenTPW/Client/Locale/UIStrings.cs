@@ -1,4 +1,5 @@
 ﻿namespace OpenTPW;
+
 public enum UIStrings
 {
 	Blank = 0,

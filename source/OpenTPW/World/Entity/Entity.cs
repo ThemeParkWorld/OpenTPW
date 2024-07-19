@@ -17,7 +17,7 @@ public class Entity
 	/// <summary>
 	/// Pitch, Yaw, Roll (PYR)
 	/// </summary>
-	public Vector3 Rotation;
+	public Quaternion Rotation;
 
 	public Vector3 Scale = Vector3.One;
 
@@ -28,12 +28,8 @@ public class Entity
 		get
 		{
 			var matrix = Matrix4x4.CreateScale( Scale );
+			matrix *= Matrix4x4.CreateFromQuaternion( Rotation );
 			matrix *= Matrix4x4.CreateTranslation( Position );
-			matrix *= Matrix4x4.CreateFromYawPitchRoll(
-				Rotation.Y.DegreesToRadians(),
-				Rotation.X.DegreesToRadians(),
-				Rotation.Z.DegreesToRadians()
-			);
 
 			return matrix;
 		}

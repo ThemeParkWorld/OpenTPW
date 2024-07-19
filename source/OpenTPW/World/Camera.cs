@@ -32,7 +32,7 @@ public static class Camera
 			MathF.Cos( yaw.DegreesToRadians() ) * Position.Z * 2f,
 			MathF.Sin( yaw.DegreesToRadians() ) * Position.Z * 2f,
 			Position.Z
-		);
+		) * 10f;
 
 		var cameraUp = new Vector3( 0, 0, 1 );
 

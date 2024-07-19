@@ -35,25 +35,18 @@ fragment {
 
   void main() 
   {
-    float waveScale = 2.0;
+    float uvScale = 0.1;
+    float waveScale = 2.0 * uvScale;
     float waveFrequency = 0.25;
     float waveAmplitude = 0.025;
     float pi = 3.14159265359;
 
     vec2 sinTime = (vs_out.vPosition.yx * waveScale + g_oUbo.g_fTime * waveFrequency) * pi;
-    vec2 uv = vs_out.vPosition.xy + vec2(sin(sinTime.x), sin(sinTime.y)) * waveAmplitude;
+    vec2 uv = (vs_out.vPosition.xy * uvScale) + vec2(sin(sinTime.x), sin(sinTime.y)) * waveAmplitude;
 
     vec4 vColor = texture( sampler2D( Color, s_Color ), uv ) * 0.75;
     vColor.z *= 1.25;
-
-    vec3 fogColor = vec3( 0.28, 0.88, 1.0 );
-    float fogStart = 2.0;
-    float fogEnd = 30.0;
-
-    // smoother fog, better looking
-    float fogAmount = ( 1.0 - exp( -length( vs_out.vPositionWs ) * 0.01 ) ) / ( 1.0 - exp( -fogEnd * 0.01 ) );
-    fogAmount = clamp( fogAmount, 0.0, 1.0 );
-
-    fragColor = mix( vColor, vec4( fogColor, 1.0 ), fogAmount );
+    
+    fragColor = vColor;
   }
 }
