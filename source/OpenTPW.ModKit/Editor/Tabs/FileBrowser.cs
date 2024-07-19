@@ -110,14 +110,12 @@ internal sealed class FileBrowser : BaseTab
 
 			foreach ( var file in FileSystem.GetFiles( path ) )
 			{
-				var relativePath = FileSystem.GetRelativePath( file );
-				node.Children.Add( FromFile( relativePath, node ) );
+				node.Children.Add( FromFile( file, node ) );
 			}
 
 			foreach ( var directory in FileSystem.GetDirectories( path ) )
 			{
-				var relativePath = FileSystem.GetRelativePath( directory );
-				node.Children.Add( FromDirectory( relativePath, node, ++depth ) );
+				node.Children.Add( FromDirectory( directory, node, ++depth ) );
 			}
 
 			return node;
