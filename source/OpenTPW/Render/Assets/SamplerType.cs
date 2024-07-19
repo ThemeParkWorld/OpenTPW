@@ -6,5 +6,6 @@ public enum SamplerType
 	Linear,
 	Point,
 
-	AnisotropicWrap
+	AnisotropicWrap,
+	AnisotropicRepeat
 }

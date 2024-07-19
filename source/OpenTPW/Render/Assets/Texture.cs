@@ -11,7 +11,7 @@ public partial class Texture : Asset
 	public uint Width { get; private set; }
 	public uint Height { get; private set; }
 
-	public static Texture Missing => new Texture( [255, 255, 255], 1, 1 );
+	public static Texture Missing => new Texture( [255, 255, 255, 255], 1, 1 );
 
 	internal Veldrid.Texture NativeTexture;
 	internal TextureView NativeTextureView;
@@ -122,6 +122,9 @@ public partial class Texture : Asset
 
 		if ( flags.HasFlag( TextureFlags.Wrap ) )
 			SamplerType = SamplerType.AnisotropicWrap;
+
+		if ( flags.HasFlag( TextureFlags.Repeat ) )
+			SamplerType = SamplerType.AnisotropicRepeat;
 
 		uint mipLevels = (uint)CalculateMipLevels( (int)width, (int)height, 1 );
 

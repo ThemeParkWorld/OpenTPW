@@ -49,14 +49,15 @@ public partial class Material : Asset
 		CreateSampler( SamplerType.Anisotropic ),
 		CreateSampler( SamplerType.Linear ),
 		CreateSampler( SamplerType.Point ),
-		CreateSampler( SamplerType.AnisotropicWrap )
+		CreateSampler( SamplerType.AnisotropicWrap ),
+		CreateSampler( SamplerType.AnisotropicRepeat ),
 	];
 
 	private static Sampler CreateSampler( SamplerType type )
 	{
 		var samplerFilter = type switch
 		{
-			SamplerType.Anisotropic or SamplerType.AnisotropicWrap => SamplerFilter.Anisotropic,
+			SamplerType.Anisotropic or SamplerType.AnisotropicWrap or SamplerType.AnisotropicRepeat => SamplerFilter.Anisotropic,
 			SamplerType.Linear => SamplerFilter.MinLinear_MagLinear_MipLinear,
 			SamplerType.Point => SamplerFilter.MinPoint_MagPoint_MipPoint,
 			_ => throw new NotImplementedException()
@@ -66,6 +67,7 @@ public partial class Material : Asset
 		{
 			SamplerType.Anisotropic or SamplerType.Linear or SamplerType.Point => SamplerAddressMode.Clamp,
 			SamplerType.AnisotropicWrap => SamplerAddressMode.Wrap,
+			SamplerType.AnisotropicRepeat => SamplerAddressMode.Mirror,
 			_ => throw new NotImplementedException()
 		};
 
@@ -75,7 +77,7 @@ public partial class Material : Asset
 			samplerAddressMode,
 			samplerFilter,
 			ComparisonKind.Always,
-			(type == SamplerType.Anisotropic || type == SamplerType.AnisotropicWrap) ? 16u : 0u,
+			(type == SamplerType.Anisotropic || type == SamplerType.AnisotropicWrap || type == SamplerType.AnisotropicRepeat) ? 16u : 0u,
 			0,
 			0,
 			0,

@@ -18,5 +18,7 @@ public enum TextureFlags
 	/// <summary>
 	/// Force wrap for this texture's sampler
 	/// </summary>
-	Wrap
+	Wrap,
+
+	Repeat
 }
