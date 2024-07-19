@@ -5,15 +5,10 @@ namespace OpenTPW;
 
 public class Model : Asset
 {
-	private DeviceBuffer uniformBuffer;
-	private Pipeline pipeline;
-	private ResourceSet resourceSet;
-
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
 
 	public Material Material { get; private set; }
-
 	public bool IsIndexed { get; private set; }
 
 	private uint indexCount;
@@ -25,7 +20,6 @@ public class Model : Asset
 		IsIndexed = true;
 
 		SetupMesh( vertices, indices );
-		SetupResources( material );
 
 		All.Add( this );
 	}
@@ -36,7 +30,6 @@ public class Model : Asset
 		IsIndexed = false;
 
 		SetupMesh( vertices );
-		SetupResources( material );
 
 		All.Add( this );
 	}
@@ -48,7 +41,7 @@ public class Model : Asset
 		vertexCount = (uint)vertices.Length;
 
 		VertexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( vertexCount * vertexStructSize, Veldrid.BufferUsage.VertexBuffer )
+			new BufferDescription( vertexCount * vertexStructSize, BufferUsage.VertexBuffer )
 		);
 
 		Device.UpdateBuffer( VertexBuffer, 0, vertices );
@@ -62,92 +55,25 @@ public class Model : Asset
 		indexCount = (uint)indices.Length;
 
 		IndexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( indexCount * sizeof( uint ), Veldrid.BufferUsage.IndexBuffer )
+			new BufferDescription( indexCount * sizeof( uint ), BufferUsage.IndexBuffer )
 		);
 
 		Device.UpdateBuffer( IndexBuffer, 0, indices );
 	}
 
-	private void SetupResources( Material material )
+	internal void Draw()
 	{
-		var vertexLayout = new VertexLayoutDescription( Vertex.VertexElementDescriptions );
+		ImDraw.AssertRenderState();
 
-		var rsrcLayoutDesc = new ResourceLayoutDescription()
-		{
-			Elements = new[]
-			{
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tDiffuse",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.Sampler,
-					Name = "g_sDiffuse",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.UniformBuffer,
-					Name = "g_oUbo",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Vertex | ShaderStages.Fragment
-				}
-			}
-		};
-
-		var rsrcLayout = Device.ResourceFactory.CreateResourceLayout( rsrcLayoutDesc );
-
-		var pipelineDescription = new GraphicsPipelineDescription()
-		{
-			BlendState = BlendStateDescription.SingleOverrideBlend,
-
-			DepthStencilState = new DepthStencilStateDescription(
-				true,
-				true,
-				ComparisonKind.Less ),
-
-			RasterizerState = new RasterizerStateDescription(
-				FaceCullMode.Back,
-				PolygonFillMode.Solid,
-				FrontFace.Clockwise,
-				true,
-				false ),
-
-			PrimitiveTopology = PrimitiveTopology.TriangleList,
-			ResourceLayouts = new[] { rsrcLayout },
-			ShaderSet = new ShaderSetDescription( new[] { vertexLayout }, material.Shader.ShaderProgram ),
-			Outputs = Device.SwapchainFramebuffer.OutputDescription
-		};
-
-		pipeline = Device.ResourceFactory.CreateGraphicsPipeline( pipelineDescription );
-
-		uint uboSizeInBytes = 4 * (uint)Marshal.SizeOf( Material.UniformBufferType );
-		uniformBuffer = Device.ResourceFactory.CreateBuffer(
-			new BufferDescription( uboSizeInBytes,
-				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
-
-		var resourceSetDescription = new ResourceSetDescription( rsrcLayout, material.DiffuseTexture.NativeTexture, Device.Aniso4xSampler, uniformBuffer );
-		resourceSet = Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
-	}
-
-	internal void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : unmanaged
-	{
-		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
-		{
-			throw new Exception( $"Tried to set unmatching uniform buffer object" +
-				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
-		}
+		var commandList = Render.CommandList;
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
-		commandList.SetPipeline( pipeline );
+		commandList.SetPipeline( Material.Pipeline );
 
-		Device.UpdateBuffer( uniformBuffer, 0, new[] { uniformBufferContents } );
-		commandList.SetGraphicsResourceSet( 0, resourceSet );
+		Material.CreateEphemeralResourceSet( out var resourceSets );
+
+		for ( uint i = 0; i < resourceSets.Length; ++i )
+			commandList.SetGraphicsResourceSet( i, resourceSets[i] );
 
 		if ( IsIndexed )
 		{

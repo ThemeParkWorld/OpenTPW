@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -23,6 +23,7 @@
 	<ItemGroup>
 		<PackageReference Include="ImGui.NET" Version="1.87.2" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
+		<PackageReference Include="SharpText.Veldrid" Version="0.3.1" />
 		<PackageReference Include="SharpZipLib" Version="1.4.2" />
 		<PackageReference Include="StbImageSharp" Version="2.27.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
@@ -31,6 +32,12 @@
 		<PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
 		<PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
 		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\OpenTPW.Common\OpenTPW.Common.csproj" />
+	  <ProjectReference Include="..\OpenTPW.Files\OpenTPW.Files.csproj" />
+	  <ProjectReference Include="..\OpenTPW.ModKit\OpenTPW.ModKit.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,20 +1,26 @@
 ﻿using Veldrid;
 using Veldrid.StartupUtilities;
-using static OpenTPW.Game;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace OpenTPW;
 
 internal class Renderer
 {
-	public Window window;
+	private DateTime _lastFrame;
+	private List<Action> _markedForDeath = [];
 
-	private Editor? editor;
+	//
+	// Objects
+	//
+	public Window Window { get; private set; }
+	public CommandList CommandList { get; private set; }
 
-	private ImGuiRenderer imguiRenderer;
-	private DateTime lastFrame;
+	//
+	// State
+	//
+	public bool IsRendering { get; private set; }
 
-	private CommandList commandList;
+	private Editor Editor { get; set; }
+	private ImGuiRenderer ImGuiRenderer { get; set; }
 
 	public Renderer()
 	{
@@ -25,32 +31,31 @@ internal class Renderer
 	{
 		Init();
 
-		lastFrame = DateTime.Now;
+		_lastFrame = DateTime.Now;
 		MainLoop();
 	}
 
 	private void Init()
 	{
-		window = new();
+		Window = new( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y, "Theme Park World (OpenTPW)", true );
 
 		CreateGraphicsDevice();
-
-		commandList = Device.ResourceFactory.CreateCommandList();
-
-		imguiRenderer = new( Device,
-			  Device.SwapchainFramebuffer.OutputDescription,
-			  window.SdlWindow.Width,
-			  window.SdlWindow.Height );
-
-		editor = new Editor( imguiRenderer );
+		CommandList = Device.ResourceFactory.CreateCommandList();
 
 		var level = new Level( "fantasy" );
 		Log.Info( $"This level costs {level.Global["Keys.CostToEnter"]} keys to enter." );
+
+		Window.Visible = true;
+
+		ImGuiRenderer = new ImGuiRenderer( Device, Device.MainSwapchain.Framebuffer.OutputDescription, Window.Size.X, Window.Size.Y );
+		OpenTPW.ModKit.GlobalNamespace.ImGuiManager = ImGuiRenderer;
+
+		Editor = new Editor( ImGuiRenderer, Device );
 	}
 
 	private void MainLoop()
 	{
-		while ( window.SdlWindow.Exists )
+		while ( Window.SdlWindow.Exists )
 		{
 			Update();
 
@@ -62,37 +67,51 @@ internal class Renderer
 
 	private void PreRender()
 	{
-		commandList.Begin();
-		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
-		commandList.ClearColorTarget( 0, RgbaFloat.Black );
-		commandList.ClearDepthStencil( 1 );
+		CommandList.Begin();
+		CommandList.SetFramebuffer( Device.SwapchainFramebuffer );
+		CommandList.ClearColorTarget( 0, RgbaFloat.Black );
+		CommandList.ClearDepthStencil( 1 );
+
+		IsRendering = true;
 	}
 
 	private void PostRender()
 	{
-		commandList.End();
-		Device.SubmitCommands( commandList );
+		IsRendering = false;
+
+		ImGuiRenderer.Render( Device, CommandList );
+
+		CommandList.End();
+		Device.SubmitCommands( CommandList );
 		Device.SwapBuffers();
+
+		Device.WaitForIdle();
+
+		foreach ( var item in _markedForDeath )
+		{
+			item.Invoke();
+		}
+
+		_markedForDeath.Clear();
 	}
 
 	private void Render()
 	{
-		Level.Current.Render( commandList );
-		imguiRenderer?.Render( Device, commandList );
+		Level.Current.Render();
 	}
 
 	private void Update()
 	{
-		float deltaTime = (float)(DateTime.Now - lastFrame).TotalSeconds;
-		lastFrame = DateTime.Now;
+		float deltaTime = (float)(DateTime.Now - _lastFrame).TotalSeconds;
+		_lastFrame = DateTime.Now;
 
-		InputSnapshot inputSnapshot = window.SdlWindow.PumpEvents();
+		InputSnapshot inputSnapshot = Window.SdlWindow.PumpEvents();
 
 		Time.UpdateFrom( deltaTime );
 		Input.UpdateFrom( inputSnapshot );
+		Editor.UpdateFrom( inputSnapshot );
 
 		Level.Current.Update();
-		editor?.UpdateFrom( inputSnapshot );
 	}
 
 	private void CreateGraphicsDevice()
@@ -101,7 +120,7 @@ internal class Renderer
 		{
 			PreferStandardClipSpaceYDirection = true,
 			PreferDepthRangeZeroToOne = true,
-			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt,
+			SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt,
 			Debug = true
 		};
 
@@ -118,15 +137,11 @@ internal class Renderer
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
 		Device.SyncToVerticalBlank = true;
-
-		var windowTitle = $"OpenTPW | {Device.BackendType}";
-		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
 	[Event.Window.Resized]
 	public void OnWindowResized( Point2 newSize )
 	{
-		imguiRenderer.WindowResized( newSize.X, newSize.Y );
 		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
 	}
 
@@ -139,5 +154,12 @@ internal class Renderer
 
 		commandList.End();
 		Device.SubmitCommands( commandList );
+
+		MarkForDeath( commandList.Dispose );
+	}
+
+	public void MarkForDeath( Action action )
+	{
+		_markedForDeath.Add( action );
 	}
 }

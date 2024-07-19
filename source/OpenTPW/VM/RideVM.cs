@@ -4,13 +4,11 @@ namespace OpenTPW;
 
 public partial class RideVM
 {
-	private readonly RideScriptFile rsseqFile;
-
 	public string ScriptName { get; set; } = "Unnamed";
 
 	public bool IsRunning { get; set; }
 	public int CurrentPos { get; set; }
-	public string Disassembly => rsseqFile.Disassembly;
+	// public string Disassembly => rsseqFile.Disassembly;
 	public List<Instruction> Instructions { get; } = new List<Instruction>();
 
 	/// <summary>
@@ -36,7 +34,7 @@ public partial class RideVM
 
 	public RideVM( Stream stream )
 	{
-		rsseqFile = new RideScriptFile( this, stream );
+		// rsseqFile = new RideScriptFile( this, stream );
 
 		// DEBUG: Log implemented opcode counts
 		var implementedOpcodes = OpcodeHandlers.Keys.ToList();

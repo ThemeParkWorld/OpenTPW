@@ -16,7 +16,7 @@ public static class Camera
 
 	private static float wishYaw = 0f;
 	private static float yaw = 0f;
-	private static float wishHeight = 8f;
+	private static float wishHeight = 2f;
 	private static float cameraSpeed = 128f;
 
 	private static Vector2 mouseAnchor;
@@ -29,10 +29,10 @@ public static class Camera
 		var lookAt = new Vector3( Position.X, Position.Y, 0 );
 
 		var cameraPos = lookAt + new Vector3(
-			MathF.Cos( yaw.DegreesToRadians() ) * Position.Z,
-			MathF.Sin( yaw.DegreesToRadians() ) * Position.Z,
+			MathF.Cos( yaw.DegreesToRadians() ) * Position.Z * 2f,
+			MathF.Sin( yaw.DegreesToRadians() ) * Position.Z * 2f,
 			Position.Z
-		);
+		) * 10f;
 
 		var cameraUp = new Vector3( 0, 0, 1 );
 

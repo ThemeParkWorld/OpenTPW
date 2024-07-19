@@ -12,21 +12,23 @@ public class RootPanel : Entity
 		Instance ??= this;
 	}
 
-	public override void Render( CommandList commandList )
+	protected override void OnRender()
 	{
-		Children.ForEach( child => child.Draw( commandList ) );
+		Children.ForEach( child => child.Draw() );
 	}
 
-	public override void Update()
+	protected override void OnUpdate()
 	{
 		Children.ForEach( child => child.Update() );
 	}
 
-	public void AddChild<T>( T? obj = null ) where T : Panel
+	public T AddChild<T>( T? obj = null ) where T : Panel
 	{
 		if ( obj is null )
 			obj = Activator.CreateInstance( typeof( T ) ) as T;
 
 		Children.Add( obj );
+
+		return obj;
 	}
 }

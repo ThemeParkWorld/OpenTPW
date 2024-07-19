@@ -8,13 +8,13 @@ public class Ride : Entity
 	{
 		var rideName = Path.GetFileNameWithoutExtension( rideArchive );
 
-		VM = new RideVM( FileSystem.Game.OpenRead( rideArchive + "\\" + rideName + ".rse" ) );
-		var settingsFile = new SettingsFile( FileSystem.Game.OpenRead( rideArchive + "\\" + rideName + ".sam" ) );
+		VM = new RideVM( FileSystem.OpenRead( rideArchive + "\\" + rideName + ".rse" ) );
+		var settingsFile = new SettingsFile( FileSystem.OpenRead( rideArchive + "\\" + rideName + ".sam" ) );
 
 		Log.Trace( $"Loaded ride {settingsFile.Entries.First( x => x.Key == "Info.Name" ).Value}" );
 	}
 
-	public override void Update()
+	protected override void OnUpdate()
 	{
 		VM.Update();
 	}

@@ -12,6 +12,6 @@ public static class GameDir
 	/// <returns></returns>
 	public static string GetPath( string path )
 	{
-		return Path.Join( Settings.Default.GamePath, path );
+		return Path.Join( Settings.Default.GamePath, path ).Replace( '/', Path.DirectorySeparatorChar );
 	}
 }

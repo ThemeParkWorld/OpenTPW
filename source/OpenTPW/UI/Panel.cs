@@ -30,17 +30,29 @@ public class Panel
 		return p;
 	}
 
-	public virtual void Update()
+	public void Update()
 	{
-
+		OnUpdate();
 	}
 
-	public virtual void Draw( CommandList commandList )
+	protected virtual void OnRender() { }
+	protected virtual void OnUpdate() { }
+	protected virtual void OnDelete() { }
+
+	public void Draw()
 	{
 		var positionNDC = PositionToNDC( position );
 		var sizeNDC = SizeToNDC( size );
 
 		modelMatrix = Matrix4x4.CreateScale( sizeNDC.X, sizeNDC.Y, 1 ) *
 			Matrix4x4.CreateTranslation( positionNDC.X, positionNDC.Y, 1 );
+
+		OnRender();
+	}
+
+	public void Delete()
+	{
+		OnDelete();
+		Level.Current.Hud.Children.Remove( this );
 	}
 }

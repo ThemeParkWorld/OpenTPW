@@ -6,13 +6,22 @@
 /// </summary>
 internal static class Game
 {
-	public static Renderer renderer;
+	private static Editor? editor;
 
 	[Flags]
 	public enum InitFlags
 	{
 		None,
-		NoVid
+
+		/// <summary>
+		/// Don't show intro videos or logos
+		/// </summary>
+		NoVid,
+
+		/// <summary>
+		/// Enables the editor inside the game
+		/// </summary>
+		Editor
 	}
 
 	private static InitFlags ParseInitFlagsFromArgs( string[] args )
@@ -42,7 +51,18 @@ internal static class Game
 
 	public static void Run( InitFlags initFlags = InitFlags.None )
 	{
-		renderer = new();
-		renderer.Run();
+		Log = new();
+
+		if ( !Path.Exists( $"{Settings.Default.GamePath}/data/" ) )
+			throw new DirectoryNotFoundException( "Theme Park World not found" );
+
+		FileSystem = new BaseFileSystem( $"{Settings.Default.GamePath}/data/" );
+		FileSystem.RegisterArchiveHandler<WadArchive>( ".wad" );
+		FileSystem.RegisterArchiveHandler<SdtArchive>( ".sdt" );
+
+		CacheFileSystem = new BaseFileSystem( $"./.opentpw" );
+
+		Render = new();
+		Render.Run();
 	}
 }

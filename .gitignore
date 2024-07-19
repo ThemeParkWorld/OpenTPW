@@ -366,3 +366,5 @@ FodyWeavers.xsd
 
 # Imgui
 [Ii]mgui.ini
+.opentpw
+dumps

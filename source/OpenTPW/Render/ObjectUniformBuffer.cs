@@ -22,5 +22,7 @@ struct ObjectUniformBuffer
 	public float _padding1; // 4
 
 	public System.Numerics.Vector3 g_vCameraPos; // 12
+	public float g_flTime; // 4
+
 	public float _padding2; // 4
 }

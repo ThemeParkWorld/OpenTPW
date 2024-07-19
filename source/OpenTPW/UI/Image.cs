@@ -1,48 +1,32 @@
-﻿using System.Numerics;
-using Veldrid;
-
-namespace OpenTPW.UI;
+﻿namespace OpenTPW.UI;
 
 public partial class Image : Panel
 {
-	private Model model;
+	private Texture Texture;
 
-	struct ObjectUniformBuffer
+	public Vector2 Uv0 { get; set; } = new Vector2( 0, 0 );
+	public Vector2 Uv1 { get; set; } = new Vector2( 1, 1 );
+
+	public Vector2 Position { get; set; }
+	public Vector2 Size { get; set; }
+
+	public Rectangle Rect => new Rectangle( Position, Size );
+	public Rectangle UvRect => new Rectangle( Uv0, Uv1 - Uv0 );
+
+	public Image( string texturePath )
 	{
-		public Matrix4x4 g_mModel;
+		Texture = new Texture( texturePath );
 	}
 
 	public Image( Texture texture )
 	{
-		var material = new Material(
-			texture,
-			ShaderBuilder.Default.WithVertex( "content/shaders/test.vert" )
-						  .WithFragment( "content/shaders/test.frag" )
-						  .Build(),
-			typeof( ObjectUniformBuffer )
-		);
-
-		model = Primitives.Plane.GenerateModel( material );
+		Texture = texture;
 	}
 
-	public override void Update()
+	protected override void OnRender()
 	{
-		base.Update();
-
-		var aspect = 4f / 3f;
-		position = new Vector2( Screen.Size.X / 2, Screen.Size.Y / 2 );
-		size = new Vector2( Screen.Size.Y * aspect, Screen.Size.Y );
-	}
-
-	public override void Draw( CommandList commandList )
-	{
-		base.Draw( commandList );
-
-		var uniformBufferContents = new ObjectUniformBuffer
-		{
-			g_mModel = modelMatrix
-		};
-
-		model.Draw( uniformBufferContents, commandList );
+		var material = Material.UI;
+		material.Set( "Color", Texture );
+		ImDraw.Quad( Rect, UvRect, material );
 	}
 }

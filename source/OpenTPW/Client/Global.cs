@@ -1,8 +1,9 @@
-﻿using OpenTPW;
+﻿global using static Global;
+using OpenTPW;
 using Veldrid;
 
 public static class Global
 {
-	public static Logger Log { get; } = new();
-	public static GraphicsDevice Device { get; internal set; } = null!;
+	internal static GraphicsDevice Device { get; set; } = null!;
+	internal static Renderer Render { get; set; } = null!;
 }

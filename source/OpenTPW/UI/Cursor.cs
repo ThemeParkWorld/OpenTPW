@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 using Veldrid;
 
 namespace OpenTPW.UI;
@@ -7,7 +8,7 @@ public class Cursor : Panel
 {
 	public static Cursor Current { get; set; }
 
-	private Model model;
+	private Texture texture;
 
 	private Input.CursorTypes cursorType;
 	public Input.CursorTypes CursorType
@@ -19,8 +20,6 @@ public class Cursor : Panel
 			LoadTexture();
 		}
 	}
-
-	public Texture Texture => model.Material.DiffuseTexture;
 
 	struct ObjectUniformBuffer
 	{
@@ -47,42 +46,28 @@ public class Cursor : Panel
 
 	private void LoadTexture()
 	{
-		var cursorPath = $"data/ui/cursors/{GetImageName( cursorType )}.tga";
-		var texture = new Texture( GameDir.GetPath( cursorPath ) );
-		var shader = ShaderBuilder.Default
-							.WithVertex( "content/shaders/cursor/cursor.vert" )
-							.WithFragment( "content/shaders/cursor/cursor.frag" )
-							.Build();
-		var uniformBufferType = typeof( ObjectUniformBuffer );
-
-		var material = new Material( texture, shader, uniformBufferType );
-		model = Primitives.Plane.GenerateModel( material );
+		var cursorPath = $"/data/ui/cursors/{GetImageName( cursorType )}.tga";
+		texture = new Texture( GameDir.GetPath( cursorPath ), TextureFlags.PinkChromaKey );
 	}
 
-	public override void Update()
+	protected override void OnRender()
 	{
-		base.Update();
+		var material = Material.UI;
+		material.Set( "Color", texture );
 
-		size = new Vector2( 32, 32 );
+		var size = new Vector2( 32 );
 
-		var center = size / 2;
-		position = Input.Mouse.Position + center;
-		position.Y = Screen.Size.Y - position.Y;
-	}
+		var position = Input.Mouse.Position;
+		position.Y = Screen.Height - position.Y;
+		position.Y -= size.Y;
 
-	public override void Draw( CommandList commandList )
-	{
-		base.Draw( commandList );
+		var frame = ((Time.Now * 3).CeilToInt()) % 4;
+		var uv0 = new Vector2( frame * 0.25f, 0f );
+		var uv1 = uv0 + new Vector2( 0.25f, 1f );
 
-		if ( this.model == null )
-			return;
+		var rect = new Rectangle( position, size );
+		var uvRect = new Rectangle( uv0, uv1 - uv0 );
 
-		var uniformBuffer = new ObjectUniformBuffer()
-		{
-			g_mModel = modelMatrix,
-			g_iFrame = ((Time.Now * 3).CeilToInt()) % 4
-		};
-
-		model.Draw( uniformBuffer, commandList );
+		ImDraw.Quad( rect, uvRect, material );
 	}
 }

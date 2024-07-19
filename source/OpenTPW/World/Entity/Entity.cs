@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection;
-using Veldrid;
 
 namespace OpenTPW;
 
@@ -18,7 +17,7 @@ public class Entity
 	/// <summary>
 	/// Pitch, Yaw, Roll (PYR)
 	/// </summary>
-	public Vector3 Rotation;
+	public Quaternion Rotation;
 
 	public Vector3 Scale = Vector3.One;
 
@@ -29,12 +28,8 @@ public class Entity
 		get
 		{
 			var matrix = Matrix4x4.CreateScale( Scale );
+			matrix *= Matrix4x4.CreateFromQuaternion( Rotation );
 			matrix *= Matrix4x4.CreateTranslation( Position );
-			matrix *= Matrix4x4.CreateFromYawPitchRoll(
-				Rotation.Y.DegreesToRadians(),
-				Rotation.X.DegreesToRadians(),
-				Rotation.Z.DegreesToRadians()
-			);
 
 			return matrix;
 		}
@@ -47,10 +42,23 @@ public class Entity
 		Name = $"{this.GetType().Name} {All.Count}";
 	}
 
-	public virtual void Render( CommandList commandList ) { }
-	public virtual void Update() { }
+	public void Render()
+	{
+		OnRender();
+	}
 
-	public virtual void Delete() { }
+	public void Update()
+	{
+		OnUpdate();
+	}
+	public void Delete()
+	{
+		OnDelete();
+	}
+
+	protected virtual void OnRender() { }
+	protected virtual void OnUpdate() { }
+	protected virtual void OnDelete() { }
 
 	public bool Equals( Entity x, Entity y ) => x.GetHashCode() == y.GetHashCode();
 	public int GetHashCode( [DisallowNull] Entity obj ) => base.GetHashCode();
