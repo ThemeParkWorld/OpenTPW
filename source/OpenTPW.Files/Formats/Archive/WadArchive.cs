@@ -239,7 +239,7 @@ public sealed class WadArchive : IArchive
 
 			if ( i == splitPath.Length - 1 )
 			{
-				return internalDirectory.Children.OfType<T>().First( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
+				return internalDirectory.Children.OfType<T>().FirstOrDefault( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
 			}
 
 			internalDirectory = internalDirectory.Children.OfType<ArchiveDirectory>().First( x => x.Name.Equals( dir, StringComparison.CurrentCultureIgnoreCase ) );
@@ -297,7 +297,12 @@ public sealed class WadArchive : IArchive
 
 	public Stream OpenFile( string path )
 	{
-		return new MemoryStream( GetFile( path ).GetData() );
+		var file = GetFile( path );
+
+		if ( file == null )
+			return null;
+
+		return new MemoryStream( file.GetData() );
 	}
 
 	public long GetFileSize( string path )
