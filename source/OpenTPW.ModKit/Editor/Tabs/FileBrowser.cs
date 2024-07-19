@@ -206,7 +206,12 @@ internal sealed class FileBrowser : BaseTab
 			if ( ImGui.MenuItem( "ImHex" ) )
 				Utility.LaunchImHex( CurrentFile.Name );
 
-			ImGui.MenuItem( "Windows Explorer" );
+			if ( ImGui.MenuItem( "Windows Explorer" ) )
+				Utility.LaunchExplorer( CurrentFile.Name );
+
+			if ( ImGui.MenuItem( "Dump" ))
+				Utility.DumpFile( CurrentFile.Name );
+
 			ImGui.EndMenu();
 		}
 
