@@ -1,8 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Numerics;
-
-namespace OpenTPW
+﻿namespace OpenTPW
 {
 	public struct Color : IEquatable<Color>
 	{
@@ -38,8 +34,8 @@ namespace OpenTPW
 		public static readonly Color Green = new( 0f, 1f, 0f, 1f );
 		public static readonly Color Blue = new( 0f, 0f, 1f, 1f );
 
-		public readonly float Length => internalColor.Length();
-		public readonly float LengthSquared => internalColor.LengthSquared();
+		public readonly float Length => internalColor.Length;
+		public readonly float LengthSquared => internalColor.LengthSquared;
 
 		public Color( float r, float g, float b, float a )
 		{
@@ -94,18 +90,6 @@ namespace OpenTPW
 				a.G.LerpTo( b.G, t ),
 				a.B.LerpTo( b.B, t ),
 				a.A.LerpTo( b.A, t )
-			);
-		}
-
-		public static Color Parse( string hex )
-		{
-			var color = ColorTranslator.FromHtml( hex );
-
-			return new System.Numerics.Vector4(
-					(color.R / 255f),
-					(color.G / 255f),
-					(color.B / 255f),
-					(color.A / 255f)
 			);
 		}
 	}
