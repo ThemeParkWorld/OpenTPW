@@ -36,6 +36,6 @@ internal static class Utility
 		System.IO.Directory.CreateDirectory( "dumps" );
 		System.IO.File.WriteAllBytes( dest, fileContent );
 
-		LaunchExplorer( dest );
+		LaunchExplorer( Path.GetFullPath( dest ) );
 	}
 }
