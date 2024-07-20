@@ -146,6 +146,7 @@ internal class Renderer
 	[Event.Window.Resized]
 	public void OnWindowResized( Point2 newSize )
 	{
+		ImGuiRenderer.WindowResized( newSize.X, newSize.Y );
 		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
 	}
 
