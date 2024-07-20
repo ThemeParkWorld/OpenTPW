@@ -83,6 +83,10 @@ internal class Renderer
 
 		CommandList.End();
 		Device.SubmitCommands( CommandList );
+
+		if ( !Window.Visible )
+			return;
+
 		Device.SwapBuffers();
 
 		Device.WaitForIdle();
