@@ -37,12 +37,12 @@ internal static class ImDraw
 		Debug.Assert( Render.IsRendering );
 	}
 
-	private static Matrix4x4 CreateScreenMatrix()
+	private static Matrix4x4 CreateScreenMatrix( Point2 screenSize )
 	{
 		var matrix = Matrix4x4.Identity;
 
 		// Scale to fit screen
-		matrix *= Matrix4x4.CreateScale( new Vector3( 1f / Screen.Size.X, 1f / Screen.Size.Y, 1 ) );
+		matrix *= Matrix4x4.CreateScale( new Vector3( 1f / screenSize.X, 1f / screenSize.Y, 1 ) );
 
 		// Convert from [-0.5f, 0.5f] to [0.0f, 1.0f]
 		matrix *= Matrix4x4.CreateScale( 2.0f );
@@ -58,11 +58,11 @@ internal static class ImDraw
 		Quad( rectangle, new Rectangle( 0, 0, 1, 1 ), material );
 	}
 
-	public static void Quad( Rectangle rectangle, Rectangle uvs, Material material )
+	public static void Quad( Rectangle rectangle, Rectangle uvs, Material material, bool fullScreen = false )
 	{
 		AssertRenderState();
 
-		var screenMatrix = CreateScreenMatrix();
+		var screenMatrix = CreateScreenMatrix( fullScreen ? Screen.Size : new Point2( 1920, 1080 ) );
 
 		var v0 = new Vector3( rectangle.TopLeft ) * screenMatrix;
 		var v1 = new Vector3( rectangle.TopRight ) * screenMatrix;

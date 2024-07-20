@@ -68,6 +68,6 @@ public class Cursor : Panel
 		var rect = new Rectangle( position, size );
 		var uvRect = new Rectangle( uv0, uv1 - uv0 );
 
-		ImDraw.Quad( rect, uvRect, material );
+		ImDraw.Quad( rect, uvRect, material, true );
 	}
 }

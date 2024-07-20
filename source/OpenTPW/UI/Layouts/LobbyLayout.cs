@@ -15,7 +15,7 @@ internal sealed class LobbyLayout : Layout
 			Size = new Vector2( 180f, 77.4f )
 		} );
 
-		var topRight = new Vector2( Screen.Width, Screen.Height );
+		var topRight = new Vector2( 1920, 1080 );
 
 		List<string> saves = new();
 
