@@ -62,7 +62,7 @@ internal static class ImDraw
 	{
 		AssertRenderState();
 
-		var screenMatrix = CreateScreenMatrix( fullScreen ? Screen.Size : new Point2( 1920, 1080 ) );
+		var screenMatrix = CreateScreenMatrix( fullScreen ? Screen.Size : new Point2( 1280, 720 ) );
 
 		var v0 = new Vector3( rectangle.TopLeft ) * screenMatrix;
 		var v1 = new Vector3( rectangle.TopRight ) * screenMatrix;
