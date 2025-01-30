@@ -36,7 +36,9 @@ public class Level
 		_ = new Water() { Scale = new Vector3( 10000f ) };
 		_ = new Sky();
 
-		var modelFile = new ModelFile( "lobby/terrain/Fan_isle.md2" );
+		Camera.SetCameraMode<LobbyCameraMode>();
+
+		var modelFile = new ModelFile( "lobby/terrain/Jun_isle.md2" );
 		foreach ( var mesh in modelFile.Meshes )
 		{
 			var material = new Material<ObjectUniformBuffer>( "content/shaders/test.shader" );
@@ -78,7 +80,7 @@ public class Level
 			var model = new Model( [.. vertices], mesh.Indices, material );
 			Matrix4x4.Decompose( mesh.TransformMatrix, out var scale, out var rot, out var pos );
 
-			pos = new System.Numerics.Vector3( pos.X, pos.Z, pos.Y );
+			pos = new System.Numerics.Vector3( pos.X, pos.Z, pos.Y - 2.5f );
 			rot = new Quaternion( rot.X, rot.Z, rot.Y, -rot.W );
 			scale = new System.Numerics.Vector3( scale.X, scale.Z, scale.Y );
 

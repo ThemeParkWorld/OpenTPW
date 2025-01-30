@@ -12,6 +12,6 @@ public class Sky : ModelEntity
 		material.Set( "Color", texture );
 
 		Model = Primitives.Cube.GenerateModel( material );
-		Scale = new Vector3( -1000f );
+		Scale = new Vector3( -10000f );
 	}
 }
