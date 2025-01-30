@@ -35,7 +35,7 @@ fragment {
 
   void main() 
   {
-    float uvScale = 0.1;
+    float uvScale = 0.05;
     float waveScale = 2.0 * uvScale;
     float waveFrequency = 0.25;
     float waveAmplitude = 0.025;
@@ -44,7 +44,10 @@ fragment {
     vec2 sinTime = (vs_out.vPosition.yx * waveScale + g_oUbo.g_fTime * waveFrequency) * pi;
     vec2 uv = (vs_out.vPosition.xy * uvScale) + vec2(sin(sinTime.x), sin(sinTime.y)) * waveAmplitude;
 
-    vec4 vColor = texture( sampler2D( Color, s_Color ), uv ) * 0.75;
+    float offsetSpeed = 0.25;
+    vec2 offset = vec2( 0, g_oUbo.g_fTime ) * offsetSpeed;
+
+    vec4 vColor = texture( sampler2D( Color, s_Color ), uv + offset ) * 0.75;
     vColor.z *= 1.25;
     
     fragColor = vColor;

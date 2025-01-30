@@ -75,5 +75,8 @@ fragment {
 
     fragColor = vec4( vLambert + vAmbient, 1.0 ) * vColor;
     fragColor = mix( fragColor, vec4( fogColor, 1.0 ), fogAmount );
+
+    if ( fragColor.w < 0.1 )
+      discard;
   }
 }

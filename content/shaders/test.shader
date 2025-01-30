@@ -20,15 +20,10 @@ vertex {
         vec3 vNormal;
         vec3 vPosition;
         vec3 vWorldPosition;
-        float flShade;
     } vs_out;
 
     layout(location = 5) out flat int outTexIndex;
     layout(location = 6) out flat uint outMatFlags;
-
-    float ShadeDiffuse(vec3 vNormal, vec3 vLightDir) {
-        return max(dot(vNormal, vLightDir), 0.0);
-    }
 
     void main() {
         vs_out.vTexCoords = texCoords;
@@ -39,10 +34,6 @@ vertex {
         vec4 pos = g_oUbo.g_mModel * vec4(position, 1.0);
         vs_out.vWorldPosition = vec3(pos);
         gl_Position = g_oUbo.g_mProj * g_oUbo.g_mView * pos;
-        
-        vec3 vLightDir = normalize(g_oUbo.g_vLightPos - vs_out.vWorldPosition);
-        float fShading = ShadeDiffuse(vs_out.vNormal, vLightDir);
-        vs_out.flShade = fShading;
 
         outTexIndex = texIndex;
         outMatFlags = matFlags;
@@ -55,7 +46,6 @@ fragment {
         vec3 vNormal;
         vec3 vPosition;
         vec3 vWorldPosition;
-        float flShade;
     } vs_out;
 
     layout(location = 5) in flat int texIndex;
@@ -110,7 +100,10 @@ fragment {
             finalTexCoords.y = finalTexCoords.y + g_oUbo.g_flTime * 0.1;
         }*/
 
-        vec3 vDiffuse = vs_out.flShade * g_oUbo.g_vLightColor;
+        vec3 N = normalize(vs_out.vNormal);
+        vec3 L = normalize(g_oUbo.g_vLightPos - vs_out.vWorldPosition);
+        
+        vec3 vDiffuse = max(dot(N, L), 0.0) * g_oUbo.g_vLightColor;
         vec3 vAmbient = vec3(0.4);
 
         vec4 vTextureSample = vec4(1, 0, 1, 1);
@@ -139,13 +132,11 @@ fragment {
         if ((outMatFlags & FLAG_GOURAUD_SHADED) != 0) {
             vOutColor = vTextureSample.xyz * vShading;
         } else {
-            vOutColor = vTextureSample.xyz;
+            vOutColor = vTextureSample.xyz * vShading;
         }
 
         // Handle opaque alpha testing
-        if ((outMatFlags & FLAG_TRANSPARENT) == 0) {
-            if (vTextureSample.a < 0.1) discard;
-        }
+        if (vTextureSample.a < 0.1) discard;
 
         fragColor = vec4(vOutColor, vTextureSample.a);
     }
