@@ -8,6 +8,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
 		<LangVersion>preview</LangVersion>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 
 	<ItemGroup>
