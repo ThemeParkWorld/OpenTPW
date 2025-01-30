@@ -6,8 +6,6 @@
 /// </summary>
 internal static class Game
 {
-	private static Editor? editor;
-
 	[Flags]
 	public enum InitFlags
 	{
@@ -59,6 +57,11 @@ internal static class Game
 		FileSystem = new BaseFileSystem( $"{Settings.Default.GamePath}/data/" );
 		FileSystem.RegisterArchiveHandler<WadArchive>( ".wad" );
 		FileSystem.RegisterArchiveHandler<SdtArchive>( ".sdt" );
+
+		if ( !Path.Exists( $"{Settings.Default.GamePath}/save/" ) )
+			Directory.CreateDirectory( $"{Settings.Default.GamePath}/save/" );
+
+		SaveFileSystem = new BaseFileSystem( $"{Settings.Default.GamePath}/save/" );
 
 		CacheFileSystem = new BaseFileSystem( $"./.opentpw" );
 
