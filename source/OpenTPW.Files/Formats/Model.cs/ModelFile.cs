@@ -352,6 +352,7 @@ public partial class ModelFile : BaseFormat
 			Vector3 edge2 = v3 - v1;
 
 			Vector3 faceNormal = Vector3.Cross( edge1, edge2 );
+			faceNormal = faceNormal.Normal; // Ensure face normal is unit length
 
 			// Accumulate the face normal to all three vertices
 			normals[i1] += faceNormal;
@@ -359,10 +360,11 @@ public partial class ModelFile : BaseFormat
 			normals[i3] += faceNormal;
 		}
 
-		// Normalize all vertex normals
+		// Normalize all vertex normals to average them
 		for ( int i = 0; i < normals.Length; i++ )
 		{
-			normals[i] = normals[i].Normal;
+			if ( normals[i] != Vector3.Zero )
+				normals[i] = normals[i].Normal;
 		}
 
 		mesh.Normals = normals;
