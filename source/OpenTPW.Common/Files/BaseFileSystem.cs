@@ -36,6 +36,18 @@ public class BaseFileSystem
 		return ms.ToArray();
 	}
 
+	public bool FileExists( string relativePath )
+	{
+		var absolutePath = GetAbsolutePath( relativePath );
+		return File.Exists( absolutePath );
+	}
+
+	public bool DirectoryExists( string relativePath )
+	{
+		var absolutePath = GetAbsolutePath( relativePath );
+		return Directory.Exists( absolutePath );
+	}
+
 	public Stream OpenWrite( string relativePath )
 	{
 		var absolutePath = GetAbsolutePath( relativePath );
