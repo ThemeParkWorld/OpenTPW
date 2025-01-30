@@ -79,7 +79,7 @@ public partial class Material : Asset
 			ComparisonKind.Always,
 			(type == SamplerType.Anisotropic || type == SamplerType.AnisotropicWrap || type == SamplerType.AnisotropicRepeat) ? 16u : 0u,
 			0,
-			0,
+			10,
 			0,
 			SamplerBorderColor.TransparentBlack
 		);

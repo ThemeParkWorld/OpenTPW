@@ -6,7 +6,7 @@ namespace OpenTPW;
 
 public partial class Texture : Asset
 {
-	public SamplerType SamplerType { get; private set; }
+	public SamplerType SamplerType { get; private set; } = SamplerType.AnisotropicRepeat;
 
 	public uint Width { get; private set; }
 	public uint Height { get; private set; }
