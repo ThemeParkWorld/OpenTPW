@@ -153,7 +153,7 @@ partial class TextureFile
 		for ( int i = 0; i < size; ++i )
 		{
 			int sOffset = 0;
-			int wOffset = isAlpha && isHalfScale ? (size * size) : size * (size / 2);
+			int wOffset = isAlpha ? (size * size) : size * (size / 2);
 			int colOffset = i;
 			D4InverseTransform(
 
