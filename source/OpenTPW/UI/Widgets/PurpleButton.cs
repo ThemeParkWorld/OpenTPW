@@ -25,7 +25,7 @@ internal class PurpleButton : Panel
 		var size = new Vector2( 200, 100 );
 		var rect = new Rectangle( position, size );
 
-		var uvs = new Rectangle( 0.01f, -0.01f, 0.98f, 0.5f );
+		var uvs = new Rectangle( 0f, 0f, 1.0f, 0.5f );
 		rect.Y -= 130;
 		rect.X -= 740;
 
@@ -41,13 +41,13 @@ internal class PurpleButton : Panel
 		//
 		material.Set( "Color", ButtonText1 );
 		rect.X += 190;
-		Graphics.Quad( rect.Shift( new Vector2( 0, 28 ) ), uvs.Shift( new Vector2( 0, -0.0f ) ), material );
+		Graphics.Quad( rect.Shift( new Vector2( 0, 28 ) ), uvs.Shift( new Vector2( 0, 0f ) ), material );
 
 		//
 		// Start
 		//
 		rect.X += 200;
 		material.Set( "Color", ButtonText2 );
-		Graphics.Quad( rect, uvs.Shift( new Vector2( 0.01f, 0.50f ) ), material );
+		Graphics.Quad( rect, uvs.Shift( new Vector2( 0f, 0.50f ) ), material );
 	}
 }
