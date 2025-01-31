@@ -38,7 +38,7 @@ OpenTPW is currently in a very early stage of development, and is not yet playab
 | Fonts ([.BF4](https://opentpw.gu3.me/formats/bf4.html))                      | ❌     |
 | Strings ([.BFMU](https://opentpw.gu3.me/formats/bfmu.html), [.BFST](https://opentpw.gu3.me/formats/bfst.html), [.BFUM](https://opentpw.gu3.me/formats/bfum.html)) | ✅     |
 | Lip Sync ([.LIPS](https://opentpw.gu3.me/formats/lips.html))                  | ❌     |
-| Models ([.MD2](https://opentpw.gu3.me/formats/m3d2.html))                      | ❌     |
+| Models ([.MD2](https://opentpw.gu3.me/formats/m3d2.html))                      | ⚠️     |
 | Map Data ([.MAP](https://opentpw.gu3.me/formats/map.html))                    | ⚠️     |
 | Materials ([.MTR](https://opentpw.gu3.me/formats/mtr.html))                   | ❌     |
 | Ride Scripts ([.RSE](https://opentpw.gu3.me/formats/rsse.html))                | ⚠️     |
@@ -46,7 +46,7 @@ OpenTPW is currently in a very early stage of development, and is not yet playab
 | Sounds ([.SDT](https://opentpw.gu3.me/formats/sdt.html), .MP2)         | ✅     |
 | Save Files ([.TPWS](https://opentpw.gu3.me/formats/tpws-ints-lays.html))                | ⚠️     |
 | Video ([.TQI](https://opentpw.gu3.me/formats/tqi.html))                       | ❌     |
-| Textures ([.WCT](https://opentpw.gu3.me/formats/wct.html))                    | ⚠️     |
+| Textures ([.WCT](https://opentpw.gu3.me/formats/wct.html))                    | ✅     |
 
 ## Prerequisites
 
