@@ -21,7 +21,11 @@ public static class Camera
 		var direction = CameraMode.Rotation.Forward;
 		var position = CameraMode.Position;
 
-		ViewMatrix = Matrix4x4.CreateLookTo( position, direction, up );
+		ViewMatrix = Matrix4x4.CreateLookTo( 
+			position.GetSystemVector3(), 
+			direction.GetSystemVector3(), 
+			up.GetSystemVector3()
+		);
 
 		var fieldOfView = CameraMode.FieldOfView;
 

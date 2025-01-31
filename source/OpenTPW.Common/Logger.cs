@@ -37,20 +37,11 @@ public class Logger
 		OnLog?.Invoke( severity, str );
 	}
 
-	private static ConsoleColor SeverityToConsoleColor( Level severity )
+	private static ConsoleColor SeverityToConsoleColor( Level severity ) => severity switch
 	{
-		switch ( severity )
-		{
-			case Level.Error:
-				return ConsoleColor.DarkRed;
-			case Level.Warning:
-				return ConsoleColor.Red;
-			case Level.Trace:
-				return ConsoleColor.DarkGray;
-			case Level.Info:
-				return ConsoleColor.White;
-		}
-
-		return ConsoleColor.White;
-	}
+		Level.Error => ConsoleColor.DarkRed,
+		Level.Warning => ConsoleColor.Red,
+		Level.Trace => ConsoleColor.DarkGray,
+		_ => ConsoleColor.White,
+	};
 }

@@ -23,6 +23,7 @@ fragment {
     vec3 vNormal;
     vec3 vPosition;
     vec3 vPositionWs;
+    vec3 vPositionVs;
   } vs_out;
 
   //
@@ -47,9 +48,16 @@ fragment {
     float offsetSpeed = 0.25;
     vec2 offset = vec2( 0, g_oUbo.g_fTime ) * offsetSpeed;
 
-    vec4 vColor = texture( sampler2D( Color, s_Color ), uv + offset ) * 0.75;
-    vColor.z *= 1.25;
-    
+    vec4 vColor = texture( sampler2D( Color, s_Color ), uv + offset );
+    vColor.xyz *= 0.4;
     fragColor = vColor;
+
+    // Calculate fog using view space depth
+    float viewSpaceDepth = length(vs_out.vPositionVs);
+    float fogFactor = exp(viewSpaceDepth * 0.01) * 0.025;
+    fogFactor = clamp( fogFactor, 0, 1 );
+    
+    // Mix with fog
+    fragColor.xyz = mix(fragColor.xyz, vec3( 0.301, 0.84, 1 ), fogFactor);
   }
 }

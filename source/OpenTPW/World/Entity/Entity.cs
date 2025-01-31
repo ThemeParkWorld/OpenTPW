@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection;
+using Veldrid;
 
 namespace OpenTPW;
 
@@ -27,9 +28,9 @@ public class Entity
 	{
 		get
 		{
-			var matrix = Matrix4x4.CreateScale( Scale );
+			var matrix = Matrix4x4.CreateScale( Scale.GetSystemVector3() );
 			matrix *= Matrix4x4.CreateFromQuaternion( Rotation );
-			matrix *= Matrix4x4.CreateTranslation( Position );
+			matrix *= Matrix4x4.CreateTranslation( Position.GetSystemVector3() );
 
 			return matrix;
 		}

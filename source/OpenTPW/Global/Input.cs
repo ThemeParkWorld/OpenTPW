@@ -139,7 +139,6 @@ public static partial class Input
 			if ( isPressed )
 			{
 				KeysDown.Add( button );
-				Log.Info( $"{button} pressed" );
 			}
 		}
 	}

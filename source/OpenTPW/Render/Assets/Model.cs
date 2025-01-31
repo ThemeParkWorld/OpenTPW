@@ -5,8 +5,8 @@ namespace OpenTPW;
 
 public class Model : Asset
 {
-	public DeviceBuffer VertexBuffer { get; private set; }
-	public DeviceBuffer IndexBuffer { get; private set; }
+	public DeviceBuffer VertexBuffer { get; private set; } = null!;
+	public DeviceBuffer? IndexBuffer { get; private set; } = null;
 
 	public Material Material { get; private set; }
 	public bool IsIndexed { get; private set; }
@@ -63,8 +63,6 @@ public class Model : Asset
 
 	internal void Draw()
 	{
-		ImDraw.AssertRenderState();
-
 		var commandList = Render.CommandList;
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );

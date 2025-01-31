@@ -3,105 +3,164 @@ using Veldrid.StartupUtilities;
 
 namespace OpenTPW;
 
-internal class Renderer
+public partial class Renderer
 {
 	private DateTime _lastFrame;
-	private List<Action> _markedForDeath = [];
+	public CommandList CommandList = null!;
 
-	//
-	// Objects
-	//
-	public Window Window { get; private set; }
-	public CommandList CommandList { get; private set; }
+	public Window Window;
 
-	//
-	// State
-	//
-	public bool IsRendering { get; private set; }
+	public Action? PreUpdate;
+	public Action? OnUpdate;
+	public Action? PostUpdate;
 
-	private Editor Editor { get; set; }
-	private ImGuiRenderer ImGuiRenderer { get; set; }
+	public Action? OnRender;
 
 	public Renderer()
 	{
-		Event.Register( this );
+		Window = new( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y, "Theme Park World", true );
+		Window.OnResized = OnWindowResized;
+		Window.Visible = true;
+
+		CreateGraphicsDevice();
+		// Swap the buffers so that the screen isn't a mangled mess
+		Device.SwapBuffers();
+		CreateMultisampledFramebuffer();
+
+		CommandList = Device.ResourceFactory.CreateCommandList();
+		_lastFrame = DateTime.Now;
 	}
+
+	private void CreateMultisampledFramebuffer()
+	{
+		var colorTextureInfo = TextureDescription.Texture2D(
+			(uint)(Screen.Size.X),
+			(uint)(Screen.Size.Y),
+			1,
+			1,
+			PixelFormat.B8_G8_R8_A8_UNorm,
+			TextureUsage.RenderTarget,
+			TextureSampleCount.Count4
+		);
+
+		var colorTexture = Device.ResourceFactory.CreateTexture( colorTextureInfo );
+
+		var depthTextureInfo = TextureDescription.Texture2D(
+			(uint)(Screen.Size.X),
+			(uint)(Screen.Size.Y),
+			1,
+			1,
+			PixelFormat.D32_Float_S8_UInt,
+			TextureUsage.DepthStencil,
+			TextureSampleCount.Count4
+		);
+
+		var depthTexture = Device.ResourceFactory.CreateTexture( depthTextureInfo );
+
+		colorTextureInfo.SampleCount = TextureSampleCount.Count1;
+		colorTextureInfo.Usage = TextureUsage.Sampled;
+
+		ResolveColorTexture = Device.ResourceFactory.CreateTexture( colorTextureInfo );
+
+		var framebufferAttachmentInfo = new FramebufferAttachmentDescription( colorTexture, 0 );
+		var depthAttachmentInfo = new FramebufferAttachmentDescription( depthTexture, 0 );
+		var framebufferDescription = new FramebufferDescription()
+		{
+			ColorTargets = [framebufferAttachmentInfo],
+			DepthTarget = depthAttachmentInfo
+		};
+
+		MultisampledFramebuffer = Device.ResourceFactory.CreateFramebuffer( framebufferDescription );
+	}
+
+	public Framebuffer MultisampledFramebuffer;
+	public Veldrid.Texture ResolveColorTexture;
+
+	private Pipeline _blitPipeline;
+	private ResourceSet _blitResourceSet;
+	private ResourceLayout _blitResourceLayout;
 
 	public void Run()
 	{
-		Init();
+		var layoutDescription = new ResourceLayoutDescription(
+			new ResourceLayoutElementDescription( "g_tInput", ResourceKind.TextureReadOnly, ShaderStages.Fragment ),
+			new ResourceLayoutElementDescription( "g_sSampler", ResourceKind.Sampler, ShaderStages.Fragment )
+		);
 
-		_lastFrame = DateTime.Now;
-		MainLoop();
-	}
+		_blitResourceLayout = Device.ResourceFactory.CreateResourceLayout( layoutDescription );
 
-	private void Init()
-	{
-		Window = new( Settings.Default.GameWindowSize.X, Settings.Default.GameWindowSize.Y, "Theme Park World (OpenTPW)", true );
+		// Create shader
+		var shader = new Shader( "content/shaders/blit.shader" );
+		var blitShader = shader.ShaderProgram;
 
-		CreateGraphicsDevice();
-		CommandList = Device.ResourceFactory.CreateCommandList();
+		var pipelineDescription = new GraphicsPipelineDescription(
+			BlendStateDescription.SingleAlphaBlend,
+			DepthStencilStateDescription.Disabled,
+			RasterizerStateDescription.CullNone,
+			PrimitiveTopology.TriangleList,
+			new ShaderSetDescription(
+				Array.Empty<VertexLayoutDescription>(),
+				shader.ShaderProgram
+			),
+			[_blitResourceLayout],
+			Device.MainSwapchain.Framebuffer.OutputDescription
+		);
 
-		var level = new Level( "fantasy" );
-		Log.Info( $"This level costs {level.Global["Keys.CostToEnter"]} keys to enter." );
+		_blitPipeline = Device.ResourceFactory.CreateGraphicsPipeline( pipelineDescription );
 
-		Window.Visible = true;
+		_blitResourceSet = Device.ResourceFactory.CreateResourceSet( new ResourceSetDescription(
+			_blitResourceLayout,
+			ResolveColorTexture,
+			Device.LinearSampler
+		) );
 
-		ImGuiRenderer = new ImGuiRenderer( Device, Device.MainSwapchain.Framebuffer.OutputDescription, Window.Size.X, Window.Size.Y );
-		OpenTPW.ModKit.GlobalNamespace.ImGuiManager = ImGuiRenderer;
+		OnWindowResized( Window.Size );
 
-		Editor = new Editor( ImGuiRenderer, Device );
-	}
-
-	private void MainLoop()
-	{
 		while ( Window.SdlWindow.Exists )
 		{
 			Update();
-
-			PreRender();
-			Render();
-			PostRender();
 		}
 	}
 
 	private void PreRender()
 	{
-		CommandList.Begin();
-		CommandList.SetFramebuffer( Device.SwapchainFramebuffer );
-		CommandList.ClearColorTarget( 0, RgbaFloat.Black );
-		CommandList.ClearDepthStencil( 1 );
+		foreach ( var shader in Asset.All.OfType<Shader>().Where( x => x.IsDirty ) )
+		{
+			shader.Recompile();
+		}
 
-		IsRendering = true;
+		CommandList.Begin();
 	}
 
 	private void PostRender()
 	{
-		IsRendering = false;
+		CommandList.SetFramebuffer( MultisampledFramebuffer ); // Use MSAA framebuffer
+		CommandList.SetViewport( 0, new Viewport( 0, 0, MultisampledFramebuffer.Width, MultisampledFramebuffer.Height, 0, 1 ) );
+		CommandList.SetFullViewports();
+		CommandList.SetFullScissorRects();
+		CommandList.ClearDepthStencil( 1 );
+		CommandList.ClearColorTarget( 0, RgbaFloat.Black );
 
-		ImGuiRenderer.Render( Device, CommandList );
+		// Render level to MSAA buffer
+		CommandList.PushDebugGroup( "Main Render" );
+		OnRender?.Invoke();
+		CommandList.PopDebugGroup();
+
+		// Resolve MSAA to non-MSAA texture
+		CommandList.ResolveTexture( MultisampledFramebuffer.ColorTargets[0].Target, ResolveColorTexture );
+
+		// Blit to screen
+		CommandList.SetFramebuffer( Device.MainSwapchain.Framebuffer );
+		CommandList.SetViewport( 0, new Viewport( 0, 0, Device.MainSwapchain.Framebuffer.Width, Device.MainSwapchain.Framebuffer.Height, 0, 1 ) );
+
+		CommandList.SetPipeline( _blitPipeline );
+		CommandList.SetGraphicsResourceSet( 0, _blitResourceSet );
+		CommandList.Draw( 3, 1, 0, 0 );
 
 		CommandList.End();
+
 		Device.SubmitCommands( CommandList );
-
-		if ( !Window.Visible )
-			return;
-
 		Device.SwapBuffers();
-
-		Device.WaitForIdle();
-
-		foreach ( var item in _markedForDeath )
-		{
-			item.Invoke();
-		}
-
-		_markedForDeath.Clear();
-	}
-
-	private void Render()
-	{
-		Level.Current.Render();
 	}
 
 	private void Update()
@@ -111,11 +170,18 @@ internal class Renderer
 
 		InputSnapshot inputSnapshot = Window.SdlWindow.PumpEvents();
 
-		Time.UpdateFrom( deltaTime );
+		Time.Update( deltaTime );
 		Input.UpdateFrom( inputSnapshot );
-		Editor.UpdateFrom( inputSnapshot );
 
-		Level.Current.Update();
+		PreRender();
+		PreUpdate?.Invoke();
+
+		OnUpdate?.Invoke();
+
+		PostRender();
+		PostUpdate?.Invoke();
+
+		ProcessDeletionQueue();
 	}
 
 	private void CreateGraphicsDevice()
@@ -124,30 +190,35 @@ internal class Renderer
 		{
 			PreferStandardClipSpaceYDirection = true,
 			PreferDepthRangeZeroToOne = true,
-			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt,
-			Debug = true
+			SwapchainDepthFormat = null,
+			SwapchainSrgbFormat = false,
+			SyncToVerticalBlank = true,
+			HasMainSwapchain = true
 		};
 
-		var preferredBackend = GraphicsBackend.Vulkan;
-		var preferredBackendStr = Settings.Default.PreferredBackend;
-
-		if ( !string.IsNullOrEmpty( preferredBackendStr ) )
-		{
-			preferredBackend = (GraphicsBackend)Enum.Parse(
-				typeof( GraphicsBackend ),
-				preferredBackendStr,
-				true );
-		}
-
-		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
-		Device.SyncToVerticalBlank = true;
+		var swapchainSource = VeldridStartup.GetSwapchainSource( Window.SdlWindow );
+		Device = GraphicsDevice.CreateVulkan( swapchainDescription: new SwapchainDescription( swapchainSource, (uint)(Window.Size.X), (uint)(Window.Size.Y), options.SwapchainDepthFormat, options.SyncToVerticalBlank, options.SwapchainSrgbFormat ), options: options );
 	}
 
-	[Event.Window.Resized]
 	public void OnWindowResized( Point2 newSize )
 	{
-		ImGuiRenderer.WindowResized( newSize.X, newSize.Y );
-		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
+		var dpiScale = 1.0f;
+		Device.MainSwapchain.Resize( (uint)(newSize.X * dpiScale), (uint)(newSize.Y * dpiScale) );
+
+		// Cleanup old MSAA resources
+		MultisampledFramebuffer?.Dispose();
+		ResolveColorTexture?.Dispose();
+
+		// Recreate MSAA resources
+		CreateMultisampledFramebuffer();
+
+		// Recreate blit resources since they depend on the framebuffer
+		_blitResourceSet?.Dispose();
+		_blitResourceSet = Device.ResourceFactory.CreateResourceSet( new ResourceSetDescription(
+			_blitResourceLayout,
+			ResolveColorTexture,
+			Device.LinearSampler
+		) );
 	}
 
 	public void ImmediateSubmit( Action<CommandList> action )
@@ -160,11 +231,6 @@ internal class Renderer
 		commandList.End();
 		Device.SubmitCommands( commandList );
 
-		MarkForDeath( commandList.Dispose );
-	}
-
-	public void MarkForDeath( Action action )
-	{
-		_markedForDeath.Add( action );
+		ScheduleDelete( commandList.Dispose );
 	}
 }

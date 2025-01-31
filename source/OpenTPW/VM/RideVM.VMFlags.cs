@@ -9,8 +9,7 @@ public partial class RideVM
 
 		Sign = 1,
 		Zero = 2,
-		Crit = 4,
 
-		All = Sign | Zero | Crit
+		All = Sign | Zero
 	}
 }

@@ -1,36 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Numerics;
-using Veldrid;
+﻿namespace OpenTPW.UI;
 
-namespace OpenTPW.UI;
-
-public class Cursor : Panel
+public class Cursor : Panel, Singleton<Cursor>
 {
-	public static Cursor Current { get; set; }
+	private Texture? _texture;
 
-	private Texture texture;
+	private Input.CursorTypes _cursorType;
 
-	private Input.CursorTypes cursorType;
 	public Input.CursorTypes CursorType
 	{
-		get => cursorType;
+		get => _cursorType;
 		set
 		{
-			cursorType = value;
+			_cursorType = value;
 			LoadTexture();
 		}
 	}
 
-	struct ObjectUniformBuffer
-	{
-		public Matrix4x4 g_mModel;
-		public int g_iFrame;
-	}
-
 	public Cursor()
 	{
-		Current ??= this;
-
 		// TODO: Move this to Input
 		CursorType = Input.CursorTypes.Normal;
 	}
@@ -46,14 +33,17 @@ public class Cursor : Panel
 
 	private void LoadTexture()
 	{
-		var cursorPath = $"/data/ui/cursors/{GetImageName( cursorType )}.tga";
-		texture = new Texture( GameDir.GetPath( cursorPath ), TextureFlags.PinkChromaKey );
+		var cursorPath = $"/data/ui/cursors/{GetImageName( _cursorType )}.tga";
+		_texture = new Texture( GameDir.GetPath( cursorPath ), TextureFlags.PinkChromaKey );
 	}
 
 	protected override void OnRender()
 	{
+		if ( _texture == null )
+			return;
+
 		var material = Material.UI;
-		material.Set( "Color", texture );
+		material.Set( "Color", _texture );
 
 		var size = new Vector2( 32 );
 
@@ -68,6 +58,9 @@ public class Cursor : Panel
 		var rect = new Rectangle( position, size );
 		var uvRect = new Rectangle( uv0, uv1 - uv0 );
 
-		ImDraw.Quad( rect, uvRect, material, true );
+		using ( _ = new Graphics.Scope( Screen.Size ) )
+		{
+			Graphics.Quad( rect, uvRect, material );
+		}
 	}
 }

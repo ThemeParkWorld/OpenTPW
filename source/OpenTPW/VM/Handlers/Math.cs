@@ -24,8 +24,6 @@ partial class OpcodeHandlers
 			if ( value.Value == 0 )
 				vm.Flags |= RideVM.VMFlags.Zero;
 
-			// TODO: What the fuck is the crit flag for
-
 			if ( value.Value < 0 )
 				vm.Flags |= RideVM.VMFlags.Sign;
 		}
@@ -40,8 +38,6 @@ partial class OpcodeHandlers
 
 			if ( valueA.Value < valueB.Value )
 				vm.Flags |= RideVM.VMFlags.Sign;
-
-			// TODO: What the fuck is the crit flag for
 		}
 	}
 }

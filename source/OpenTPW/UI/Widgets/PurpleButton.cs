@@ -12,8 +12,8 @@ internal class PurpleButton : Panel
 
 	public PurpleButton( string text )
 	{
-		ButtonText1 = new Texture( "ui/textures/button_text1.wct" );
-		ButtonText2 = new Texture( "ui/textures/button_text2.wct" );
+		ButtonText1 = new Texture( "ui/textures/button_text1.wct", TextureFlags.PointFilter );
+		ButtonText2 = new Texture( "ui/textures/button_text2.wct", TextureFlags.PointFilter );
 
 		Text = Localization.Parse( text );
 		Log.Info( $"Parsed '{text}' as '{Text}'" );
@@ -25,28 +25,29 @@ internal class PurpleButton : Panel
 		var size = new Vector2( 200, 100 );
 		var rect = new Rectangle( position, size );
 
-		var uvs = new Rectangle( 0, 0, 1, 0.5f );
+		var uvs = new Rectangle( 0.01f, -0.01f, 0.98f, 0.5f );
 		rect.Y -= 130;
-		rect.X += 40;
+		rect.X -= 740;
 
 		//
-		// Start
+		// End
 		//
-		rect.X -= 200;
-		material.Set( "Color", ButtonText2 );
-		ImDraw.Quad( rect, uvs.Shift( new Vector2( 0, 0.5f ) ), material );
+		material.Set( "Color", ButtonText1 );
+		rect.X += 190;
+		Graphics.Quad( rect, uvs.Shift( new Vector2( 0, 0.50f ) ), material );
 
 		//
 		// Middle
 		//
 		material.Set( "Color", ButtonText1 );
-		rect.X -= 200;
-		ImDraw.Quad( rect.Shift( new Vector2( 0, 28 ) ), uvs, material );
+		rect.X += 190;
+		Graphics.Quad( rect.Shift( new Vector2( 0, 28 ) ), uvs.Shift( new Vector2( 0, -0.0f ) ), material );
 
 		//
-		// End
+		// Start
 		//
-		rect.X -= 200;
-		ImDraw.Quad( rect, uvs.Shift( new Vector2( 0, 0.5f ) ), material );
+		rect.X += 200;
+		material.Set( "Color", ButtonText2 );
+		Graphics.Quad( rect, uvs.Shift( new Vector2( 0.01f, 0.50f ) ), material );
 	}
 }

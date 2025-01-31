@@ -202,7 +202,7 @@ public partial struct Rotation : IEquatable<Rotation>
 		var rotAxis = Vector3.Cross( Vector3.Forward, forwardDir );
 		rotAxis = rotAxis.Normal;
 
-		return new Rotation() { _internalQuaternion = Quaternion.CreateFromAxisAngle( rotAxis, rotAngle ) };
+		return new Rotation() { _internalQuaternion = Quaternion.CreateFromAxisAngle( rotAxis.GetSystemVector3(), rotAngle ) };
 	}
 
 	public static float Angle( Rotation a, Rotation b )

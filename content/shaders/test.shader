@@ -32,7 +32,7 @@ vertex {
         vs_out.vPosition = vec3(g_oUbo.g_mModel * vec4(position, 1.0));
 
         vec4 pos = g_oUbo.g_mModel * vec4(position, 1.0);
-        vs_out.vWorldPosition = vec3(pos);
+        vs_out.vWorldPosition = vec3(g_oUbo.g_mView * pos);
         gl_Position = g_oUbo.g_mProj * g_oUbo.g_mView * pos;
 
         outTexIndex = texIndex;
@@ -139,5 +139,13 @@ fragment {
         if (vTextureSample.a < 0.1) discard;
 
         fragColor = vec4(vOutColor, vTextureSample.a);
+
+        // Calculate fog using view space depth
+        float viewSpaceDepth = length(vs_out.vWorldPosition);
+        float fogFactor = exp(viewSpaceDepth * 0.01) * 0.025;
+        fogFactor = clamp( fogFactor, 0, 1 );
+        
+        // Mix with fog
+        fragColor.xyz = mix(fragColor.xyz, vec3( 0.301, 0.84, 1 ), fogFactor);
     }
 }

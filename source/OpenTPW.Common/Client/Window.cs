@@ -15,6 +15,8 @@ public class Window
 	public Sdl2Window SdlWindow { get; private set; }
 	public Point2 Size => new Point2( SdlWindow.Width, SdlWindow.Height );
 
+	public Action<Point2>? OnResized { get; set; }
+
 	public bool Visible
 	{
 		get => SdlWindow.Visible;
@@ -36,6 +38,7 @@ public class Window
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
+		SdlWindow.Resizable = false;
 		SdlWindow.Resized += SdlWindow_Resized;
 		Screen.UpdateFrom( Size );
 	}
@@ -43,6 +46,6 @@ public class Window
 	private void SdlWindow_Resized()
 	{
 		Screen.UpdateFrom( Size );
-		Event.Run( Event.Window.ResizedAttribute.Name, Size );
+		OnResized?.Invoke( Size );
 	}
 }

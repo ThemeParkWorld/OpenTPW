@@ -75,14 +75,7 @@ public struct Vector3 : IEquatable<Vector3>
 
 	}
 
-	internal Vector3( System.Numerics.Vector3 other ) : this( other.X, other.Y, other.Z )
-	{
-
-	}
-
 	public static implicit operator Vector3( System.Numerics.Vector3 value ) => new Vector3( value.X, value.Y, value.Z );
-
-	public static implicit operator System.Numerics.Vector3( Vector3 value ) => new System.Numerics.Vector3( value.X, value.Y, value.Z );
 
 	public static Vector3 operator +( Vector3 a, Vector3 b ) => new Vector3( a.X + b.X, a.Y + b.Y, a.Z + b.Z );
 
@@ -98,7 +91,7 @@ public struct Vector3 : IEquatable<Vector3>
 
 	public static Vector3 operator *( float f, Vector3 a ) => new Vector3( a.X * f, a.Y * f, a.Z * f );
 
-	public static Vector3 operator *( Vector3 a, System.Numerics.Matrix4x4 transform ) => System.Numerics.Vector3.Transform( a, transform );
+	public static Vector3 operator *( Vector3 a, System.Numerics.Matrix4x4 transform ) => System.Numerics.Vector3.Transform( a.GetSystemVector3(), transform );
 
 	public static Vector3 operator /( Vector3 a, float f ) => new Vector3( a.X / f, a.Y / f, a.Z / f );
 

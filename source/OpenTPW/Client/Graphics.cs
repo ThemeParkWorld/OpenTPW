@@ -1,14 +1,10 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using Veldrid;
 
 namespace OpenTPW;
 
-/// <summary>
-/// Immediate mode draw functions
-/// </summary>
-internal static class ImDraw
+internal static partial class Graphics
 {
 	private const int MaxVertexCount = ushort.MaxValue;
 	private const int MaxIndexCount = ushort.MaxValue;
@@ -16,7 +12,7 @@ internal static class ImDraw
 	private static DeviceBuffer vertexBuffer;
 	private static DeviceBuffer indexBuffer;
 
-	static ImDraw()
+	static Graphics()
 	{
 		var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
 
@@ -31,38 +27,28 @@ internal static class ImDraw
 		);
 	}
 
-	// TODO: move
-	public static void AssertRenderState()
-	{
-		Debug.Assert( Render.IsRendering );
-	}
-
 	private static Matrix4x4 CreateScreenMatrix( Point2 screenSize )
 	{
 		var matrix = Matrix4x4.Identity;
 
 		// Scale to fit screen
-		matrix *= Matrix4x4.CreateScale( new Vector3( 1f / screenSize.X, 1f / screenSize.Y, 1 ) );
+		matrix *= Matrix4x4.CreateScale( new Vector3( 1f / screenSize.X, 1f / screenSize.Y, 1 ).GetSystemVector3() );
 
 		// Convert from [-0.5f, 0.5f] to [0.0f, 1.0f]
 		matrix *= Matrix4x4.CreateScale( 2.0f );
-		matrix *= Matrix4x4.CreateTranslation( new Vector3( -1f, -1f, 0 ) );
+		matrix *= Matrix4x4.CreateTranslation( new Vector3( -1f, -1f, 0 ).GetSystemVector3() );
 
 		return matrix;
 	}
 
 	public static void Quad( Rectangle rectangle, Material material )
 	{
-		AssertRenderState();
-
 		Quad( rectangle, new Rectangle( 0, 0, 1, 1 ), material );
 	}
 
-	public static void Quad( Rectangle rectangle, Rectangle uvs, Material material, bool fullScreen = false )
+	public static void Quad( Rectangle rectangle, Rectangle uvs, Material material )
 	{
-		AssertRenderState();
-
-		var screenMatrix = CreateScreenMatrix( fullScreen ? Screen.Size : new Point2( 1280, 720 ) );
+		var screenMatrix = CreateScreenMatrix( BaseScreenSize );
 
 		var v0 = new Vector3( rectangle.TopLeft ) * screenMatrix;
 		var v1 = new Vector3( rectangle.TopRight ) * screenMatrix;

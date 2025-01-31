@@ -28,6 +28,7 @@ public partial class Material : Asset
 	public Material( string shaderPath, MaterialFlags flags = MaterialFlags.None )
 	{
 		Shader = new Shader( shaderPath );
+		Shader.OnRecompile += () => SetupResources( flags );
 
 		All.Add( this );
 		SetupResources( flags );
@@ -36,6 +37,7 @@ public partial class Material : Asset
 	protected Material( string shaderPath, Type uniformBufferType, MaterialFlags flags = MaterialFlags.None )
 	{
 		Shader = new Shader( shaderPath );
+		Shader.OnRecompile += () => SetupResources( flags );
 		UniformBufferType = uniformBufferType;
 
 		All.Add( this );
@@ -105,7 +107,7 @@ public partial class Material : Asset
 			_boundResources[name] = ScratchBuffer;
 		} );
 
-		Render.MarkForDeath( ClearBoundResources );
+		Render.ScheduleDelete( ClearBoundResources );
 	}
 
 	public void Set( string name, Texture[] texture )
@@ -117,7 +119,7 @@ public partial class Material : Asset
 
 		_boundResources["s_" + name] = Samplers[(int)SamplerType.AnisotropicWrap];
 
-		Render.MarkForDeath( ClearBoundResources );
+		Render.ScheduleDelete( ClearBoundResources );
 	}
 
 	public void Set( string name, Texture texture )
@@ -125,7 +127,7 @@ public partial class Material : Asset
 		_boundResources[name] = texture.NativeTexture;
 		_boundResources["s_" + name] = Samplers[(int)texture.SamplerType];
 
-		Render.MarkForDeath( ClearBoundResources );
+		Render.ScheduleDelete( ClearBoundResources );
 	}
 
 	internal ResourceLayout[] CreateResourceLayouts()
@@ -175,7 +177,7 @@ public partial class Material : Asset
 		resourceSets = newResourceSets;
 
 		// Mark set for death
-		Render.MarkForDeath( () => DestroyResourceSets( newResourceSets ) );
+		Render.ScheduleDelete( () => DestroyResourceSets( newResourceSets ) );
 	}
 
 	private static void DestroyResourceSets( ResourceSet[] resourceSets )
@@ -225,7 +227,7 @@ public partial class Material : Asset
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
 			ResourceLayouts = [.. _resourceLayouts],
 			ShaderSet = new ShaderSetDescription( [vertexLayout], Shader.ShaderProgram ),
-			Outputs = Device.SwapchainFramebuffer.OutputDescription
+			Outputs = Render.MultisampledFramebuffer.OutputDescription
 		};
 
 		Pipeline = Device.ResourceFactory.CreateGraphicsPipeline( pipelineDescription );

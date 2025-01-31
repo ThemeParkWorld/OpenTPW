@@ -1,7 +1,4 @@
 ﻿using OpenTPW.UI;
-using System.Numerics;
-using Veldrid;
-using static OpenTPW.ModelFile;
 
 namespace OpenTPW;
 
@@ -14,9 +11,6 @@ public class Level
 
 	public SettingsFile Global { get; private init; }
 
-	// private int fCount = 0;
-	// private Image loadingTexture;
-
 	public Level( string levelName )
 	{
 		Global = new SettingsFile( $"/levels/{levelName}/global.sam" );
@@ -24,9 +18,6 @@ public class Level
 
 		SetupEntities();
 		SetupHud();
-
-		Event.Register( this );
-		Event.Run( Event.Game.LoadAttribute.Name );
 	}
 
 	private void SetupEntities()
@@ -36,62 +27,12 @@ public class Level
 		_ = new Water() { Scale = new Vector3( 10000f ) };
 		_ = new Sky();
 
+		_ = new LobbyIsland( new Vector3( 400, 400, 0 ), "Jungle" );
+		_ = new LobbyIsland( new Vector3( 600, 400, 0 ), "Hallow" );
+		_ = new LobbyIsland( new Vector3( 600, 600, 0 ), "Fantasy" );
+		// _ = new LobbyIsland( new Vector3( 400, 600, 0 ), "Space" );
+
 		Camera.SetCameraMode<LobbyCameraMode>();
-
-		var modelFile = new ModelFile( "lobby/terrain/Jun_isle.md2" );
-		foreach ( var mesh in modelFile.Meshes )
-		{
-			var material = new Material<ObjectUniformBuffer>( "content/shaders/test.shader" );
-			var textures = new List<Texture>();
-
-			Log.Info( $"{mesh.Name}: " );
-
-			for ( int i = 0; i < 16; ++i )
-			{
-				if ( mesh.Materials.Length <= i )
-				{
-					textures.Add( Texture.Missing );
-				}
-				else
-				{
-					var j = mesh.Materials[i];
-					Log.Info( $"\tMaterial:" );
-					Log.Info( $"\tName: {j.Name}" );
-					Log.Info( $"\tFlags: {j.Flags}" );
-					textures.Add( new Texture( $"lobby/terrain/textures/{j.Name}.wct", TextureFlags.Repeat ) );
-				}
-			}
-
-			material.Set( $"Color", textures.ToArray() );
-
-			var vertices = new List<Vertex>();
-			for ( int i = 0; i < mesh.Vertices.Length; ++i )
-			{
-				vertices.Add( new Vertex()
-				{
-					Position = new Vector3( mesh.Vertices[i].Position.X, mesh.Vertices[i].Position.Z, mesh.Vertices[i].Position.Y ),
-					Normal = mesh.Normals[i],
-					TexCoords = mesh.TexCoords[i],
-					TexIndex = (int)mesh.Vertices[i].TextureIndex,
-					MatFlags = mesh.Materials[(int)mesh.Vertices[i].TextureIndex].Flags
-				} );
-			}
-
-			var model = new Model( [.. vertices], mesh.Indices, material );
-			Matrix4x4.Decompose( mesh.TransformMatrix, out var scale, out var rot, out var pos );
-
-			pos = new System.Numerics.Vector3( pos.X, pos.Z, pos.Y - 2.5f );
-			rot = new Quaternion( rot.X, rot.Z, rot.Y, -rot.W );
-			scale = new System.Numerics.Vector3( scale.X, scale.Z, scale.Y );
-
-			var m = new ModelEntity
-			{
-				Model = model,
-				Scale = scale,
-				Rotation = rot,
-				Position = pos
-			};
-		}
 	}
 
 	private void SetupHud()
@@ -114,11 +55,5 @@ public class Level
 		Camera.Update();
 
 		Entity.All.ForEach( entity => entity.Render() );
-	}
-
-	[Event.Game.Load]
-	public void OnLoad()
-	{
-		Entity.All.OfType<Ride>().ToList().ForEach( x => x.VM.Run() );
 	}
 }

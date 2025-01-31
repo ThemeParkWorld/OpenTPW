@@ -13,6 +13,7 @@ layout( location = 0 ) out struct VS_OUT {
   vec3 vNormal;
   vec3 vPosition;
   vec3 vPositionWs;
+  vec3 vPositionVs;
 } vs_out;
 
 void main() {
@@ -22,6 +23,7 @@ void main() {
 
   vec4 pos = g_oUbo.g_mModel * vec4( position, 1.0 );
 
+  vs_out.vPositionVs = vec3( g_oUbo.g_mView * pos );
   vs_out.vPositionWs = vec3( g_oUbo.g_mProj * g_oUbo.g_mView * pos );
   gl_Position = g_oUbo.g_mProj * g_oUbo.g_mView * pos;
 }

@@ -13,9 +13,7 @@ public static class Localization
 
 	private class LocalizationParser : BaseParser
 	{
-		public LocalizationParser( string input ) : base( input )
-		{
-		}
+		public LocalizationParser( string input ) : base( input ) { }
 
 		public string Parse()
 		{

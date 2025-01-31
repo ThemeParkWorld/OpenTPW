@@ -212,4 +212,23 @@ public class BaseFileSystem
 
 		return !string.IsNullOrEmpty( archivePath );
 	}
+
+	public FileSystemWatcher CreateWatcher( string relativeDir, string filter )
+	{
+		var directoryName = GetAbsolutePath( relativeDir );
+		var watcher = new FileSystemWatcher( directoryName, filter );
+
+		watcher.NotifyFilter = NotifyFilters.Attributes
+							 | NotifyFilters.CreationTime
+							 | NotifyFilters.DirectoryName
+							 | NotifyFilters.FileName
+							 | NotifyFilters.LastAccess
+							 | NotifyFilters.LastWrite
+							 | NotifyFilters.Security
+							 | NotifyFilters.Size;
+
+		watcher.EnableRaisingEvents = true;
+
+		return watcher;
+	}
 }
