@@ -103,7 +103,7 @@ partial class TextureFile
 		// Step 2: decode rows
 		//
 		if ( isHalfScale )
-			dequantizationScale *= 0.5f;
+			dequantizationScale *= MathF.PI * 1/6f;
 
 		D4Coefficients coefs = new( dequantizationScale );
 		for ( int i = 0; i < size; i++ )
@@ -153,7 +153,7 @@ partial class TextureFile
 		for ( int i = 0; i < size; ++i )
 		{
 			int sOffset = 0;
-			int wOffset = isAlpha ? (size * size) : size * (size / 2);
+			int wOffset = isAlpha && isHalfScale ? (size * size) : size * (size / 2);
 			int colOffset = i;
 			D4InverseTransform(
 
