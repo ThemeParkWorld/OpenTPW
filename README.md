@@ -9,22 +9,15 @@
         <a href="https://github.com/ThemeParkWorld/OpenTPW/issues">Issues</a> |
         <a href="https://github.com/ThemeParkWorld/OpenTPW/pulls">Pull Requests</a>
     </p>
-    <p align="center">
-        <img src="https://img.shields.io/github/repo-size/ThemeParkWorld/OpenTPW?style=flat-square" alt="Repo Size">
-        <img src="https://img.shields.io/github/contributors/ThemeParkWorld/OpenTPW?style=flat-square" alt="Contributors">
-        <img src="https://img.shields.io/github/stars/ThemeParkWorld/OpenTPW?style=flat-square" alt="Stars"> 
-        <img src="https://img.shields.io/github/forks/ThemeParkWorld/OpenTPW?style=flat-square" alt="Forks">
-        <img src="https://img.shields.io/github/license/ThemeParkWorld/OpenTPW?style=flat-square" alt="License">
-        <img src="https://img.shields.io/github/issues/ThemeParkWorld/OpenTPW?style=flat-square" alt="Issues">
-    </p>
 </p>
 
 ![image](https://github.com/user-attachments/assets/678e4977-7287-4b4d-884a-5403a3a35cf4)
 
-
 ## About
 
-OpenTPW is a re-implementation of [Sim Theme Park / Theme Park World](https://en.wikipedia.org/wiki/Theme_Park_World), requiring an installation the original game and its assets in order to run. OpenTPW aims to re-create the same experience as the original game. While OpenTPW was initially created as it is quite difficult to get Sim Theme Park to run on modern hardware and on a modern operating system, it also aims to somewhat re-introduce the original online aspect of the game - the servers of which have since been shut down.
+OpenTPW is a re-implementation of Theme Park World, requiring an installation the original game and its assets in order to run. OpenTPW aims to re-create the same experience as the original game. While OpenTPW was initially created as it is quite difficult to get Sim Theme Park to run on modern hardware and on a modern operating system, it also aims to somewhat re-introduce the original online aspect of the game - the servers of which have since been shut down.
+
+**In order to run OpenTPW, you must have a full legal copy of any version of the original game.**
 
 ## Status
 
@@ -51,12 +44,7 @@ OpenTPW is currently in a very early stage of development, and is not yet playab
 | Materials ([.MTR](https://opentpw.gu3.me/formats/mtr.html))                   | ❌     |
 | Video ([.TQI](https://opentpw.gu3.me/formats/tqi.html))                       | ❌     |
 
-## Prerequisites
-
-- A copy of the original game (either Theme Park World or Sim Theme Park)
-- A decent graphics card & processor
-
-## Documentation
+### Documentation
 
 File format information is available at the [OpenTPW formats](https://opentpw.gu3.me/formats/) website. Keep in mind that this information is a work-in-progress, and therefore might not be of incredible detail - however, upon completion, it still aims to be as useful, detailed, and as in-depth as possible.
 
@@ -71,6 +59,3 @@ Contributions to this project are greatly appreciated; please follow these steps
 ## License
 
 This project is licensed under the MIT license; a copy of this license is available at [LICENSE.md](https://github.com/ThemeParkWorld/OpenTPW/blob/main/LICENSE.md).
-
-## Acknowledgements
-* [Badges](https://shields.io)
