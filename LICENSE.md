@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright © `2022` `Alex Guthrie`
+Copyright © `2022-2025` `Alex Guthrie`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
